@@ -6,7 +6,7 @@ class Program
         Console.Write("$ ");
 
         List<string> validCommandsList = new List<string>();
-        validCommandsList.Add("bac");
+        
         string inputCommand = Console.ReadLine();
 
         if(!validCommandsList.Contains(inputCommand))
