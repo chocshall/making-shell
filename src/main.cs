@@ -83,7 +83,7 @@ class Program
 
                     if (secondChecker && splitInputList.Count() > 2)
                     {
-                        Console.Error.WriteLine(splitInputList[1] + ":  not found");
+                        Console.Error.WriteLine(splitInputList[1] + ": not found");
                     }
 
                     
