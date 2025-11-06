@@ -10,6 +10,7 @@ class Program
         List<string> validCommandsList = new List<string>();
         validCommandsList.Add("exit");
         validCommandsList.Add("echo");
+        validCommandsList.Add("type");
 
         while (true)
         {
@@ -20,40 +21,80 @@ class Program
 
             if (checker)
             {
+                
                 string[] splitInputList = inputCommand.Split(' ');
 
-
-                foreach (string item in splitInputList)
+                if (splitInputList[0] == "exit")
                 {
-
-                    if (splitInputList[0] == "exit" && splitInputList[1] == "0")
+                    foreach (string item in splitInputList)
                     {
-                        Environment.Exit(Int32.Parse(splitInputList[1]));
-                    }
-                    // probably not really how exit code 1 should work
-                    if (splitInputList[0] == "exit" && splitInputList[1] == "1")
-                    {
-                        Environment.Exit(Int32.Parse(splitInputList[1]));
-                    }
 
-                    if (splitInputList[0] == "exit" && Int32.Parse(splitInputList[1]) > 1)
-                    {
-                        Console.Error.WriteLine(inputCommand + ": command not found");
-                        break;
+                        if (splitInputList[0] == "exit" && splitInputList[1] == "0")
+                        {
+                            Environment.Exit(Int32.Parse(splitInputList[1]));
+                        }
+                        // for now probably dont need it
+                        if (splitInputList[0] == "exit" && splitInputList[1] == "1")
+                        {
+                            Environment.Exit(Int32.Parse(splitInputList[1]));
+                        }
+
+                        if (splitInputList[0] == "exit" && Int32.Parse(splitInputList[1]) > 1)
+                        {
+                            Console.Error.WriteLine(inputCommand + ": command not found");
+                            break;
+                        }
+
+
                     }
-
-
                 }
+                    
                 if (splitInputList[0] == "echo")
                 {
-                    foreach (string item  in splitInputList.Skip(1))
+                    if (splitInputList.Count() >= 2)
                     {
-                        Console.Write(item + " ");
+                        foreach (string item in splitInputList.Skip(1))
+                        {
+                            Console.Write(item + " ");
+                        }
+                        Console.Write("\n");
                     }
-                    Console.Write("\n");
+                    
+
+                     else
+                    {
+                        Console.Error.WriteLine(inputCommand + ": command not found ");
+                    }
                 }
-               
+
                 
+
+
+                if (splitInputList[0] == "type")
+                {
+                    bool secondChecker = CheckIfStartsWithCommand(splitInputList[1], validCommandsList);
+
+                    if (secondChecker && splitInputList.Count() == 2)
+                    {
+                        Console.WriteLine(splitInputList[1] + " is a shell builtin");
+                    }
+
+                    if (secondChecker && splitInputList.Count() > 2)
+                    {
+                        Console.Error.WriteLine(splitInputList[1] + ": command not found ");
+                    }
+
+                    
+                }
+                
+
+                    
+                
+                    
+
+
+
+
             }
 
             
@@ -79,8 +120,9 @@ class Program
             }
 
         }
-        Console.Error.WriteLine(inputCommand + ": command not found");
+        Console.Error.WriteLine(inputCommand + ": command not found ");
         return false;
     }
+
 
 }
