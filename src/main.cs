@@ -43,7 +43,7 @@ class Program
 
                         if (splitInputList[0] == "exit" && Int32.Parse(splitInputList[1]) > 1)
                         {
-                            Console.Error.WriteLine(inputCommand + ": command not found");
+                            Console.Error.WriteLine(inputCommand + ": command not found 1");
                             break;
                         }
 
@@ -65,7 +65,7 @@ class Program
 
                      else
                     {
-                        Console.Error.WriteLine(inputCommand + ": command not found ");
+                        Console.Error.WriteLine(inputCommand + ": command not found");
                     }
                 }
 
@@ -125,7 +125,7 @@ class Program
         }
         if(counter >= 1)
         {
-            Console.Error.WriteLine(inputCommand + ":  not found");
+            Console.Error.WriteLine(inputCommand + ": not found");
             return false;
         }
         Console.Error.WriteLine(inputCommand + ": command not found");
