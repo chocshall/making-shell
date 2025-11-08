@@ -19,9 +19,19 @@ class Program
         string inputCommand = "";
         string[] splitInputList =  Array.Empty<string>();
         //string[] splitInputByCommaList = Array.Empty<string>();
-        
 
+        string pathListString = Environment.GetEnvironmentVariable("PATH");
         
+        splitInputList = pathListString.Split(';');
+        string newWord = "one";
+        newWord = "two" + newWord;
+
+        foreach (string item in splitInputList)
+        {
+            Console.WriteLine(item);
+
+        }
+
 
         while (true)
         {
@@ -160,14 +170,14 @@ class Program
                 Console.WriteLine(splitInputList[1] + " is a shell builtin");
             }
 
-            string pathListString = Environment.GetEnvironmentVariable("PATH");
+            
 
-            string[] splitPathListString = pathListString.Split(";");
+            //string[] splitPathListString = pathListString.Split(";");
 
-            //if (File.Exists("page.txt"))
-            //{
-            //    Console.WriteLine("iterator exists ");
-            //}
+            ////if (File.Exists("page.txt"))
+            ////{
+            ////    Console.WriteLine("iterator exists ");
+            ////}
 
                
 
