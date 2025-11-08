@@ -22,15 +22,15 @@ class Program
 
         string pathListString = Environment.GetEnvironmentVariable("PATH");
         
-        splitInputList = pathListString.Split(';');
-        string newWord = "one";
-        newWord = "two" + newWord;
+        //splitInputList = pathListString.Split(';');
+        //string newWord = "one";
+        //newWord = "two" + newWord;
 
-        foreach (string item in splitInputList)
-        {
-            Console.WriteLine(item);
+        //foreach (string item in splitInputList)
+        //{
+        //    Console.WriteLine(item);
 
-        }
+        //}
 
 
         while (true)
