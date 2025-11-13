@@ -176,15 +176,17 @@ class Program
 
             string pathListString = Environment.GetEnvironmentVariable("PATH");
 
-            string userInput = $"E:\\Downloads{Path.PathSeparator}/usr/local/bin{Path.PathSeparator}$PATH";
+            string userInput = $"/usr/bin{Path.PathSeparator}/usr/local/bin{Path.PathSeparator}$PATH";
 
             // this doesnt really work for testing on windows on how i did it because im no running not linux so it doesnt check : 
-            string expandedInput = userInput.Replace("$PATH", pathListString);
-            
+            string expandedInput = userInput
+                .Replace("$PATH", pathListString)
+                .Replace("${PATH}", pathListString)
+                .Replace("%PATH%", pathListString);
 
             //Console.WriteLine(expandedInput);
 
-            if(!false)
+            if (false)
             {
                 splitPathList = pathListString.Split(Path.PathSeparator);
             }
@@ -206,8 +208,8 @@ class Program
 
                 changedWord = Path.Join(directoryString, findFileString);
 
-                //Console.WriteLine(changedWord + "\n");
-                //Console.WriteLine(directoryString);
+                Console.WriteLine(changedWord + "\n");
+                Console.WriteLine(directoryString);
                 if (File.Exists(changedWord))
                 {
                     wordCheckerIsPath = true;
