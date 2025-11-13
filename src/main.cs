@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Formats.Tar;
 using System.IO;
 using System.Net.NetworkInformation;
+using System.Xml.Linq;
 
 class Program
 {
@@ -20,15 +21,29 @@ class Program
         string[] splitInputList =  Array.Empty<string>();
         //string[] splitInputByCommaList = Array.Empty<string>();
 
-        string pathListString = Environment.GetEnvironmentVariable("PATH");
-        
-        //splitInputList = pathListString.Split(';');
-        //string newWord = "one";
-        //newWord = "two" + newWord;
+        // nedaryti taip kad paduotu variable jau turi predefined path su unit testing
+        // folder kur real parasai pats savo failus kaip cat ar kitus. nenaudojant visu jau dabar automatiskai priimtu.
 
-        //foreach (string item in splitInputList)
+       
+
+        
+        //string pathListString = Environment.GetEnvironmentVariable("PATH");
+        //Console.WriteLine(pathListString + "\n");
+        //splitInputList = pathListString.Split(';');
+        //string findFileString = "cat";
+        //string changedWord = "";
+        
+
+        //foreach (string directoryString in splitInputList)
         //{
-        //    Console.WriteLine(item);
+
+        //    changedWord = Path.Join(directoryString, findFileString);
+        //    Console.WriteLine(changedWord + "\n");
+        //    if (File.Exists(changedWord))
+        //    {
+        //        Console.WriteLine("found one " + directoryString);
+        //    }
+            
 
         //}
 
@@ -157,10 +172,40 @@ class Program
     {
         if (splitInputList[0] == "type")
         {
-            
+            string[] splitPathList = Array.Empty<string>();
+
+            string pathListString = Environment.GetEnvironmentVariable("PATH");
+
+
+            splitPathList = pathListString.Split(';');
+            string findFileString = splitInputList[1];
+            string changedWord = "";
+            bool wordCheckerIsPath = false;
+
+
+            foreach (string directoryString in splitPathList)
+            {
+
+                changedWord = Path.Join(directoryString, findFileString);
+                //Console.WriteLine(changedWord + "\n");
+                if (File.Exists(changedWord))
+                {
+                    wordCheckerIsPath = true;
+                    Console.WriteLine(findFileString + " is " + directoryString);
+                }
+
+
+            }
+
             bool secondChecker = false;
+
+            if (!wordCheckerIsPath)
+            {
+                secondChecker = CheckIfStartsWithCommand(splitInputList, splitInputList[1], validCommandsList);
+            }
+                
             
-            secondChecker = CheckIfStartsWithCommand(splitInputList, splitInputList[1], validCommandsList);
+            
             
             
             // probably still need this because (type echo example) can be
@@ -170,7 +215,7 @@ class Program
                 Console.WriteLine(splitInputList[1] + " is a shell builtin");
             }
 
-            
+
 
             //string[] splitPathListString = pathListString.Split(";");
 
@@ -178,13 +223,14 @@ class Program
             ////{
             ////    Console.WriteLine("iterator exists ");
             ////}
-
-               
-
-
+            ///
+            
 
 
-            if (splitInputList.Count() > 2)
+
+
+
+            if (splitInputList.Count() > 2 && !File.Exists(changedWord))
             {
                 Console.Error.WriteLine(splitInputList[1] + ": not found");
             }
