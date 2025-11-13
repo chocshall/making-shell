@@ -194,7 +194,7 @@ class Program
                 splitPathList = expandedInput.Split(Path.PathSeparator);
             }
 
-            splitPathList = expandedInput.Split(Path.PathSeparator);
+            
             
             string findFileString = splitInputList[1];
             string changedWord = "";
