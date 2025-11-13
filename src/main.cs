@@ -178,10 +178,12 @@ class Program
             string userInput = "/usr/bin:/usr/local/bin:$PATH";
 
             // this doesnt really work for testing on windows on how i did it because im no running not linux so it doesnt check : 
-            string expandedInput = userInput
-            .Replace("$PATH", pathListString)
-            .Replace("${PATH}", pathListString)
-            .Replace("%PATH%", pathListString);
+            //string expandedInput = userInput
+            //.Replace("$PATH", pathListString)
+            //.Replace("${PATH}", pathListString)
+            //.Replace("%PATH%", pathListString);
+
+            string expandedInput = pathListString;
 
 
             splitPathList = expandedInput.Split(Path.PathSeparator);
@@ -203,8 +205,7 @@ class Program
                     Console.WriteLine(findFileString + " is " + changedWord);
                     break;
                 }
-
-
+                
             }
 
             bool secondChecker = false;
