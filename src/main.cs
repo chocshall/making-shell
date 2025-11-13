@@ -187,6 +187,8 @@ class Program
 
 
             splitPathList = expandedInput.Split(Path.PathSeparator);
+
+            splitPathList.Reverse();
             string findFileString = splitInputList[1];
             string changedWord = "";
             bool wordCheckerIsPath = false;
