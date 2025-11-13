@@ -181,7 +181,7 @@ class Program
             string userInput = $"/usr/bin:/usr/local/bin:$PATH";
 
 
-            // this doesnt really work for testing on windows on how i did it because im no running not linux so it doesnt check : 
+             
             string expandedInput = userInput
                 .Replace("$PATH", pathListString)
                 .Replace("${PATH}", pathListString)
@@ -205,44 +205,49 @@ class Program
             string changedWord = "";
             bool wordCheckerIsPath = false;
 
-
-            foreach (string directoryString in splitPathList)
+            if(!validCommandsList.Contains(splitInputList[1]))
             {
-                // skip the not existing directories
-                if(!Directory.Exists(directoryString))
-                {
-                    continue;
-                }
-                
-                // make the full path
-                changedWord = Path.Join(directoryString, findFileString);
-
-                //Console.WriteLine(changedWord + "\n");
-                //Console.WriteLine(directoryString);
-                if (File.Exists(changedWord))
-                {
-                    wordCheckerIsPath = true;
-                    
-
-                    var mode = File.GetUnixFileMode(changedWord);
-                    if ((mode & UnixFileMode.UserExecute) != 0 ||
-                        (mode & UnixFileMode.GroupExecute) != 0 ||
-                        (mode & UnixFileMode.OtherExecute) != 0)
+                foreach(string directoryString in splitPathList)
+            {
+                    // skip the not existing directories
+                    if (!Directory.Exists(directoryString))
                     {
-                        
-
-                        Console.WriteLine(findFileString + " is " + changedWord);
-                        wordCheckerIsPath = true;
-                        break;
+                        continue;
                     }
-                       
-                     
 
-                        
-                    
+                    // make the full path
+                    changedWord = Path.Join(directoryString, findFileString);
+
+                    //Console.WriteLine(changedWord + "\n");
+                    //Console.WriteLine(directoryString);
+                    if (File.Exists(changedWord))
+                    {
+                        wordCheckerIsPath = true;
+
+                        // checks on linux if the program is executable because file exists is not enoguth to check
+                        // thats why there was a problem with finding a file in a folder that you didnt have permis and printed
+                        // != 0 mean file is exucatable by someone
+                        var mode = File.GetUnixFileMode(changedWord);
+                        if ((mode & UnixFileMode.UserExecute) != 0 ||
+                            (mode & UnixFileMode.GroupExecute) != 0 ||
+                            (mode & UnixFileMode.OtherExecute) != 0)
+                        {
+
+
+                            Console.WriteLine(findFileString + " is " + changedWord);
+                            wordCheckerIsPath = true;
+                            break;
+                        }
+
+
+
+
+
+                    }
+
                 }
-                
             }
+            
 
             bool secondChecker = false;
 
