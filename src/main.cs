@@ -175,9 +175,9 @@ class Program
             string[] splitPathList = Array.Empty<string>();
 
             string pathListString = Environment.GetEnvironmentVariable("PATH");
-            string userInput = Console.ReadLine();
+            string userInput = Environment.GetEnvironmentVariable("PATH");
             //string userInput = "/usr/bin:/usr/local/bin:$PATH";
-
+            // asd
             string expandedInput = userInput
             .Replace("$PATH", pathListString)
             .Replace("${PATH}", pathListString)
