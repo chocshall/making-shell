@@ -174,9 +174,12 @@ class Program
         {
             string[] splitPathList = Array.Empty<string>();
 
-            string pathListString = Environment.GetEnvironmentVariable("PATH");
+            // if the left is null use the right;
+            string pathListString = Environment.GetEnvironmentVariable("PATH") ?? "";
 
-            string userInput = $"/usr/bin{Path.PathSeparator}/usr/local/bin{Path.PathSeparator}$PATH";
+            //string userInput = $"E:\\Downloads\\testfolder{Path.PathSeparator}E:\\Downloads\\onedollar{Path.PathSeparator}/usr/local/bin{Path.PathSeparator}$PATH";
+            string userInput = $"/usr/bin:/usr/local/bin:$PATH";
+
 
             // this doesnt really work for testing on windows on how i did it because im no running not linux so it doesnt check : 
             string expandedInput = userInput
@@ -188,12 +191,12 @@ class Program
 
             if (false)
             {
-                splitPathList = pathListString.Split(Path.PathSeparator);
+                splitPathList = pathListString.Split(Path.PathSeparator,StringSplitOptions.RemoveEmptyEntries);
             }
 
             else
             {
-                splitPathList = expandedInput.Split(Path.PathSeparator);
+                splitPathList = expandedInput.Split(Path.PathSeparator,StringSplitOptions.RemoveEmptyEntries);
             }
 
             
@@ -205,16 +208,38 @@ class Program
 
             foreach (string directoryString in splitPathList)
             {
-
+                // skip the not existing directories
+                if(!Directory.Exists(directoryString))
+                {
+                    continue;
+                }
+                
+                // make the full path
                 changedWord = Path.Join(directoryString, findFileString);
 
                 //Console.WriteLine(changedWord + "\n");
-                //Console.WriteLine(directoryString);
+                Console.WriteLine(directoryString);
                 if (File.Exists(changedWord))
                 {
                     wordCheckerIsPath = true;
-                    Console.WriteLine(findFileString + " is " + changedWord);
-                    break;
+                    
+
+                    var mode = File.GetUnixFileMode(changedWord);
+                    if ((mode & UnixFileMode.UserExecute) != 0 ||
+                        (mode & UnixFileMode.GroupExecute) != 0 ||
+                        (mode & UnixFileMode.OtherExecute) != 0)
+                    {
+                        
+
+                        Console.WriteLine(findFileString + " is " + changedWord);
+                        wordCheckerIsPath = true;
+                        break;
+                    }
+                       
+                     
+
+                        
+                    
                 }
                 
             }
