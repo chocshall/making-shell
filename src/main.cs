@@ -175,9 +175,9 @@ class Program
             string[] splitPathList = Array.Empty<string>();
 
             string pathListString = Environment.GetEnvironmentVariable("PATH");
-            string userInput = Environment.GetEnvironmentVariable("PATH");
-            //string userInput = "/usr/bin:/usr/local/bin:$PATH";
-            // asd
+            string userInput = "/usr/bin:/usr/local/bin:$PATH";
+
+            // this doesnt really work for testing on windows on how i did it because im no running not linux so it doesnt check : 
             string expandedInput = userInput
             .Replace("$PATH", pathListString)
             .Replace("${PATH}", pathListString)
@@ -201,6 +201,7 @@ class Program
                 {
                     wordCheckerIsPath = true;
                     Console.WriteLine(findFileString + " is " + changedWord);
+                    break;
                 }
 
 
