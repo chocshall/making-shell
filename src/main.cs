@@ -175,9 +175,15 @@ class Program
             string[] splitPathList = Array.Empty<string>();
 
             string pathListString = Environment.GetEnvironmentVariable("PATH");
+            string userInput = "/usr/bin:/usr/local/bin:$PATH";
+
+            string expandedInput = userInput
+            .Replace("$PATH", pathListString)
+            .Replace("${PATH}", pathListString)
+            .Replace("%PATH%", pathListString);
 
 
-            splitPathList = pathListString.Split(';');
+            splitPathList = expandedInput.Split(Path.PathSeparator);
             string findFileString = splitInputList[1];
             string changedWord = "";
             bool wordCheckerIsPath = false;
@@ -187,7 +193,9 @@ class Program
             {
 
                 changedWord = Path.Join(directoryString, findFileString);
+
                 //Console.WriteLine(changedWord + "\n");
+                Console.WriteLine(directoryString);
                 if (File.Exists(changedWord))
                 {
                     wordCheckerIsPath = true;
