@@ -181,7 +181,7 @@ class Program
             string expandedInput = userInput.Replace("$PATH", pathListString);
             
 
-            Console.WriteLine(expandedInput);
+            //Console.WriteLine(expandedInput);
 
 
 
