@@ -175,7 +175,7 @@ class Program
             string[] splitPathList = Array.Empty<string>();
 
             string pathListString = Environment.GetEnvironmentVariable("PATH");
-            string userInput = "/usr/bin:/usr/local/bin:$PATH";
+            string userInput = $"/usr/bin{Path.PathSeparator}/usr/local/bin{Path.PathSeparator}$PATH";
 
             // this doesnt really work for testing on windows on how i did it because im no running not linux so it doesnt check : 
             string expandedInput = userInput.Replace("$PATH", pathListString);
