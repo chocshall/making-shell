@@ -199,7 +199,7 @@ class Program
                 if (File.Exists(changedWord))
                 {
                     wordCheckerIsPath = true;
-                    Console.WriteLine(findFileString + " is " + directoryString);
+                    Console.WriteLine(findFileString + " is " + changedWord);
                 }
 
 
