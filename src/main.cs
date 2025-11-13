@@ -189,7 +189,7 @@ class Program
 
             //Console.WriteLine(expandedInput);
 
-            if (false)
+            if (!false)
             {
                 splitPathList = pathListString.Split(Path.PathSeparator,StringSplitOptions.RemoveEmptyEntries);
             }
@@ -293,3 +293,6 @@ class Program
 
 
 }
+
+
+// TODO:  make a unit testing for windows and linux?? or does unit testing check both in one heap.
