@@ -193,13 +193,13 @@ class Program
             bool wordCheckerIsPath = false;
 
 
-            foreach (string directoryString in splitPathList.Reverse())
+            foreach (string directoryString in splitPathList)
             {
 
                 changedWord = Path.Join(directoryString, findFileString);
 
                 //Console.WriteLine(changedWord + "\n");
-                //Console.WriteLine(directoryString);
+                Console.WriteLine(directoryString);
                 if (File.Exists(changedWord))
                 {
                     wordCheckerIsPath = true;
