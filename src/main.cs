@@ -10,7 +10,7 @@ class Program
     {
         
 
-        bool checker = false;
+        
        
         List<string> validCommandsList = new List<string>();
         validCommandsList.Add("exit");
@@ -24,46 +24,53 @@ class Program
         while (true)
         {
             Console.Write("$ ");
-
-           
-            inputCommand = Console.ReadLine();
-            splitInputList = inputCommand.Split(' ');
-            checker = CheckIfStartsWithCommand(splitInputList, inputCommand, validCommandsList);
-            
-
-            
+            userInput( inputCommand,  validCommandsList, splitInputList);
 
 
-            if (checker)
-            {
-                
-                
-                
-
-                if(splitInputList.Count() > 1)
-                {
-                    exitCommand(splitInputList, inputCommand);
-
-                    echoCommand(splitInputList, inputCommand);
 
 
-                    typeBuiltCommand(splitInputList, validCommandsList);
-                }
 
-                else
-                {
-                    Console.Error.WriteLine(inputCommand + ": command not found");
-                }
-
-                
-
-
-            }
-
-            
         }
 
 
+    }
+
+    static void userInput(string inputCommand, List<string> validCommandsList, string[] splitInputList)
+    {
+        bool checker = false;
+        inputCommand = Console.ReadLine();
+        splitInputList = inputCommand.Split(' ');
+        checker = CheckIfStartsWithCommand(splitInputList, inputCommand, validCommandsList);
+
+
+
+
+
+        if (checker)
+        {
+
+
+
+
+            if (splitInputList.Count() > 1)
+            {
+                exitCommand(splitInputList, inputCommand);
+
+                echoCommand(splitInputList, inputCommand);
+
+
+                typeBuiltCommand(splitInputList, validCommandsList);
+            }
+
+            else
+            {
+                Console.Error.WriteLine(inputCommand + ": command not found");
+            }
+
+
+
+
+        }
     }
 
     public static bool CheckIfStartsWithCommand(string[] splitInputList, string inputCommand, List<string> validCommandsList)
