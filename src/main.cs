@@ -8,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        //TODO: Uncomment the code below to pass the first stage
+        
 
         bool checker = false;
        
@@ -19,55 +19,20 @@ class Program
 
         string inputCommand = "";
         string[] splitInputList =  Array.Empty<string>();
-        //string[] splitInputByCommaList = Array.Empty<string>();
-
-        // nedaryti taip kad paduotu variable jau turi predefined path su unit testing
-        // folder kur real parasai pats savo failus kaip cat ar kitus. nenaudojant visu jau dabar automatiskai priimtu.
-
-       
-
-        
-        //string pathListString = Environment.GetEnvironmentVariable("PATH");
-        //Console.WriteLine(pathListString + "\n");
-        //splitInputList = pathListString.Split(';');
-        //string findFileString = "cat";
-        //string changedWord = "";
-        
-
-        //foreach (string directoryString in splitInputList)
-        //{
-
-        //    changedWord = Path.Join(directoryString, findFileString);
-        //    Console.WriteLine(changedWord + "\n");
-        //    if (File.Exists(changedWord))
-        //    {
-        //        Console.WriteLine("found one " + directoryString);
-        //    }
-            
-
-        //}
 
 
         while (true)
         {
             Console.Write("$ ");
 
-            if (!false)
-            {
-
-                inputCommand = Console.ReadLine();
-                splitInputList = inputCommand.Split(' ');
-                checker = CheckIfStartsWithCommand(splitInputList, inputCommand, validCommandsList);
-            }
-
-            else
-            {
-                
-            }
-
+           
+            inputCommand = Console.ReadLine();
+            splitInputList = inputCommand.Split(' ');
+            checker = CheckIfStartsWithCommand(splitInputList, inputCommand, validCommandsList);
             
 
             
+
 
             if (checker)
             {
@@ -97,11 +62,6 @@ class Program
 
             
         }
-
-
-
-
-
 
 
     }
@@ -141,7 +101,7 @@ class Program
                 {
                     Environment.Exit(Int32.Parse(splitInputList[1]));
                 }
-                // for now probably dont need it
+                
                 if (splitInputList[0] == "exit" && splitInputList[1] == "1")
                 {
                     Environment.Exit(Int32.Parse(splitInputList[1]));
@@ -177,17 +137,9 @@ class Program
             // if the left is null use the right;
             string pathListString = Environment.GetEnvironmentVariable("PATH") ?? "";
 
-            //string userInput = $"E:\\Downloads\\testfolder{Path.PathSeparator}E:\\Downloads\\onedollar{Path.PathSeparator}/usr/local/bin{Path.PathSeparator}$PATH";
-            string userInput = $"/usr/bin:/usr/local/bin:$PATH";
+            
 
-
-             
-            string expandedInput = userInput
-                .Replace("$PATH", pathListString)
-                .Replace("${PATH}", pathListString)
-                .Replace("%PATH%", pathListString);
-
-            //Console.WriteLine(expandedInput);
+           
 
             if (!false)
             {
@@ -196,6 +148,15 @@ class Program
 
             else
             {
+                //string userInput = $"E:\\Downloads\\testfolder{Path.PathSeparator}E:\\Downloads\\onedollar{Path.PathSeparator}/usr/local/bin{Path.PathSeparator}$PATH";
+                string userInput = $"/usr/bin{Path.PathSeparator}/usr/local/bin{Path.PathSeparator}$PATH";
+
+
+                // path variants to check
+                string expandedInput = userInput
+                    .Replace("$PATH", pathListString)
+                    .Replace("${PATH}", pathListString)
+                    .Replace("%PATH%", pathListString);
                 splitPathList = expandedInput.Split(Path.PathSeparator,StringSplitOptions.RemoveEmptyEntries);
             }
 
@@ -227,20 +188,27 @@ class Program
                         // checks on linux if the program is executable because file exists is not enoguth to check
                         // thats why there was a problem with finding a file in a folder that you didnt have permis and printed
                         // != 0 mean file is exucatable by someone
-                        var mode = File.GetUnixFileMode(changedWord);
-                        if ((mode & UnixFileMode.UserExecute) != 0 ||
+                        if(Path.PathSeparator == ':')
+                        {
+                            var mode = File.GetUnixFileMode(changedWord);
+                            if ((mode & UnixFileMode.UserExecute) != 0 ||
                             (mode & UnixFileMode.GroupExecute) != 0 ||
                             (mode & UnixFileMode.OtherExecute) != 0)
+                            {
+
+
+                                Console.WriteLine(findFileString + " is " + changedWord);
+                                wordCheckerIsPath = true;
+                                break;
+                            }
+                        }
+
+                        if (Path.PathSeparator == ';')
                         {
-
-
                             Console.WriteLine(findFileString + " is " + changedWord);
                             wordCheckerIsPath = true;
                             break;
                         }
-
-
-
 
 
                     }
@@ -248,38 +216,11 @@ class Program
                 }
             }
             
-
-            bool secondChecker = false;
-
-            if (!wordCheckerIsPath)
-            {
-                secondChecker = CheckIfStartsWithCommand(splitInputList, splitInputList[1], validCommandsList);
-            }
                 
-            
-            
-            
-            
-            // probably still need this because (type echo example) can be
-            
             if (validCommandsList.Contains(splitInputList[1]) && splitInputList.Count() == 2)
             {
                 Console.WriteLine(splitInputList[1] + " is a shell builtin");
             }
-
-
-
-            //string[] splitPathListString = pathListString.Split(";");
-
-            ////if (File.Exists("page.txt"))
-            ////{
-            ////    Console.WriteLine("iterator exists ");
-            ////}
-            ///
-            
-
-
-
 
 
             if (splitInputList.Count() > 2 && !File.Exists(changedWord))
@@ -296,3 +237,5 @@ class Program
 
 
 // TODO:  make a unit testing for windows and linux?? or does unit testing check both in one heap.
+//  variable  predefined path su unit testing
+// folder where files are made cat or others not using predefined.
