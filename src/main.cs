@@ -211,11 +211,24 @@ class Program
                         }
 
 
+
+
+
+
+
+
                     }
 
                 }
             }
             
+
+            bool secondChecker = false;
+
+            if (!wordCheckerIsPath)
+            {
+                secondChecker = CheckIfStartsWithCommand(splitInputList, splitInputList[1], validCommandsList);
+            }
                 
             if (validCommandsList.Contains(splitInputList[1]) && splitInputList.Count() == 2)
             {
