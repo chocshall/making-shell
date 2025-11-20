@@ -42,26 +42,22 @@ class Program
         
         inputCommand = Console.ReadLine();
         splitInputList = inputCommand.Split(' ');
+        bool  checker = false;
+        
+        if (splitInputList[0].Contains(".exe") && splitInputList.Length > 1 || (splitInputList[0].Contains("_exe") && splitInputList.Length > 1))
+        {
+            checker = true;
+
+
+            typeBuiltCommand(splitInputList, validCommandsList, splitInputList[0]);
+        }
 
         if (splitInputList[0] == "pwd" && splitInputList.Count() == 1)
         {
             printWorkingDirectory(splitInputList, validCommandsList);
         }
-        if (splitInputList.Length == 1 && !validCommandsList.Contains(inputCommand))
-        {
-            Console.WriteLine(inputCommand + ": command not found");
-        }
-        
-        if (splitInputList[0].Contains(".exe") && splitInputList.Length > 1 || (splitInputList[0].Contains("_exe") && splitInputList.Length > 1))
-        {
-            
-            
-            typeBuiltCommand(splitInputList, validCommandsList, splitInputList[0]);
-        }
 
-       
-
-        if (splitInputList.Count() > 1 && CheckDoesCommandExist(splitInputList, inputCommand, validCommandsList))
+        if (splitInputList.Count() > 1 && CheckDoesCommandExist(splitInputList, inputCommand, validCommandsList) && !checker)
         {
             exitCommand(splitInputList, inputCommand);
 
@@ -77,10 +73,7 @@ class Program
 
         }
 
-        if (!validCommandsList.Contains(splitInputList[0]))
-        {
-            Console.Error.WriteLine(inputCommand + ": command not found ");
-        }
+        
 
 
 
@@ -123,6 +116,11 @@ class Program
             Console.Error.WriteLine(inputCommand + ": not found");
            
             return false;
+        }
+
+        if(splitInputList[0].Contains("_exe") || splitInputList[0].Contains(".exe"))
+        {
+            return true;
         }
 
         Console.Error.WriteLine(inputCommand + ": command not found");
@@ -182,7 +180,7 @@ class Program
             // used for getting a check if there exist atleast one full path
             bool wordCheckerIsPath = false;
 
-            if (!false)
+            if (false)
             {
                 splitPathList = pathListString.Split(Path.PathSeparator,StringSplitOptions.RemoveEmptyEntries);
             }
