@@ -17,7 +17,7 @@ class Program
         validCommandsList.Add("exit");
         validCommandsList.Add("echo");
         validCommandsList.Add("type");
-
+        validCommandsList.Add("pwd");
         string inputCommand = "";
         string[] splitInputList =  Array.Empty<string>();
 
@@ -50,7 +50,9 @@ class Program
         }
         else
         {
-            
+            printWorkingDirectory(splitInputList, validCommandsList);
+
+
             if (splitInputList.Count() > 1 && CheckDoesCommandExist(splitInputList, inputCommand, validCommandsList))
             {
                 exitCommand(splitInputList, inputCommand);
@@ -61,7 +63,7 @@ class Program
                 typeBuiltCommand(splitInputList, validCommandsList, splitInputList[1]);
             }
 
-            else
+            if (!validCommandsList.Contains(splitInputList[0]))
             {
                 Console.Error.WriteLine(inputCommand + ": command not found ");
             }
@@ -300,6 +302,19 @@ class Program
         process.WaitForExit();
     }
 
+    static void printWorkingDirectory (string[] splitInputList, List<string> validCommandsList)
+    {
+        if (splitInputList[0] == "pwd" && splitInputList.Count() == 1)
+        {
+            string pathWorkingDirectory = Directory.GetCurrentDirectory();
+            Console.WriteLine(pathWorkingDirectory);
+        }
+
+        
+    }
+
 
 }
+
+
 
