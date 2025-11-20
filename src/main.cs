@@ -228,7 +228,7 @@ class Program
                                 else
                                 {
                                     string arguments = string.Join(" ", splitInputList.Skip(1));
-                                    executesFileIfMeetRequirements(changedWord, arguments);
+                                    executesFileIfMeetRequirements(nameOfFile, arguments);
                                 }
                                 
                                 
