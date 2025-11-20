@@ -42,6 +42,15 @@ class Program
         
         inputCommand = Console.ReadLine();
         splitInputList = inputCommand.Split(' ');
+
+        if (splitInputList[0] == "pwd" && splitInputList.Count() == 1)
+        {
+            printWorkingDirectory(splitInputList, validCommandsList);
+        }
+        if (splitInputList.Length == 1 && validCommandsList.Contains(inputCommand))
+        {
+            Console.WriteLine(inputCommand + ": command not found");
+        }
         
         if (splitInputList[0].Contains(".exe") && splitInputList.Length > 1 || (splitInputList[0].Contains("_exe") && splitInputList.Length > 1))
         {
@@ -49,45 +58,52 @@ class Program
             
             typeBuiltCommand(splitInputList, validCommandsList, splitInputList[0]);
         }
-        else
+
+       
+
+        if (splitInputList.Count() > 1 && CheckDoesCommandExist(splitInputList, inputCommand, validCommandsList))
         {
-            printWorkingDirectory(splitInputList, validCommandsList);
+            exitCommand(splitInputList, inputCommand);
 
+            echoCommand(splitInputList, inputCommand);
 
-            if (splitInputList.Count() > 1 && CheckDoesCommandExist(splitInputList, inputCommand, validCommandsList))
+            // checking the second input
+            typeBuiltCommand(splitInputList, validCommandsList, splitInputList[1]);
+
+            if (splitInputList[0] == "cd")
             {
-                exitCommand(splitInputList, inputCommand);
-
-                echoCommand(splitInputList, inputCommand);
-
-                // checking the second input
-                typeBuiltCommand(splitInputList, validCommandsList, splitInputList[1]);
-
                 changeDirectory(splitInputList, validCommandsList);
             }
 
-            if (!validCommandsList.Contains(splitInputList[0]))
-            {
-                Console.Error.WriteLine(inputCommand + ": command not found ");
-            }
         }
-            
+
+        if (!validCommandsList.Contains(splitInputList[0]))
+        {
+            Console.Error.WriteLine(inputCommand + ": command not found ");
+        }
 
 
 
 
 
-        
 
 
 
 
-            
 
 
 
 
-        
+
+
+
+
+
+
+
+
+
+
     }
 
     public static bool CheckDoesCommandExist(string[] splitInputList, string inputCommand, List<string> validCommandsList)
@@ -313,10 +329,10 @@ class Program
             Console.WriteLine(pathWorkingDirectory);
         }
 
-        if(splitInputList[0] != "pwd" && splitInputList.Count() == 1)
-        {
-            Console.Error.WriteLine(splitInputList[0] + ": command not found");
-        }
+        //if(splitInputList[0] != "pwd" && splitInputList.Count() == 1)
+        //{
+            
+        //}
 
         
     }
