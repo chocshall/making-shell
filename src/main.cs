@@ -159,7 +159,7 @@ class Program
 
 
 
-           
+            bool wordCheckerIsPath = false;
 
             if (false)
             {
@@ -208,7 +208,7 @@ class Program
                     if (File.Exists(changedWord))
                     {
 
-                       
+                        wordCheckerIsPath = true;
 
                         // checks on linux if the program is executable because file exists is not enoguth to check
                         // thats why there was a problem with finding a file in a folder that you didnt have permis and printed
@@ -269,7 +269,7 @@ class Program
             }
 
             // checks if second word after type is valid if not print not found
-            if (splitInputList[0] == "type" && !File.Exists(changedWord))
+            if (splitInputList[0] == "type")
             {
                 CheckDoesCommandExist(splitInputList, splitInputList[1], validCommandsList);
             }
@@ -294,7 +294,7 @@ class Program
 
     static void executesFileIfMeetRequirements(string nameOfFile, string arguments)
     {
-        // still need to make it so it check if the program i wan to run is executable if not dont do anythin
+       
         
         var process = Process.Start(nameOfFile, arguments);
         
