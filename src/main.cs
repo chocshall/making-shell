@@ -43,6 +43,11 @@ class Program
         inputCommand = Console.ReadLine();
         splitInputList = inputCommand.Split(' ');
         bool  checker = false;
+
+        if(splitInputList.Length == 1 && !validCommandsList.Contains(inputCommand))
+        {
+            Console.Error.WriteLine(inputCommand + ": command not found");
+        }
         
         if (splitInputList[0].Contains(".exe") && splitInputList.Length > 1 || (splitInputList[0].Contains("_exe") && splitInputList.Length > 1))
         {
@@ -118,7 +123,7 @@ class Program
             return false;
         }
 
-        if(splitInputList[0].Contains("_exe") || splitInputList[0].Contains(".exe"))
+        if((splitInputList[0].Contains("_exe") && splitInputList.Length > 1) || (splitInputList[0].Contains(".exe") && splitInputList.Length > 1))
         {
             return true;
         }
