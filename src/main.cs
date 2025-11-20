@@ -99,7 +99,7 @@ class Program
         
         if (splitInputList[0] == "type")
         {
-            Console.Error.WriteLine(inputCommand + ": not found 1");
+            Console.Error.WriteLine(inputCommand + ": not found");
            
             return false;
         }
@@ -185,7 +185,7 @@ class Program
             
             
             string changedWord = "";
-            bool wordCheckerIsPath = false;
+            //bool wordCheckerIsPath = false;
 
             if(!validCommandsList.Contains(nameOfFile))
             {
@@ -266,12 +266,11 @@ class Program
 
                 }
             }
-            
-            //if (!wordCheckerIsPath)
-            //{
-            //    //CheckDoesCommandExist(splitInputList, splitInputList[1], validCommandsList);
-            //}
-                
+
+            // checks if second word after type is valid if not print not found
+            CheckDoesCommandExist(splitInputList, splitInputList[1], validCommandsList);
+           
+
             if (validCommandsList.Contains(splitInputList[1]) && splitInputList.Count() == 2)
             {
                 Console.WriteLine(splitInputList[1] + " is a shell builtin");
