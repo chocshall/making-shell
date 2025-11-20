@@ -96,7 +96,7 @@ class Program
             }
 
         }
-        
+        // checks the second string given does it exist in commands
         if (splitInputList[0] == "type")
         {
             Console.Error.WriteLine(inputCommand + ": not found");
@@ -147,7 +147,7 @@ class Program
         
     }
 
-    // custom_exe arg1 arg2
+    
     static void typeBuiltCommand (string[] splitInputList, List<string> validCommandsList, string nameOfFile)
     {
         if (splitInputList[0] == "type" || splitInputList[0].Contains(".exe")|| splitInputList[0].Contains("_exe"))
@@ -158,10 +158,10 @@ class Program
             string pathListString = Environment.GetEnvironmentVariable("PATH") ?? "";
 
 
-
+            // used for getting a check if there exist atleast one full path
             bool wordCheckerIsPath = false;
 
-            if (false)
+            if (!false)
             {
                 splitPathList = pathListString.Split(Path.PathSeparator,StringSplitOptions.RemoveEmptyEntries);
             }
@@ -191,7 +191,7 @@ class Program
             {
                 foreach(string directoryString in splitPathList)
             {
-                    //Console.WriteLine(directoryString);
+                    
                     // skip the not existing directories
                     if (!Directory.Exists(directoryString))
                     {
@@ -201,10 +201,7 @@ class Program
                     // make the full path
                     changedWord = Path.Join(directoryString, nameOfFile);
                    
-                    //Console.WriteLine(changedWord);
-
-                    //Console.WriteLine(changedWord + "\n");
-                    //Console.WriteLine(directoryString);
+                    
                     if (File.Exists(changedWord))
                     {
 
@@ -251,6 +248,7 @@ class Program
 
                             else
                             {
+                                // in requirements it should be only filename given, but because of how i placed my downloads need full path to work, when testing locally.
                                 string arguments = string.Join(" ", splitInputList.Skip(1));
                                 executesFileIfMeetRequirements(changedWord, arguments);
                                
@@ -259,7 +257,7 @@ class Program
                             }
                            
                             
-                            //break;
+                            
                         }
 
 
@@ -271,6 +269,7 @@ class Program
             // checks if second word after type is valid if not print not found
             if (splitInputList[0] == "type" && !wordCheckerIsPath)
             {
+                // checks the second string given does it exist in commands
                 CheckDoesCommandExist(splitInputList, splitInputList[1], validCommandsList);
             }
             
