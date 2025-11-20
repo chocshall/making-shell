@@ -42,9 +42,9 @@ class Program
         inputCommand = Console.ReadLine();
         splitInputList = inputCommand.Split(' ');
         
-        if (splitInputList[0].Contains("_exe") && splitInputList.Length > 1)
+        if (splitInputList[0].Contains(".exe") && splitInputList.Length > 1 || (splitInputList[0].Contains("_exe") && splitInputList.Length > 1))
         {
-            splitInputList[0] = splitInputList[0] + ".cs";
+            
             
             typeBuiltCommand(splitInputList, validCommandsList, splitInputList[0]);
         }
@@ -99,7 +99,7 @@ class Program
         
         if (splitInputList[0] == "type")
         {
-            Console.Error.WriteLine(inputCommand + ": not found");
+            Console.Error.WriteLine(inputCommand + ": not found 1");
            
             return false;
         }
@@ -150,7 +150,7 @@ class Program
     // custom_exe arg1 arg2
     static void typeBuiltCommand (string[] splitInputList, List<string> validCommandsList, string nameOfFile)
     {
-        if (splitInputList[0] == "type" || splitInputList[0].Contains("_exe"))
+        if (splitInputList[0] == "type" || splitInputList[0].Contains(".exe")|| splitInputList[0].Contains("_exe"))
         {
             string[] splitPathList = Array.Empty<string>();
 
@@ -161,7 +161,7 @@ class Program
 
            
 
-            if (false)
+            if (!false)
             {
                 splitPathList = pathListString.Split(Path.PathSeparator,StringSplitOptions.RemoveEmptyEntries);
             }
@@ -169,7 +169,7 @@ class Program
             else
             {
                 //string userInput = $"E:\\Downloads\\testfolder{Path.PathSeparator}E:\\Downloads\\onedollar{Path.PathSeparator}/usr/local/bin{Path.PathSeparator}$PATH";
-                string userInput = $"E:\\Downloads\\Sunshine\\ArgsPrintingFile{Path.PathSeparator}$PATH";
+                string userInput = $"E:\\Downloads\\c#programs\\HowToPublish{Path.PathSeparator}$PATH";
 
 
                 // path variants to check
@@ -200,6 +200,7 @@ class Program
 
                     // make the full path
                     changedWord = Path.Join(directoryString, nameOfFile);
+                   
                     //Console.WriteLine(changedWord);
 
                     //Console.WriteLine(changedWord + "\n");
@@ -213,17 +214,28 @@ class Program
                         // != 0 mean file is exucatable by someone
                         if(Path.PathSeparator == ':')
                         {
+
                             var mode = File.GetUnixFileMode(changedWord);
                             if ((mode & UnixFileMode.UserExecute) != 0 ||
                             (mode & UnixFileMode.GroupExecute) != 0 ||
                             (mode & UnixFileMode.OtherExecute) != 0)
                             {
 
-
-                                Console.WriteLine(nameOfFile + " is " + changedWord);
+                                if (splitInputList[0] == "type")
+                                {
+                                    Console.WriteLine(nameOfFile + " is " + changedWord);
+                                }
+                                else
+                                {
+                                    string arguments = string.Join(" ", splitInputList.Skip(1));
+                                    executesFileIfMeetRequirements(changedWord, arguments);
+                                }
                                 
-                                break;
+                                
                             }
+
+
+
                         }
 
 
@@ -233,22 +245,21 @@ class Program
                             if (splitInputList[0] == "type")
                             {
                                 Console.WriteLine(nameOfFile + " is " + changedWord);
+                                break;
                             }
 
                             else
                             {
+                                string arguments = string.Join(" ", splitInputList.Skip(1));
+                                executesFileIfMeetRequirements(changedWord, arguments);
+                               
+
 
                             }
                            
                             
-                            break;
+                            //break;
                         }
-
-
-
-
-
-
 
 
                     }
@@ -256,13 +267,10 @@ class Program
                 }
             }
             
-
-            
-
-            if (!wordCheckerIsPath)
-            {
-                CheckDoesCommandExist(splitInputList, splitInputList[1], validCommandsList);
-            }
+            //if (!wordCheckerIsPath)
+            //{
+            //    //CheckDoesCommandExist(splitInputList, splitInputList[1], validCommandsList);
+            //}
                 
             if (validCommandsList.Contains(splitInputList[1]) && splitInputList.Count() == 2)
             {
@@ -275,8 +283,18 @@ class Program
                 Console.Error.WriteLine(splitInputList[1] + ": not found");
             }
 
+            
 
         }
+    }
+
+    static void executesFileIfMeetRequirements(string nameOfFile, string arguments)
+    {
+        // still need to make it so it check if the program i wan to run is executable if not dont do anythin
+        
+        var process = Process.Start(nameOfFile, arguments);
+        
+        process.WaitForExit();
     }
 
 
