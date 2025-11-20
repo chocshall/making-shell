@@ -47,7 +47,7 @@ class Program
         {
             printWorkingDirectory(splitInputList, validCommandsList);
         }
-        if (splitInputList.Length == 1 && validCommandsList.Contains(inputCommand))
+        if (splitInputList.Length == 1 && !validCommandsList.Contains(inputCommand))
         {
             Console.WriteLine(inputCommand + ": command not found");
         }
