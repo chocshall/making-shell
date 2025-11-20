@@ -18,6 +18,7 @@ class Program
         validCommandsList.Add("echo");
         validCommandsList.Add("type");
         validCommandsList.Add("pwd");
+        validCommandsList.Add("cd");
         string inputCommand = "";
         string[] splitInputList =  Array.Empty<string>();
 
@@ -59,8 +60,10 @@ class Program
 
                 echoCommand(splitInputList, inputCommand);
 
-
+                // checking the second input
                 typeBuiltCommand(splitInputList, validCommandsList, splitInputList[1]);
+
+                changeDirectory(splitInputList, validCommandsList);
             }
 
             if (!validCommandsList.Contains(splitInputList[0]))
@@ -310,7 +313,29 @@ class Program
             Console.WriteLine(pathWorkingDirectory);
         }
 
+        if(splitInputList[0] != "pwd" && splitInputList.Count() == 1)
+        {
+            Console.Error.WriteLine(splitInputList[0] + ": command not found");
+        }
+
         
+    }
+
+    static void changeDirectory (string[] splitInputList, List<string> validCommandsList)
+    {
+        if (splitInputList[0] == "cd" && Directory.Exists(splitInputList[1]))
+        {
+            
+            Directory.SetCurrentDirectory(splitInputList[1]);
+        }
+
+        if (splitInputList[0] == "cd" && !Directory.Exists(splitInputList[1]))
+        {
+
+            Console.WriteLine($"cd: {splitInputList[1]}: No such file or directory");
+        }
+
+
     }
 
 
