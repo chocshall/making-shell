@@ -157,7 +157,7 @@ class Program
             // if the left is null use the right;
             string pathListString = Environment.GetEnvironmentVariable("PATH") ?? "";
 
-            
+
 
            
 
@@ -185,7 +185,7 @@ class Program
             
             
             string changedWord = "";
-            //bool wordCheckerIsPath = false;
+            
 
             if(!validCommandsList.Contains(nameOfFile))
             {
@@ -207,12 +207,13 @@ class Program
                     //Console.WriteLine(directoryString);
                     if (File.Exists(changedWord))
                     {
-                        
+
+                       
 
                         // checks on linux if the program is executable because file exists is not enoguth to check
                         // thats why there was a problem with finding a file in a folder that you didnt have permis and printed
                         // != 0 mean file is exucatable by someone
-                        if(Path.PathSeparator == ':')
+                        if (Path.PathSeparator == ':')
                         {
 
                             var mode = File.GetUnixFileMode(changedWord);
@@ -268,7 +269,7 @@ class Program
             }
 
             // checks if second word after type is valid if not print not found
-            if (splitInputList[0] == "type")
+            if (splitInputList[0] == "type" && !File.Exists(changedWord))
             {
                 CheckDoesCommandExist(splitInputList, splitInputList[1], validCommandsList);
             }
