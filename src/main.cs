@@ -161,7 +161,7 @@ class Program
 
            
 
-            if (!false)
+            if (false)
             {
                 splitPathList = pathListString.Split(Path.PathSeparator,StringSplitOptions.RemoveEmptyEntries);
             }
@@ -278,7 +278,7 @@ class Program
             }
 
 
-            if (splitInputList.Count() > 2 && !File.Exists(changedWord))
+            if (splitInputList[0] == "type" && splitInputList.Count() > 2 && !File.Exists(changedWord))
             {
                 Console.Error.WriteLine(splitInputList[1] + ": not found");
             }
