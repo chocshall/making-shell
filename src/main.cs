@@ -269,7 +269,7 @@ class Program
             }
 
             // checks if second word after type is valid if not print not found
-            if (splitInputList[0] == "type" && File.Exists(changedWord))
+            if (splitInputList[0] == "type" && !File.Exists(changedWord))
             {
                 CheckDoesCommandExist(splitInputList, splitInputList[1], validCommandsList);
             }
