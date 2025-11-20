@@ -268,7 +268,11 @@ class Program
             }
 
             // checks if second word after type is valid if not print not found
-            CheckDoesCommandExist(splitInputList, splitInputList[1], validCommandsList);
+            if (splitInputList[0] == "type")
+            {
+                CheckDoesCommandExist(splitInputList, splitInputList[1], validCommandsList);
+            }
+            
            
 
             if (validCommandsList.Contains(splitInputList[1]) && splitInputList.Count() == 2)
