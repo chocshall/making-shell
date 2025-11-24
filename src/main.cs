@@ -63,6 +63,13 @@ class Program
             printWorkingDirectory(splitInputList, validCommandsList);
         }
 
+        if (splitInputList[0] == "exit" && splitInputList.Count() == 1)
+        {
+            exitCommand(splitInputList, inputCommand);
+        }
+
+
+
         if (splitInputList.Count() > 1 && CheckDoesCommandExist(splitInputList, inputCommand, validCommandsList) && !checker)
         {
             exitCommand(splitInputList, inputCommand);
@@ -137,7 +144,11 @@ class Program
     
     static void exitCommand(string[] splitInputList, string inputCommand)
     {
-        if (splitInputList[0] == "exit" )
+        if (splitInputList[0] == "exit" && splitInputList.Length == 1)
+        {
+            Environment.Exit(0);
+        }
+            if (splitInputList[0] == "exit" && splitInputList.Length > 1 )
         {
             foreach (string item in splitInputList)
             {
