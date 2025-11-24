@@ -368,15 +368,6 @@ class Program
     {
         
 
-        //if (splitInputList[0] == "cd" && splitInputList[1] == "../" )
-        //{
-
-        //    upALevelsPath(splitInputList);
-        //    return;
-        //}
-
-       
-
         if (splitInputList[0] == "cd" && Directory.Exists(splitInputList[1]))
         {
             //Console.WriteLine("this matches 2");
@@ -393,29 +384,7 @@ class Program
 
     }
 
-    static void upALevelsPath(string[] splitInputList)
-    {
-        
-
-        string pathWorkingDirectory = Directory.GetCurrentDirectory();
-        
-
-        string goUpLevelPath = Path.Combine(pathWorkingDirectory, splitInputList[1]);
-        
-
-        goUpLevelPath = Path.GetFullPath(goUpLevelPath);
-        
-
-        if (Directory.Exists(goUpLevelPath))
-        {
-            Directory.SetCurrentDirectory(goUpLevelPath);
-            
-        }
-        else
-        {
-            Console.WriteLine("Directory does not exist: " + goUpLevelPath);
-        }
-    }
+    
 
    
 
