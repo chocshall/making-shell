@@ -366,7 +366,17 @@ class Program
 
     static void changeDirectory (string[] splitInputList, List<string> validCommandsList)
     {
-        
+        if (splitInputList[0] == "cd" && splitInputList[1] == "~")
+        {
+            //Console.WriteLine("this matches 2");
+            string homePath = (Environment.OSVersion.Platform == PlatformID.Unix ||
+                                Environment.OSVersion.Platform == PlatformID.MacOSX)
+                                ? Environment.GetEnvironmentVariable("HOME")
+                                : Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
+            
+            Directory.SetCurrentDirectory(homePath);
+            return;
+        }
 
         if (splitInputList[0] == "cd" && Directory.Exists(splitInputList[1]))
         {
