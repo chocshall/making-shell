@@ -364,12 +364,12 @@ class Program
             return;
         }
 
-        if (splitInputList[0] == "cd" && splitInputList[1].StartsWith("./"))
-        {
-            //Console.WriteLine("yes matches");
-            getRelativePath(splitInputList);
-            return;
-        }
+        //if (splitInputList[0] == "cd" && splitInputList[1].StartsWith("./"))
+        //{
+        //    //Console.WriteLine("yes matches");
+        //    getRelativePath(splitInputList);
+        //    return;
+        //}
 
         if (splitInputList[0] == "cd" && Directory.Exists(splitInputList[1]))
         {
