@@ -1,9 +1,10 @@
+using System;
 using System.Diagnostics;
 using System.Formats.Tar;
 using System.IO;
 using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
 using System.Xml.Linq;
-using System;
 
 class Program
 {
@@ -48,7 +49,7 @@ class Program
         {
             Console.Error.WriteLine(inputCommand + ": command not found");
         }
-        
+        // _exe neveikia taip kaip per windwos linux 
         if (splitInputList[0].Contains(".exe") && splitInputList.Length > 1 || (splitInputList[0].Contains("_exe") && splitInputList.Length > 1))
         {
             checker = true;
@@ -170,10 +171,11 @@ class Program
         }
         
     }
-
-    
+    // todo
+    // pastaisyti kad jeigu neieni i commanda tada tirkini executable ar yra
     static void typeBuiltCommand (string[] splitInputList, List<string> validCommandsList, string nameOfFile)
     {
+        
         if (splitInputList[0] == "type" || splitInputList[0].Contains(".exe")|| splitInputList[0].Contains("_exe"))
         {
             string[] splitPathList = Array.Empty<string>();
@@ -193,7 +195,7 @@ class Program
             else
             {
                 //string userInput = $"E:\\Downloads\\testfolder{Path.PathSeparator}E:\\Downloads\\onedollar{Path.PathSeparator}/usr/local/bin{Path.PathSeparator}$PATH";
-                string userInput = $"E:\\Downloads\\c#programs\\HowToPublish{Path.PathSeparator}$PATH";
+                string userInput = $@"E:\Downloads\c#programs\TestingProccesClass\bin\Debug\net8.0{Path.PathSeparator}$PATH";
 
 
                 // path variants to check
@@ -234,7 +236,7 @@ class Program
                         // checks on linux if the program is executable because file exists is not enoguth to check
                         // thats why there was a problem with finding a file in a folder that you didnt have permis and printed
                         // != 0 mean file is exucatable by someone
-                        if (Path.PathSeparator == ':')
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                         {
 
                             var mode = File.GetUnixFileMode(changedWord);
@@ -242,6 +244,17 @@ class Program
                             (mode & UnixFileMode.GroupExecute) != 0 ||
                             (mode & UnixFileMode.OtherExecute) != 0)
                             {
+                                //05
+                                //005
+                                //101
+
+                                 
+                                //01
+                                //1000
+                                //1001001
+
+                                //1000000
+
 
                                 if (splitInputList[0] == "type")
                                 {
@@ -342,10 +355,27 @@ class Program
 
     static void changeDirectory (string[] splitInputList, List<string> validCommandsList)
     {
+        
+
+        if (splitInputList[0] == "cd" && splitInputList[1] == "../" )
+        {
+
+            upALevelsPath(splitInputList);
+            return;
+        }
+
+        if (splitInputList[0] == "cd" && splitInputList[1].StartsWith("./"))
+        {
+            //Console.WriteLine("yes matches");
+            getRelativePath(splitInputList);
+            return;
+        }
+
         if (splitInputList[0] == "cd" && Directory.Exists(splitInputList[1]))
         {
-            
+            //Console.WriteLine("this matches 2");
             Directory.SetCurrentDirectory(splitInputList[1]);
+            return;
         }
 
         if (splitInputList[0] == "cd" && !Directory.Exists(splitInputList[1]))
@@ -355,6 +385,44 @@ class Program
         }
 
 
+    }
+
+    static void upALevelsPath(string[] splitInputList)
+    {
+        
+
+        string pathWorkingDirectory = Directory.GetCurrentDirectory();
+        
+
+        string goUpLevelPath = Path.Combine(pathWorkingDirectory, splitInputList[1]);
+        
+
+        goUpLevelPath = Path.GetFullPath(goUpLevelPath);
+        
+
+        if (Directory.Exists(goUpLevelPath))
+        {
+            Directory.SetCurrentDirectory(goUpLevelPath);
+            
+        }
+        else
+        {
+            Console.WriteLine("Directory does not exist: " + goUpLevelPath);
+        }
+    }
+
+    static void getRelativePath(string[] splitInputList)
+    {
+        string pathWorkingDirectory = Directory.GetCurrentDirectory();
+        Console.WriteLine("path work:" + pathWorkingDirectory);
+        Console.WriteLine("add want:" + splitInputList[1]);
+        string relativePath = Path.Combine(splitInputList[1], pathWorkingDirectory);
+        relativePath = Path.GetFullPath(relativePath);
+        Console.WriteLine("after : " + relativePath);
+        if (Directory.Exists(relativePath))
+        {
+            Directory.SetCurrentDirectory(relativePath);
+        }
     }
 
 
