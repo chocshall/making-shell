@@ -414,11 +414,11 @@ class Program
     static void getRelativePath(string[] splitInputList)
     {
         string pathWorkingDirectory = Directory.GetCurrentDirectory();
-        Console.WriteLine("path work:" + pathWorkingDirectory);
-        Console.WriteLine("add want:" + splitInputList[1]);
+        //Console.WriteLine("path work:" + pathWorkingDirectory);
+        //Console.WriteLine("add want:" + splitInputList[1]);
         string relativePath = Path.Combine(splitInputList[1], pathWorkingDirectory);
         relativePath = Path.GetFullPath(relativePath);
-        Console.WriteLine("after : " + relativePath);
+        //Console.WriteLine("after : " + relativePath);
         if (Directory.Exists(relativePath))
         {
             Directory.SetCurrentDirectory(relativePath);
