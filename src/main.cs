@@ -368,19 +368,14 @@ class Program
     {
         
 
-        if (splitInputList[0] == "cd" && splitInputList[1] == "../" )
-        {
-
-            upALevelsPath(splitInputList);
-            return;
-        }
-
-        //if (splitInputList[0] == "cd" && splitInputList[1].StartsWith("./"))
+        //if (splitInputList[0] == "cd" && splitInputList[1] == "../" )
         //{
-        //    //Console.WriteLine("yes matches");
-        //    getRelativePath(splitInputList);
+
+        //    upALevelsPath(splitInputList);
         //    return;
         //}
+
+       
 
         if (splitInputList[0] == "cd" && Directory.Exists(splitInputList[1]))
         {
@@ -422,19 +417,7 @@ class Program
         }
     }
 
-    static void getRelativePath(string[] splitInputList)
-    {
-        string pathWorkingDirectory = Directory.GetCurrentDirectory();
-        //Console.WriteLine("path work:" + pathWorkingDirectory);
-        //Console.WriteLine("add want:" + splitInputList[1]);
-        string relativePath = Path.Combine(splitInputList[1], pathWorkingDirectory);
-        relativePath = Path.GetFullPath(relativePath);
-        //Console.WriteLine("after : " + relativePath);
-        if (Directory.Exists(relativePath))
-        {
-            Directory.SetCurrentDirectory(relativePath);
-        }
-    }
+   
 
 
 }
