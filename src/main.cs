@@ -86,29 +86,6 @@ class Program
 
         }
 
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     }
 
@@ -246,7 +223,7 @@ class Program
 
                         // checks on linux if the program is executable because file exists is not enoguth to check
                         // thats why there was a problem with finding a file in a folder that you didnt have permis and printed
-                        // != 0 mean file is exucatable by someone
+                        
                         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                         {
 
