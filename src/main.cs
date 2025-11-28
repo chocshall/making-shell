@@ -351,7 +351,7 @@ class Program
                                 ? Environment.GetEnvironmentVariable("HOME")
                                 : Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
             
-            Directory.SetCurrentDirectory(homePath);
+            Directory.SetCurrentDirectory(homePath); 
             return;
         }
 
