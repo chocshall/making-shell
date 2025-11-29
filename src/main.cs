@@ -2,8 +2,10 @@ using System;
 using System.Diagnostics;
 using System.Formats.Tar;
 using System.IO;
+using System.Linq;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 class Program
@@ -22,6 +24,7 @@ class Program
         validCommandsList.Add("cd");
         string inputCommand = "";
         string[] splitInputList =  Array.Empty<string>();
+        
 
 
         while (true)
@@ -42,12 +45,36 @@ class Program
     {
         
         inputCommand = Console.ReadLine();
-        splitInputList = inputCommand.Split(' ');
-        bool  checker = false;
+
+        string pattern = "echo.+";
+
+        Regex regularExpressionObject = new Regex(pattern, RegexOptions.IgnoreCase);
+        Match checkingMatch = regularExpressionObject.Match(inputCommand);
+
+
+
+        if(!checkingMatch.Success)
+        {
+            Console.WriteLine("23");
+            splitInputList = inputCommand.Split(' ');
+        }
+        else
+        {
+            echoCommand(inputCommand);
+            return;
+            
+            
+        }
+
+
+
+
+            bool checker = false;
 
         if(splitInputList.Length == 1 && !validCommandsList.Contains(inputCommand))
         {
             Console.Error.WriteLine(inputCommand + ": command not found");
+            return;
         }
         // _exe neveikia taip kaip per windwos linux 
         if (splitInputList[0].Contains(".exe") && splitInputList.Length > 1 || (splitInputList[0].Contains("_exe") && splitInputList.Length > 1))
@@ -74,7 +101,7 @@ class Program
         {
             exitCommand(splitInputList, inputCommand);
 
-            echoCommand(splitInputList, inputCommand);
+            //echoCommand(splitInputList, inputCommand);
 
             // checking the second input
             typeBuiltCommand(splitInputList, validCommandsList, splitInputList[1]);
@@ -145,18 +172,54 @@ class Program
         }
     }
 
-    static void echoCommand(string[] splitInputList, string inputCommand)
+    static void echoCommand(string inputCommand)
     {
-        if (splitInputList[0] == "echo")
+        inputCommand = inputCommand.Remove(0, 5);
+        if (inputCommand.StartsWith('\'') && inputCommand.EndsWith('\''))
         {
-            foreach (string item in splitInputList.Skip(1))
+            inputCommand = inputCommand.Remove(0,1);
+            inputCommand = inputCommand.TrimEnd('\'');
+            if (inputCommand.Contains('\''))
             {
-                Console.Write(item + " ");
+                string[] splitInputList = Array.Empty<string>();
+                inputCommand = inputCommand.Replace('\'', ' ');
+
+                splitInputList = inputCommand.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                inputCommand = string.Join("", splitInputList);
+
             }
-            Console.Write("\n");
-
-
+            Console.WriteLine(inputCommand);
+            return;
         }
+            
+
+
+        if(!inputCommand.StartsWith('\'') && !inputCommand.EndsWith('\''))
+        {
+            string[] splitInputList = Array.Empty<string>();
+            splitInputList = inputCommand.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+            string joinedItem = string.Join(" ", splitInputList);
+
+            if(joinedItem.Contains('\''))
+            {
+                joinedItem = joinedItem.Replace('\'', ' ');
+
+                splitInputList = joinedItem.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                joinedItem = string.Join(" ", splitInputList);
+
+            }
+
+                Console.WriteLine(joinedItem);
+           
+            return;
+        }
+
+        
+
+        
         
     }
     // todo
