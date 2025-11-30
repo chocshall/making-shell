@@ -46,29 +46,30 @@ class Program
         
         inputCommand = Console.ReadLine();
 
-        splitInputList = ParseWithQuotes(inputCommand);
+        string pattern = "echo.+";
 
-        if (splitInputList.Length == 0) return;
+        Regex regularExpressionObject = new Regex(pattern, RegexOptions.IgnoreCase);
+        Match checkingMatch = regularExpressionObject.Match(inputCommand);
 
-        
-        if (splitInputList[0] == "echo")
+
+
+        if(!checkingMatch.Success)
         {
-            echoCommand(splitInputList);
+            Console.WriteLine("23");
+            splitInputList = inputCommand.Split(' ');
+        }
+        else
+        {
+            echoCommand(inputCommand);
             return;
+            
+            
         }
 
-        if (splitInputList.Length > 0 && IsExternalCommand(splitInputList[0]))
-        {
-            string[] argumentsArray = splitInputList.Skip(1).ToArray();
-            executesFileIfMeetRequirements(splitInputList[0], argumentsArray);
-            return;
-        }
 
 
 
-
-
-        bool checker = false;
+            bool checker = false;
 
         if(splitInputList.Length == 1 && !validCommandsList.Contains(inputCommand))
         {
@@ -96,7 +97,7 @@ class Program
 
 
 
-        if (splitInputList.Length > 0 && CheckDoesCommandExist(splitInputList, inputCommand, validCommandsList) && !checker)
+        if (splitInputList.Count() > 1 && CheckDoesCommandExist(splitInputList, inputCommand, validCommandsList) && !checker)
         {
             exitCommand(splitInputList, inputCommand);
 
@@ -117,35 +118,34 @@ class Program
 
     public static bool CheckDoesCommandExist(string[] splitInputList, string inputCommand, List<string> validCommandsList)
     {
-        // Check if the first part is a builtin command
-        if (splitInputList.Length > 0 && validCommandsList.Contains(splitInputList[0]))
+        
+        foreach (string item in validCommandsList)
         {
-            return true;
-        }
+            if (inputCommand.StartsWith(item))
+            {
+                return true;
+            }
 
+        }
         // checks the second string given does it exist in commands
         if (splitInputList[0] == "type")
         {
-            Console.Error.WriteLine(splitInputList[1] + ": not found");
+            Console.Error.WriteLine(inputCommand + ": not found");
+           
             return false;
         }
 
-        if ((splitInputList[0].Contains("_exe") && splitInputList.Length > 1) || (splitInputList[0].Contains(".exe") && splitInputList.Length > 1))
+        if((splitInputList[0].Contains("_exe") && splitInputList.Length > 1) || (splitInputList[0].Contains(".exe") && splitInputList.Length > 1))
         {
             return true;
         }
 
-        // Check if it's an external command
-        if (splitInputList.Length > 0 && IsExternalCommand(splitInputList[0]))
-        {
-            return true;
-        }
-
-        Console.Error.WriteLine(splitInputList[0] + ": command not found");
+        Console.Error.WriteLine(inputCommand + ": command not found");
+        
         return false;
     }
 
-
+    
     static void exitCommand(string[] splitInputList, string inputCommand)
     {
         if (splitInputList[0] == "exit" && splitInputList.Length == 1)
@@ -175,29 +175,56 @@ class Program
 
     // disable special meaning of single quates make it so that everything in single quates is treated literraly
     // this echo not how it suppose to be basically read again what it need
-    static void echoCommand(string[] splitInputList)
+    static void echoCommand(string inputCommand)
     {
-        // Join all arguments after "echo" with spaces
-        if (splitInputList.Length > 1)
+        inputCommand = inputCommand.Remove(0, 5);
+        if (inputCommand.StartsWith('\'') && inputCommand.EndsWith('\''))
         {
-            string output = string.Join(" ", splitInputList.Skip(1));
-            Console.WriteLine(output);
+            inputCommand = inputCommand.Remove(0,1);
+            inputCommand = inputCommand.TrimEnd('\'');
+            if (inputCommand.Contains('\''))
+            {
+                string[] splitInputList = Array.Empty<string>();
+                inputCommand = inputCommand.Replace('\'', ' ');
+
+                splitInputList = inputCommand.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                inputCommand = string.Join("", splitInputList);
+
+            }
+            Console.WriteLine(inputCommand);
+            return;
         }
-        else
-        {
-            Console.WriteLine();
-        }
-    }
             
 
 
-        
+        if(!inputCommand.StartsWith('\'') && !inputCommand.EndsWith('\''))
+        {
+            string[] splitInputList = Array.Empty<string>();
+            splitInputList = inputCommand.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+            string joinedItem = string.Join(" ", splitInputList);
+
+            if(joinedItem.Contains('\''))
+            {
+                joinedItem = joinedItem.Replace('\'', ' ');
+
+                splitInputList = joinedItem.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                joinedItem = string.Join(" ", splitInputList);
+
+            }
+
+                Console.WriteLine(joinedItem);
+           
+            return;
+        }
 
         
 
         
         
-    
+    }
     // todo
     // pastaisyti kad jeigu neieni i commanda tada tirkini executable ar yra
     static void typeBuiltCommand (string[] splitInputList, List<string> validCommandsList, string nameOfFile)
@@ -289,8 +316,8 @@ class Program
                                 }
                                 else
                                 {
-                                    string[] argumentsArray = splitInputList.Skip(1).ToArray();
-                                    executesFileIfMeetRequirements(nameOfFile, argumentsArray);
+                                    string arguments = string.Join(" ", splitInputList.Skip(1));
+                                    executesFileIfMeetRequirements(nameOfFile, arguments);
                                 }
                                 
                                 
@@ -313,9 +340,9 @@ class Program
                             else
                             {
                                 // in requirements it should be only filename given, but because of how i placed my downloads need full path to work, when testing locally.
-                                string[] argumentsArray = splitInputList.Skip(1).ToArray();
-                                executesFileIfMeetRequirements(changedWord, argumentsArray);
-
+                                string arguments = string.Join(" ", splitInputList.Skip(1));
+                                executesFileIfMeetRequirements(changedWord, arguments);
+                               
 
 
                             }
@@ -355,21 +382,12 @@ class Program
         }
     }
 
-    static void executesFileIfMeetRequirements(string nameOfFile, string[] argumentsArray)
+    static void executesFileIfMeetRequirements(string nameOfFile, string arguments)
     {
-        var process = new Process();
-        process.StartInfo.FileName = nameOfFile;
-
-        // Pass arguments as an array instead of a single string
-        foreach (string arg in argumentsArray)
-        {
-            process.StartInfo.ArgumentList.Add(arg);
-        }
-
-        process.StartInfo.UseShellExecute = false;
-        process.StartInfo.RedirectStandardOutput = false;
-
-        process.Start();
+       
+        
+        var process = Process.Start(nameOfFile, arguments);
+        
         process.WaitForExit();
     }
 
@@ -419,61 +437,9 @@ class Program
 
     }
 
-    static string[] ParseWithQuotes(string input)
-    {
-        List<string> parts = new List<string>();
-        bool inQuotes = false;
-        string currentPart = "";
+    
 
-        foreach (char c in input)
-        {
-            if (c == '\'' && !inQuotes)
-            {
-                inQuotes = true;
-            }
-            else if (c == '\'' && inQuotes)
-            {
-                inQuotes = false;
-            }
-            else if (char.IsWhiteSpace(c) && !inQuotes)
-            {
-                if (!string.IsNullOrEmpty(currentPart))
-                {
-                    parts.Add(currentPart);
-                    currentPart = "";
-                }
-            }
-            else
-            {
-                currentPart += c;
-            }
-        }
-
-        if (!string.IsNullOrEmpty(currentPart))
-        {
-            parts.Add(currentPart);
-        }
-
-        return parts.ToArray();
-    }
-
-    static bool IsExternalCommand(string command)
-    {
-        string[] pathDirectories = Environment.GetEnvironmentVariable("PATH")?.Split(Path.PathSeparator) ?? new string[0];
-
-        foreach (string directory in pathDirectories)
-        {
-            if (string.IsNullOrEmpty(directory)) continue;
-
-            string fullPath = Path.Combine(directory, command);
-            if (File.Exists(fullPath))
-                return true;
-        }
-
-        return false;
-    }
-
-
+   
 
 
 }
