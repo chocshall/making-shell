@@ -48,8 +48,10 @@ class Program
 
         splitInputList = ParseWithQuotes(inputCommand);
 
-       
-        if (splitInputList.Length > 0 && splitInputList[0] == "echo")
+        if (splitInputList.Length == 0) return;
+
+        
+        if (splitInputList[0] == "echo")
         {
             echoCommand(splitInputList);
             return;
