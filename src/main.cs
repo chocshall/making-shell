@@ -1,445 +1,305 @@
 using System;
-using System.Diagnostics;
-using System.Formats.Tar;
+using System.Collections.Generic;
 using System.IO;
+using System.Diagnostics;
 using System.Linq;
-using System.Net.NetworkInformation;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
-using System.Xml.Linq;
 
-class Program
+namespace CodeCraftersShell
 {
-    static void Main()
+    class Program
     {
-        
+        private static string currentDirectory = Directory.GetCurrentDirectory();
+        private static Dictionary<string, string> builtinCommands = new Dictionary<string, string>
+        {
+            { "exit", "builtin" },
+            { "echo", "builtin" },
+            { "type", "builtin" },
+            { "pwd", "builtin" },
+            { "cd", "builtin" }
+        };
 
-        
-       
-        List<string> validCommandsList = new List<string>();
-        validCommandsList.Add("exit");
-        validCommandsList.Add("echo");
-        validCommandsList.Add("type");
-        validCommandsList.Add("pwd");
-        validCommandsList.Add("cd");
-        string inputCommand = "";
-        string[] splitInputList =  Array.Empty<string>();
-        
+        static void Main(string[] args)
+        {
+            RunREPL();
+        }
 
+        static void RunREPL()
+        {
+            while (true)
+            {
+                PrintPrompt();
+                string input = Console.ReadLine()?.Trim();
 
-        while (true)
+                if (string.IsNullOrEmpty(input))
+                    continue;
+
+                ProcessInput(input);
+            }
+        }
+
+        static void PrintPrompt()
         {
             Console.Write("$ ");
-            userInput( inputCommand,  validCommandsList, splitInputList);
-
-
-
-
-
         }
 
-
-    }
-
-    static void userInput(string inputCommand, List<string> validCommandsList, string[] splitInputList)
-    {
-        
-        inputCommand = Console.ReadLine();
-
-        string pattern = "echo.+";
-
-        Regex regularExpressionObject = new Regex(pattern, RegexOptions.IgnoreCase);
-        Match checkingMatch = regularExpressionObject.Match(inputCommand);
-
-
-
-        if(!checkingMatch.Success)
+        static void ProcessInput(string input)
         {
-            Console.WriteLine("23");
-            splitInputList = inputCommand.Split(' ');
-        }
-        else
-        {
-            echoCommand(inputCommand);
-            return;
-            
-            
-        }
+            string[] parts = ParseInput(input);
+            if (parts.Length == 0) return;
 
+            string command = parts[0];
+            string[] arguments = parts.Length > 1 ? parts.Skip(1).ToArray() : new string[0];
 
-
-
-            bool checker = false;
-
-        if(splitInputList.Length == 1 && !validCommandsList.Contains(inputCommand))
-        {
-            Console.Error.WriteLine(inputCommand + ": command not found");
-            return;
-        }
-        // _exe neveikia taip kaip per windwos linux 
-        if (splitInputList[0].Contains(".exe") && splitInputList.Length > 1 || (splitInputList[0].Contains("_exe") && splitInputList.Length > 1))
-        {
-            checker = true;
-
-
-            typeBuiltCommand(splitInputList, validCommandsList, splitInputList[0]);
-        }
-
-        if (splitInputList[0] == "pwd" && splitInputList.Count() == 1)
-        {
-            printWorkingDirectory(splitInputList, validCommandsList);
-        }
-
-        if (splitInputList[0] == "exit" && splitInputList.Count() == 1)
-        {
-            exitCommand(splitInputList, inputCommand);
-        }
-
-
-
-        if (splitInputList.Count() > 1 && CheckDoesCommandExist(splitInputList, inputCommand, validCommandsList) && !checker)
-        {
-            exitCommand(splitInputList, inputCommand);
-
-            //echoCommand(splitInputList, inputCommand);
-
-            // checking the second input
-            typeBuiltCommand(splitInputList, validCommandsList, splitInputList[1]);
-
-            if (splitInputList[0] == "cd")
+            switch (command)
             {
-                changeDirectory(splitInputList, validCommandsList);
+                case "exit":
+                    HandleExit();
+                    break;
+                case "echo":
+                    HandleEcho(arguments);
+                    break;
+                case "type":
+                    HandleType(arguments);
+                    break;
+                case "pwd":
+                    HandlePwd();
+                    break;
+                case "cd":
+                    HandleCd(arguments);
+                    break;
+                default:
+                    HandleExternalCommand(command, arguments);
+                    break;
+            }
+        }
+
+        static string[] ParseInput(string input)
+        {
+            List<string> parts = new List<string>();
+            bool inQuotes = false;
+            string currentPart = "";
+
+            foreach (char c in input)
+            {
+                if (c == '"')
+                {
+                    inQuotes = !inQuotes;
+                }
+                else if (char.IsWhiteSpace(c) && !inQuotes)
+                {
+                    if (!string.IsNullOrEmpty(currentPart))
+                    {
+                        parts.Add(currentPart);
+                        currentPart = "";
+                    }
+                }
+                else
+                {
+                    currentPart += c;
+                }
             }
 
-        }
-
-
-    }
-
-    public static bool CheckDoesCommandExist(string[] splitInputList, string inputCommand, List<string> validCommandsList)
-    {
-        
-        foreach (string item in validCommandsList)
-        {
-            if (inputCommand.StartsWith(item))
+            if (!string.IsNullOrEmpty(currentPart))
             {
-                return true;
+                parts.Add(currentPart);
             }
 
-        }
-        // checks the second string given does it exist in commands
-        if (splitInputList[0] == "type")
-        {
-            Console.Error.WriteLine(inputCommand + ": not found");
-           
-            return false;
+            return parts.ToArray();
         }
 
-        if((splitInputList[0].Contains("_exe") && splitInputList.Length > 1) || (splitInputList[0].Contains(".exe") && splitInputList.Length > 1))
-        {
-            return true;
-        }
-
-        Console.Error.WriteLine(inputCommand + ": command not found");
-        
-        return false;
-    }
-
-    
-    static void exitCommand(string[] splitInputList, string inputCommand)
-    {
-        if (splitInputList[0] == "exit" && splitInputList.Length == 1)
+        static void HandleExit()
         {
             Environment.Exit(0);
         }
-            if (splitInputList[0] == "exit" && splitInputList.Length > 1 )
+
+        static void HandleEcho(string[] arguments)
         {
-            foreach (string item in splitInputList)
-            {
-                if (splitInputList[0] == "exit" && splitInputList[1] == "0")
-                {
-                    Environment.Exit(Int32.Parse(splitInputList[1]));
-                }
-                
-                if (splitInputList[0] == "exit" && splitInputList[1] == "1")
-                {
-                    Environment.Exit(Int32.Parse(splitInputList[1]));
-                }
-
-            }
-
-
-        }
-    }
-
-    static void echoCommand(string inputCommand)
-    {
-        inputCommand = inputCommand.Remove(0, 5);
-        if (inputCommand.StartsWith('\'') && inputCommand.EndsWith('\''))
-        {
-            inputCommand = inputCommand.Remove(0,1);
-            inputCommand = inputCommand.TrimEnd('\'');
-            if (inputCommand.Contains('\''))
-            {
-                string[] splitInputList = Array.Empty<string>();
-                inputCommand = inputCommand.Replace('\'', ' ');
-
-                splitInputList = inputCommand.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-                inputCommand = string.Join("", splitInputList);
-
-            }
-            Console.WriteLine(inputCommand);
-            return;
-        }
-            
-
-
-        if(!inputCommand.StartsWith('\'') && !inputCommand.EndsWith('\''))
-        {
-            string[] splitInputList = Array.Empty<string>();
-            splitInputList = inputCommand.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-            string joinedItem = string.Join(" ", splitInputList);
-
-            if(joinedItem.Contains('\''))
-            {
-                joinedItem = joinedItem.Replace('\'', ' ');
-
-                splitInputList = joinedItem.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-                joinedItem = string.Join(" ", splitInputList);
-
-            }
-
-                Console.WriteLine(joinedItem);
-           
-            return;
+            Console.WriteLine(string.Join(" ", arguments));
         }
 
-        
-
-        
-        
-    }
-    // todo
-    // pastaisyti kad jeigu neieni i commanda tada tirkini executable ar yra
-    static void typeBuiltCommand (string[] splitInputList, List<string> validCommandsList, string nameOfFile)
-    {
-        
-        if (splitInputList[0] == "type" || splitInputList[0].Contains(".exe")|| splitInputList[0].Contains("_exe"))
+        static void HandleType(string[] arguments)
         {
-            string[] splitPathList = Array.Empty<string>();
-
-            // if the left is null use the right;
-            string pathListString = Environment.GetEnvironmentVariable("PATH") ?? "";
-
-
-            // used for getting a check if there exist atleast one full path
-            bool wordCheckerIsPath = false;
-
-            if (false)
+            if (arguments.Length == 0)
             {
-                splitPathList = pathListString.Split(Path.PathSeparator,StringSplitOptions.RemoveEmptyEntries);
+                Console.WriteLine("type: missing argument");
+                return;
             }
 
+            string command = arguments[0];
+
+            if (builtinCommands.ContainsKey(command))
+            {
+                Console.WriteLine($"{command} is a shell builtin");
+            }
             else
             {
-                //string userInput = $"E:\\Downloads\\testfolder{Path.PathSeparator}E:\\Downloads\\onedollar{Path.PathSeparator}/usr/local/bin{Path.PathSeparator}$PATH";
-                string userInput = $@"E:\Downloads\c#programs\TestingProccesClass\bin\Debug\net8.0{Path.PathSeparator}$PATH";
-
-
-                // path variants to check
-                string expandedInput = userInput
-                    .Replace("$PATH", pathListString)
-                    .Replace("${PATH}", pathListString)
-                    .Replace("%PATH%", pathListString);
-                splitPathList = expandedInput.Split(Path.PathSeparator,StringSplitOptions.RemoveEmptyEntries);
-                
+                string executablePath = FindExecutable(command);
+                if (executablePath != null)
+                {
+                    Console.WriteLine($"{command} is {executablePath}");
+                }
+                else
+                {
+                    Console.WriteLine($"{command}: not found");
+                }
             }
+        }
 
-            
-            
-            
-            string changedWord = "";
-            
+        static void HandlePwd()
+        {
+            Console.WriteLine(currentDirectory);
+        }
 
-            if(!validCommandsList.Contains(nameOfFile))
+        static void HandleCd(string[] arguments)
+        {
+            string targetPath;
+
+            if (arguments.Length == 0)
             {
-                foreach(string directoryString in splitPathList)
+                // No arguments - go to home directory
+                targetPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            }
+            else
             {
-                    
-                    // skip the not existing directories
-                    if (!Directory.Exists(directoryString))
+                targetPath = arguments[0];
+
+                // Handle ~ as home directory
+                if (targetPath == "~" || targetPath.StartsWith("~/"))
+                {
+                    string homeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                    if (targetPath == "~")
                     {
-                        continue;
+                        targetPath = homeDir;
                     }
-
-                    // make the full path
-                    changedWord = Path.Join(directoryString, nameOfFile);
-                   
-                    
-                    if (File.Exists(changedWord))
+                    else
                     {
-
-                        wordCheckerIsPath = true;
-
-                        // checks on linux if the program is executable because file exists is not enoguth to check
-                        // thats why there was a problem with finding a file in a folder that you didnt have permis and printed
-                        
-                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                        {
-
-                            var mode = File.GetUnixFileMode(changedWord);
-                            if ((mode & UnixFileMode.UserExecute) != 0 ||
-                            (mode & UnixFileMode.GroupExecute) != 0 ||
-                            (mode & UnixFileMode.OtherExecute) != 0)
-                            {
-                                //05
-                                //005
-                                //101
-
-                                 
-                                //01
-                                //1000
-                                //1001001
-
-                                //1000000
-
-
-                                if (splitInputList[0] == "type")
-                                {
-                                    Console.WriteLine(nameOfFile + " is " + changedWord);
-                                }
-                                else
-                                {
-                                    string arguments = string.Join(" ", splitInputList.Skip(1));
-                                    executesFileIfMeetRequirements(nameOfFile, arguments);
-                                }
-                                
-                                
-                            }
-
-
-
-                        }
-
-
-
-                        if (Path.PathSeparator == ';')
-                        {
-                            if (splitInputList[0] == "type")
-                            {
-                                Console.WriteLine(nameOfFile + " is " + changedWord);
-                                break;
-                            }
-
-                            else
-                            {
-                                // in requirements it should be only filename given, but because of how i placed my downloads need full path to work, when testing locally.
-                                string arguments = string.Join(" ", splitInputList.Skip(1));
-                                executesFileIfMeetRequirements(changedWord, arguments);
-                               
-
-
-                            }
-                           
-                            
-                            
-                        }
-
-
+                        targetPath = Path.Combine(homeDir, targetPath.Substring(2));
                     }
+                }
 
+                // Convert relative paths to absolute
+                if (!Path.IsPathRooted(targetPath))
+                {
+                    targetPath = Path.Combine(currentDirectory, targetPath);
                 }
             }
 
-            // checks if second word after type is valid if not print not found
-            if (splitInputList[0] == "type" && !wordCheckerIsPath)
+            try
             {
-                // checks the second string given does it exist in commands
-                CheckDoesCommandExist(splitInputList, splitInputList[1], validCommandsList);
+                if (Directory.Exists(targetPath))
+                {
+                    currentDirectory = Path.GetFullPath(targetPath);
+                    Directory.SetCurrentDirectory(currentDirectory);
+                }
+                else
+                {
+                    Console.WriteLine($"cd: {targetPath}: No such file or directory");
+                }
             }
-            
-           
-
-            if (validCommandsList.Contains(splitInputList[1]) && splitInputList.Count() == 2)
+            catch (Exception ex)
             {
-                Console.WriteLine(splitInputList[1] + " is a shell builtin");
+                Console.WriteLine($"cd: {targetPath}: {ex.Message}");
             }
+        }
 
+        static void HandleExternalCommand(string command, string[] arguments)
+        {
+            string executablePath = FindExecutable(command);
 
-            if (splitInputList[0] == "type" && splitInputList.Count() > 2 && !File.Exists(changedWord))
+            if (executablePath != null)
             {
-                Console.Error.WriteLine(splitInputList[1] + ": not found");
+                try
+                {
+                    ProcessStartInfo startInfo = new ProcessStartInfo
+                    {
+                        FileName = executablePath,
+                        Arguments = string.Join(" ", arguments),
+                        UseShellExecute = false,
+                        RedirectStandardOutput = false,
+                        WorkingDirectory = currentDirectory
+                    };
+
+                    Process process = Process.Start(startInfo);
+                    process.WaitForExit();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error executing {command}: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"{command}: command not found");
+            }
+        }
+
+        static string FindExecutable(string command)
+        {
+            // Check if it's an absolute or relative path
+            if (Path.IsPathRooted(command))
+            {
+                if (File.Exists(command) && IsExecutable(command))
+                    return command;
+                return null;
             }
 
-            
+            // Check relative to current directory
+            string relativePath = Path.Combine(currentDirectory, command);
+            if (File.Exists(relativePath) && IsExecutable(relativePath))
+                return relativePath;
 
+            // Check in PATH directories
+            string pathEnv = Environment.GetEnvironmentVariable("PATH");
+            if (!string.IsNullOrEmpty(pathEnv))
+            {
+                string[] pathDirectories = pathEnv.Split(Path.PathSeparator);
+
+                foreach (string directory in pathDirectories)
+                {
+                    if (string.IsNullOrEmpty(directory)) continue;
+
+                    string fullPath = Path.Combine(directory, command);
+                    if (File.Exists(fullPath) && IsExecutable(fullPath))
+                        return fullPath;
+
+                    // On Windows, also check with .exe extension
+                    if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                    {
+                        string exePath = fullPath + ".exe";
+                        if (File.Exists(exePath) && IsExecutable(exePath))
+                            return exePath;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        static bool IsExecutable(string filePath)
+        {
+            try
+            {
+                // On Unix-like systems, check if file has execute permission
+                if (Environment.OSVersion.Platform == PlatformID.Unix ||
+                    Environment.OSVersion.Platform == PlatformID.MacOSX)
+                {
+                    var fileInfo = new FileInfo(filePath);
+                    return (fileInfo.Attributes & FileAttributes.Directory) == 0;
+                }
+
+                // On Windows, check file extensions
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                {
+                    string extension = Path.GetExtension(filePath).ToLower();
+                    return extension == ".exe" || extension == ".com" || extension == ".bat" || extension == ".cmd";
+                }
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
-
-    static void executesFileIfMeetRequirements(string nameOfFile, string arguments)
-    {
-       
-        
-        var process = Process.Start(nameOfFile, arguments);
-        
-        process.WaitForExit();
-    }
-
-    static void printWorkingDirectory (string[] splitInputList, List<string> validCommandsList)
-    {
-        if (splitInputList[0] == "pwd" && splitInputList.Count() == 1)
-        {
-            string pathWorkingDirectory = Directory.GetCurrentDirectory();
-            Console.WriteLine(pathWorkingDirectory);
-        }
-
-        //if(splitInputList[0] != "pwd" && splitInputList.Count() == 1)
-        //{
-            
-        //}
-
-        
-    }
-
-    static void changeDirectory (string[] splitInputList, List<string> validCommandsList)
-    {
-        if (splitInputList[0] == "cd" && splitInputList[1] == "~")
-        {
-            //Console.WriteLine("this matches 2");
-            string homePath = (Environment.OSVersion.Platform == PlatformID.Unix ||
-                                Environment.OSVersion.Platform == PlatformID.MacOSX)
-                                ? Environment.GetEnvironmentVariable("HOME")
-                                : Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
-            
-            Directory.SetCurrentDirectory(homePath); 
-            return;
-        }
-
-        if (splitInputList[0] == "cd" && Directory.Exists(splitInputList[1]))
-        {
-            //Console.WriteLine("this matches 2");
-            Directory.SetCurrentDirectory(splitInputList[1]);
-            return;
-        }
-
-        if (splitInputList[0] == "cd" && !Directory.Exists(splitInputList[1]))
-        {
-
-            Console.WriteLine($"cd: {splitInputList[1]}: No such file or directory");
-        }
-
-
-    }
-
-    
-
-   
-
-
 }
-
-
-
