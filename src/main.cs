@@ -89,7 +89,7 @@ class Program
 
 
 
-        if (splitInputList.Count() > 1 && CheckDoesCommandExist(splitInputList, inputCommand, validCommandsList) && !checker)
+        if (splitInputList.Length > 0 && CheckDoesCommandExist(splitInputList, inputCommand, validCommandsList) && !checker)
         {
             exitCommand(splitInputList, inputCommand);
 
@@ -110,34 +110,35 @@ class Program
 
     public static bool CheckDoesCommandExist(string[] splitInputList, string inputCommand, List<string> validCommandsList)
     {
-        
-        foreach (string item in validCommandsList)
-        {
-            if (inputCommand.StartsWith(item))
-            {
-                return true;
-            }
-
-        }
-        // checks the second string given does it exist in commands
-        if (splitInputList[0] == "type")
-        {
-            Console.Error.WriteLine(inputCommand + ": not found");
-           
-            return false;
-        }
-
-        if((splitInputList[0].Contains("_exe") && splitInputList.Length > 1) || (splitInputList[0].Contains(".exe") && splitInputList.Length > 1))
+        // Check if the first part is a builtin command
+        if (splitInputList.Length > 0 && validCommandsList.Contains(splitInputList[0]))
         {
             return true;
         }
 
-        Console.Error.WriteLine(inputCommand + ": command not found");
-        
+        // checks the second string given does it exist in commands
+        if (splitInputList[0] == "type")
+        {
+            Console.Error.WriteLine(splitInputList[1] + ": not found");
+            return false;
+        }
+
+        if ((splitInputList[0].Contains("_exe") && splitInputList.Length > 1) || (splitInputList[0].Contains(".exe") && splitInputList.Length > 1))
+        {
+            return true;
+        }
+
+        // Check if it's an external command
+        if (splitInputList.Length > 0 && IsExternalCommand(splitInputList[0]))
+        {
+            return true;
+        }
+
+        Console.Error.WriteLine(splitInputList[0] + ": command not found");
         return false;
     }
 
-    
+
     static void exitCommand(string[] splitInputList, string inputCommand)
     {
         if (splitInputList[0] == "exit" && splitInputList.Length == 1)
@@ -440,7 +441,21 @@ class Program
         return parts.ToArray();
     }
 
+    static bool IsExternalCommand(string command)
+    {
+        string[] pathDirectories = Environment.GetEnvironmentVariable("PATH")?.Split(Path.PathSeparator) ?? new string[0];
 
+        foreach (string directory in pathDirectories)
+        {
+            if (string.IsNullOrEmpty(directory)) continue;
+
+            string fullPath = Path.Combine(directory, command);
+            if (File.Exists(fullPath))
+                return true;
+        }
+
+        return false;
+    }
 
 
 
