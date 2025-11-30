@@ -59,8 +59,8 @@ class Program
 
         if (splitInputList.Length > 0 && IsExternalCommand(splitInputList[0]))
         {
-            string arguments = string.Join(" ", splitInputList.Skip(1));
-            executesFileIfMeetRequirements(splitInputList[0], arguments);
+            string[] argumentsArray = splitInputList.Skip(1).ToArray();
+            executesFileIfMeetRequirements(splitInputList[0], argumentsArray);
             return;
         }
 
@@ -289,8 +289,8 @@ class Program
                                 }
                                 else
                                 {
-                                    string arguments = string.Join(" ", splitInputList.Skip(1));
-                                    executesFileIfMeetRequirements(nameOfFile, arguments);
+                                    string[] argumentsArray = splitInputList.Skip(1).ToArray();
+                                    executesFileIfMeetRequirements(nameOfFile, argumentsArray);
                                 }
                                 
                                 
@@ -313,9 +313,9 @@ class Program
                             else
                             {
                                 // in requirements it should be only filename given, but because of how i placed my downloads need full path to work, when testing locally.
-                                string arguments = string.Join(" ", splitInputList.Skip(1));
-                                executesFileIfMeetRequirements(changedWord, arguments);
-                               
+                                string[] argumentsArray = splitInputList.Skip(1).ToArray();
+                                executesFileIfMeetRequirements(changedWord, argumentsArray);
+
 
 
                             }
@@ -355,12 +355,21 @@ class Program
         }
     }
 
-    static void executesFileIfMeetRequirements(string nameOfFile, string arguments)
+    static void executesFileIfMeetRequirements(string nameOfFile, string[] argumentsArray)
     {
-       
-        
-        var process = Process.Start(nameOfFile, arguments);
-        
+        var process = new Process();
+        process.StartInfo.FileName = nameOfFile;
+
+        // Pass arguments as an array instead of a single string
+        foreach (string arg in argumentsArray)
+        {
+            process.StartInfo.ArgumentList.Add(arg);
+        }
+
+        process.StartInfo.UseShellExecute = false;
+        process.StartInfo.RedirectStandardOutput = false;
+
+        process.Start();
         process.WaitForExit();
     }
 
