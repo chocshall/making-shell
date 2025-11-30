@@ -57,6 +57,13 @@ class Program
             return;
         }
 
+        if (splitInputList.Length > 0 && IsExternalCommand(splitInputList[0]))
+        {
+            string arguments = string.Join(" ", splitInputList.Skip(1));
+            executesFileIfMeetRequirements(splitInputList[0], arguments);
+            return;
+        }
+
 
 
 
