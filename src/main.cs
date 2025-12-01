@@ -419,22 +419,65 @@ class Program
         }
     }
 
+    //static void executesFileIfMeetRequirements(string nameOfFile, string[] splitInputList)
+    //{
+    //    var processStartInfo = new ProcessStartInfo
+    //    {
+    //        FileName = nameOfFile,
+    //        UseShellExecute = false
+    //    };
+
+    //    foreach (string item in splitInputList.Skip(1))
+    //    {
+    //        processStartInfo.ArgumentList.Add(item);
+    //    }
+
+    //    var process = Process.Start(processStartInfo);
+
+    //    process.WaitForExit();
+    //}
+
     static void executesFileIfMeetRequirements(string nameOfFile, string[] splitInputList)
     {
-        var processStartInfo = new ProcessStartInfo
-        {
-            FileName = nameOfFile,
-            UseShellExecute = false
-        };
+        Console.Error.WriteLine($"DEBUG: Trying to execute: {nameOfFile}");
+        Console.Error.WriteLine($"DEBUG: With args: {string.Join(", ", splitInputList.Skip(1))}");
 
-        foreach (string item in splitInputList.Skip(1))
+        try
         {
-            processStartInfo.ArgumentList.Add(item);
+            var processStartInfo = new ProcessStartInfo
+            {
+                FileName = nameOfFile,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+
+            foreach (string item in splitInputList.Skip(1))
+            {
+                processStartInfo.ArgumentList.Add(item);
+            }
+
+            var process = Process.Start(processStartInfo);
+            string output = process.StandardOutput.ReadToEnd();
+            string error = process.StandardError.ReadToEnd();
+            process.WaitForExit();
+
+            Console.Error.WriteLine($"DEBUG: Output length: {output.Length}");
+            Console.Error.WriteLine($"DEBUG: Error length: {error.Length}");
+            Console.Error.WriteLine($"DEBUG: Exit code: {process.ExitCode}");
+
+            if (!string.IsNullOrEmpty(output))
+                Console.Write(output);
+            else
+                Console.Error.WriteLine("DEBUG: No output received!");
+
+            if (!string.IsNullOrEmpty(error))
+                Console.Error.Write(error);
         }
-
-        var process = Process.Start(processStartInfo);
-
-        process.WaitForExit();
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"DEBUG: Exception: {ex.Message}");
+        }
     }
 
     static void printWorkingDirectory(string[] splitInputList, List<string> validCommandsList)
@@ -514,6 +557,7 @@ class Program
             {
                 result.Add(trimmed);
             }
+            Console.WriteLine(s);
         }
 
     }
