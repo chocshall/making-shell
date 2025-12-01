@@ -431,10 +431,38 @@ class Program
     static void executesFileIfMeetRequirements(string nameOfFile, string[] splitInputList)
     {
         string executable = nameOfFile;
+
+        // Try to find cat
         if (nameOfFile == "cat")
         {
-            executable = "/bin/cat";
+            // Check common locations for cat
+            string[] possiblePaths = { "/bin/cat", "/usr/bin/cat", "cat" };
+            bool found = false;
+
+            foreach (string path in possiblePaths)
+            {
+                try
+                {
+                    if (File.Exists(path) || path == "cat") // "cat" will rely on PATH
+                    {
+                        executable = path;
+                        found = true;
+                        break;
+                    }
+                }
+                catch
+                {
+                    // Continue checking
+                }
+            }
+
+            if (!found)
+            {
+                Console.Error.WriteLine("cat: command not found");
+                return;
+            }
         }
+
         var processStartInfo = new ProcessStartInfo
         {
             FileName = executable,
