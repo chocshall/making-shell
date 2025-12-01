@@ -264,7 +264,7 @@ class Program
     static void typeBuiltCommand(string[] splitInputList, List<string> validCommandsList, string nameOfFile)
     {
 
-        if (splitInputList[0] == "type" || splitInputList[0].Contains(".exe") || splitInputList[0].Contains("_exe"))
+        if (splitInputList[0] == "type" || splitInputList[0].Contains(".exe") || splitInputList[0].Contains("_exe") || splitInputList[0].Contains("cat"))
         {
             string[] splitPathList = Array.Empty<string>();
 
