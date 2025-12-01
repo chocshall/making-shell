@@ -492,7 +492,7 @@ class Program
         
         inputlist[0] = splitInputListTwo[0];
         inputlist[1] = result;
-        Console.WriteLine(inputlist[1]);
+        
 
     }
 }
