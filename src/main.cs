@@ -279,7 +279,7 @@ class Program
             // used for getting a check if there exist atleast one full path
             bool wordCheckerIsPath = false;
 
-            if (!false)
+            if (false)
             {
                 splitPathList = pathListString.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries);
             }
@@ -428,92 +428,54 @@ class Program
 
     }
 
-    //static void executesFileIfMeetRequirements(string nameOfFile, string[] splitInputList)
-    //{
-    //    string executable = nameOfFile;
-
-    //    // Try to find cat
-    //    if (nameOfFile == "cat")
-    //    {
-    //        // Check common locations for cat
-    //        string[] possiblePaths = { "/bin/cat", "/usr/bin/cat", "cat" };
-    //        bool found = false;
-
-    //        foreach (string path in possiblePaths)
-    //        {
-    //            try
-    //            {
-    //                if (File.Exists(path) || path == "cat") // "cat" will rely on PATH
-    //                {
-    //                    executable = path;
-    //                    found = true;
-    //                    break;
-    //                }
-    //            }
-    //            catch
-    //            {
-    //                // Continue checking
-    //            }
-    //        }
-
-    //        if (!found)
-    //        {
-    //            Console.Error.WriteLine("cat: command not found");
-    //            return;
-    //        }
-    //    }
-
-    //    var processStartInfo = new ProcessStartInfo
-    //    {
-    //        FileName = executable,
-    //        UseShellExecute = false
-    //    };
-
-    //    foreach (string item in splitInputList.Skip(1))
-    //    {
-    //        processStartInfo.ArgumentList.Add(item);
-    //    }
-
-    //    var process = Process.Start(processStartInfo);
-
-    //    process.WaitForExit();
-    //}
-
     static void executesFileIfMeetRequirements(string nameOfFile, string[] splitInputList)
     {
-        try
+       string executable = nameOfFile;
+    
+    // Try to find cat
+    if (nameOfFile == "cat")
+    {
+        // Check common locations for cat
+        string[] possiblePaths = { "/bin/cat", "/usr/bin/cat", "cat" };
+        bool found = false;
+        
+        foreach (string path in possiblePaths)
         {
-            var processStartInfo = new ProcessStartInfo
+            try
             {
-                FileName = nameOfFile,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,  // MUST HAVE THIS!
-                RedirectStandardError = true    // MUST HAVE THIS!
-            };
-
-            foreach (string item in splitInputList.Skip(1))
-            {
-                processStartInfo.ArgumentList.Add(item);
+                if (File.Exists(path) || path == "cat")
+                {
+                    executable = path;
+                    found = true;
+                    break;
+                }
             }
-
-            var process = Process.Start(processStartInfo);
-
-            // MUST READ THE OUTPUT!
-            string output = process.StandardOutput.ReadToEnd();
-            string error = process.StandardError.ReadToEnd();
-
-            process.WaitForExit();
-
-            // MUST PRINT THE OUTPUT!
-            Console.Write(output);
-            if (!string.IsNullOrEmpty(error))
-                Console.Error.Write(error);
+            catch
+            {
+                
+            }
         }
-        catch (Exception)
+        
+        if (!found)
         {
-            // CATCH ANY EXCEPTION!
-            Console.Error.WriteLine($"{nameOfFile}: command not found");
+            Console.Error.WriteLine("cat: command not found");
+            return;
         }
+    }
+        var processStartInfo = new ProcessStartInfo
+        {
+            FileName = executable,
+            UseShellExecute = false
+        };
+
+        foreach (string item in splitInputList.Skip(1))
+        {
+            processStartInfo.ArgumentList.Add(item);
+        }
+
+        var process = Process.Start(processStartInfo);
+
+        process.WaitForExit();
     }
 
     //static void executesFileIfMeetRequirements(string nameOfFile, string[] splitInputList)
@@ -604,40 +566,22 @@ class Program
 
     static void SingleQuotes(string input, ref string[] inputlist)
     {
-       
-        
-        string[] splitInputList = Array.Empty<string>();
-        int newArrayLength = 0;
 
 
-
-        splitInputList = input.Split('\'');
-
+        string[] splitInputList = input.Split('\'');
         List<string> result = new List<string>();
 
         foreach (string s in splitInputList)
         {
-            if(s != " ")
-            {
-               result.Add(s);
-               newArrayLength++;
-            }
-            
-        }
-
-        inputlist = new string[newArrayLength];
-
-        inputlist = result.ToArray();
-
-        foreach (string s in inputlist)
-        {
-            string trimmed = s.Trim(); // Trim whitespace!
+            // Use Trim() and check for non-empty strings
+            string trimmed = s.Trim();
             if (!string.IsNullOrEmpty(trimmed))
             {
                 result.Add(trimmed);
             }
-            
         }
+
+        inputlist = result.ToArray();
 
     }
 }
