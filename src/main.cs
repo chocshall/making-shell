@@ -66,11 +66,11 @@ class Program
 
         if (!checkingMatch.Success)
         {
-            if (inputCommand.Contains('\''))
+            if (inputCommand.Contains('\'') || inputCommand.Contains('\"'))
             {
-                
 
-                SingleQuotes(inputCommand, ref splitInputList);
+
+                WhatIsInQuotes(inputCommand, ref splitInputList);
                 
             }
             else
@@ -213,6 +213,17 @@ class Program
             return;
         }
 
+       
+
+        if (inputCommand.StartsWith('\"') || inputCommand.EndsWith('\"'))
+        {
+            splitInputList = inputCommand.Split('\"');
+            string result = string.Join("", splitInputList);
+            Console.WriteLine(result);
+
+            return;
+        }
+
 
 
         if (!inputCommand.StartsWith('\'') && !inputCommand.EndsWith('\''))
@@ -232,10 +243,25 @@ class Program
 
             }
 
+            if (joinedItem.Contains('\"'))
+            {
+                joinedItem = joinedItem.Replace('\"', ' ');
+
+                splitInputList = joinedItem.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                joinedItem = string.Join("", splitInputList);
+
+            }
+
             Console.WriteLine(joinedItem);
 
             return;
         }
+
+        
+
+        
+        
 
 
 
@@ -249,6 +275,7 @@ class Program
         if (!validCommandsList.Contains(splitInputList[0]))
         {
             executesFileIfMeetRequirements(splitInputList[0], splitInputList);
+            return;
         }
         if (splitInputList[0] == "type")
         {
@@ -415,7 +442,7 @@ class Program
     if (nameOfFile == "cat")
     {
         // Check common locations for cat on linux
-        string[] possiblePaths = { "/bin/cat", "/usr/bin/cat", "cat" };
+        string[] possiblePaths = { "/bin/cat", "/usr/bin/cat", "cat", "E:\\Downloads\\c#programs\\TestingProccesClass\\bin\\Debug\\net8.0" };
         bool found = false;
         
         foreach (string path in possiblePaths)
@@ -501,26 +528,49 @@ class Program
     }
 
 
-    static void SingleQuotes(string input, ref string[] inputlist)
+    static void WhatIsInQuotes(string input, ref string[] inputlist)
     {
 
-
-        string[] splitInputList = input.Split('\'');
-        List<string> result = new List<string>();
-
-        foreach (string s in splitInputList)
+        if (input.Contains('\"'))
         {
-            // Use Trim() and check for non-empty strings
-            string trimmed = s.Trim();
-            // checks if blank or nothing
-            if (!string.IsNullOrEmpty(trimmed))
-            {
-                result.Add(trimmed);
-            }
-        }
+            string[] splitInputList = input.Split('\"');
+            List<string> result = new List<string>();
 
-        inputlist = result.ToArray();
+            foreach (string s in splitInputList)
+            {
+                // Use Trim() and check for non-empty strings
+                string trimmed = s.Trim();
+                // checks if blank or nothing
+                if (!string.IsNullOrEmpty(trimmed))
+                {
+                    result.Add(trimmed);
+                }
+            }
+
+            inputlist = result.ToArray();
+        }
+        else
+        {
+            string[] splitInputList = input.Split('\'');
+            List<string> result = new List<string>();
+
+            foreach (string s in splitInputList)
+            {
+                // Use Trim() and check for non-empty strings
+                string trimmed = s.Trim();
+                // checks if blank or nothing
+                if (!string.IsNullOrEmpty(trimmed))
+                {
+                    result.Add(trimmed);
+                }
+            }
+
+            inputlist = result.ToArray();
+        }
+        
     }
+
+    
 }
 
             
