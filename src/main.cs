@@ -206,186 +206,186 @@ class Program
         inputCommand = inputCommand.Remove(0, 5);
         string newWord = "";
         int checkForDoubleNotNeededSpace = 0;
-        if (inputCommand.Contains("\"\"") || inputCommand.Contains("\'\'"))
-        {
-            if (inputCommand.StartsWith('\"') || inputCommand.EndsWith('\"'))
-            {
-                try
-                {
-                    for (int i = 0; i < inputCommand.Length; i++)
-                    {
+        //if(inputCommand.Contains("\"\"") || inputCommand.Contains("\'\'"))
+        //{
+        //    if (inputCommand.StartsWith('\"') || inputCommand.EndsWith('\"'))
+        //    {
+        //        try
+        //        {
+        //            for (int i = 0; i < inputCommand.Length; i++)
+        //            {
 
-                        if (inputCommand[i] == '\"' && inputCommand[i + 1] == '\"')
-                        {
-                            continue;
-                        }
+        //                if (inputCommand[i] == '\"' && inputCommand[i + 1] == '\"')
+        //                {
+        //                    continue;
+        //                }
 
-                        if (inputCommand[i] == '\"' && inputCommand[i + 1] == ' ')
-                        {
-                            checkForDoubleNotNeededSpace++;
-                            continue;
-                        }
-                        // this part maybw works
-                        if (inputCommand[i] == ' ' && inputCommand[i] == ' ' && checkForDoubleNotNeededSpace > 0)
-                        {
-                            checkForDoubleNotNeededSpace = 0;
-                            continue;
-                        }
+        //                if (inputCommand[i] == '\"' && inputCommand[i + 1] == ' ')
+        //                {
+        //                    checkForDoubleNotNeededSpace++;
+        //                    continue;
+        //                }
+        //                // this part maybw works
+        //                if(inputCommand[i] == ' ' && inputCommand[i] == ' ' && checkForDoubleNotNeededSpace > 0)
+        //                {
+        //                    checkForDoubleNotNeededSpace = 0;
+        //                    continue;
+        //                }
+                        
+        //                if (inputCommand[i+1] == '\"' && inputCommand[i] == ' ')
+        //                {
+        //                    newWord += inputCommand[i];
+        //                }
+        //                if (inputCommand[i] == '\"' && Char.IsLetter(inputCommand[i + 1]))
+        //                {
+        //                    continue;
+        //                }
 
-                        if (inputCommand[i + 1] == '\"' && inputCommand[i] == ' ')
-                        {
-                            newWord += inputCommand[i];
-                        }
-                        if (inputCommand[i] == '\"' && Char.IsLetter(inputCommand[i + 1]))
-                        {
-                            continue;
-                        }
+        //                if (inputCommand[i] == '\"' && Char.IsLetter(inputCommand[i + 1]))
+        //                {
+        //                    continue;
+        //                }
 
-                        if (inputCommand[i] == '\"' && Char.IsLetter(inputCommand[i + 1]))
-                        {
-                            continue;
-                        }
+        //                if (inputCommand[i + 1] == '\"' && Char.IsLetter(inputCommand[i]))
+        //                {
+        //                    newWord += inputCommand[i];
+        //                }
 
-                        if (inputCommand[i + 1] == '\"' && Char.IsLetter(inputCommand[i]))
-                        {
-                            newWord += inputCommand[i];
-                        }
+        //                if (inputCommand[i + 1] == '\'' && Char.IsLetter(inputCommand[i]))
+        //                {
+        //                    newWord += inputCommand[i];
+        //                }
 
-                        if (inputCommand[i + 1] == '\'' && Char.IsLetter(inputCommand[i]))
-                        {
-                            newWord += inputCommand[i];
-                        }
+        //                if (inputCommand[i] == '\'' && Char.IsLetter(inputCommand[i+1]))
+        //                {
+        //                    newWord += inputCommand[i];
+        //                }
 
-                        if (inputCommand[i] == '\'' && Char.IsLetter(inputCommand[i + 1]))
-                        {
-                            newWord += inputCommand[i];
-                        }
+        //                if (Char.IsLetter(inputCommand[i + 1]) && Char.IsLetter(inputCommand[i]))
+        //                {
+        //                    newWord += inputCommand[i];
+        //                }
 
-                        if (Char.IsLetter(inputCommand[i + 1]) && Char.IsLetter(inputCommand[i]))
-                        {
-                            newWord += inputCommand[i];
-                        }
+        //                if (Char.IsWhiteSpace(inputCommand[i + 1]) && Char.IsWhiteSpace(inputCommand[i]))
+        //                {
+        //                    newWord += inputCommand[i];
+        //                }
 
-                        if (Char.IsWhiteSpace(inputCommand[i + 1]) && Char.IsWhiteSpace(inputCommand[i]))
-                        {
-                            newWord += inputCommand[i];
-                        }
+        //                if (Char.IsWhiteSpace(inputCommand[i + 1]) && Char.IsLetter(inputCommand[i]))
+        //                {
+        //                    newWord += inputCommand[i];
+        //                }
 
-                        if (Char.IsWhiteSpace(inputCommand[i + 1]) && Char.IsLetter(inputCommand[i]))
-                        {
-                            newWord += inputCommand[i];
-                        }
-
-                        if (Char.IsWhiteSpace(inputCommand[i]) && Char.IsLetter(inputCommand[i + 1]))
-                        {
-                            newWord += inputCommand[i];
-                        }
-
-
-
-
-
-                    }
-                }
-                catch (IndexOutOfRangeException ex)
-                {
-                    if (inputCommand[^1] != '\'' && inputCommand[^1] != '\"')
-                    {
-                        newWord += inputCommand[^1];
-                    }
-
-                    Console.WriteLine(newWord);
-                    newWord = "";
-                }
-            }
-
-
-            if (inputCommand.StartsWith('\'') || inputCommand.EndsWith('\''))
-            {
-                try
-                {
-                    for (int i = 0; i < inputCommand.Length; i++)
-                    {
-
-                        if (inputCommand[i] == '\'' && inputCommand[i + 1] == '\'')
-                        {
-                            continue;
-                        }
-
-                        if (inputCommand[i] == '\'' && inputCommand[i + 1] == ' ')
-                        {
-                            continue;
-                        }
-                        if (inputCommand[i] == '\'' && Char.IsLetter(inputCommand[i + 1]))
-                        {
-                            continue;
-                        }
-
-                        if (inputCommand[i] == '\"' && inputCommand[i + 1] == ' ')
-                        {
-                            checkForDoubleNotNeededSpace++;
-                            continue;
-                        }
-
-                        if (inputCommand[i] == ' ' && inputCommand[i] == ' ' && checkForDoubleNotNeededSpace > 0)
-                        {
-                            checkForDoubleNotNeededSpace = 0;
-                            continue;
-                        }
-
-                        if (inputCommand[i + 1] == '\'' && inputCommand[i] == ' ')
-                        {
-                            newWord += inputCommand[i];
-                        }
-
-                        if (inputCommand[i + 1] == '\'' && Char.IsLetter(inputCommand[i]))
-                        {
-                            newWord += inputCommand[i];
-                        }
-
-                        if (Char.IsLetter(inputCommand[i + 1]) && Char.IsLetter(inputCommand[i]))
-                        {
-                            newWord += inputCommand[i];
-                        }
-
-                        if (Char.IsWhiteSpace(inputCommand[i + 1]) && Char.IsWhiteSpace(inputCommand[i]))
-                        {
-                            newWord += inputCommand[i];
-                        }
-
-                        if (Char.IsWhiteSpace(inputCommand[i + 1]) && Char.IsLetter(inputCommand[i]))
-                        {
-                            newWord += inputCommand[i];
-                        }
-
-                        if (Char.IsWhiteSpace(inputCommand[i]) && Char.IsLetter(inputCommand[i + 1]))
-                        {
-                            newWord += inputCommand[i];
-                        }
+        //                if (Char.IsWhiteSpace(inputCommand[i]) && Char.IsLetter(inputCommand[i + 1]))
+        //                {
+        //                    newWord += inputCommand[i];
+        //                }
 
 
 
 
 
-                    }
-                }
-                catch (IndexOutOfRangeException ex)
-                {
-                    if (inputCommand[^1] != '\'')
-                    {
-                        newWord += inputCommand[^1];
-                    }
-                    Console.WriteLine(newWord);
-                    newWord = "";
-                }
-            }
-        }
+        //            }
+        //        }
+        //        catch (IndexOutOfRangeException ex)
+        //        {
+        //            if (inputCommand[^1] != '\'' && inputCommand[^1] != '\"')
+        //            {
+        //                newWord += inputCommand[^1];
+        //            }
+                        
+        //            Console.WriteLine(newWord);
+        //            newWord = "";
+        //        }
+        //    }
+
+
+        //    if (inputCommand.StartsWith('\'') || inputCommand.EndsWith('\''))
+        //    {
+        //        try
+        //        {
+        //            for (int i = 0; i < inputCommand.Length; i++)
+        //            {
+
+        //                if (inputCommand[i] == '\'' && inputCommand[i + 1] == '\'')
+        //                {
+        //                    continue;
+        //                }
+
+        //                if (inputCommand[i] == '\'' && inputCommand[i + 1] == ' ')
+        //                {
+        //                    continue;
+        //                }
+        //                if (inputCommand[i] == '\'' && Char.IsLetter(inputCommand[i + 1]))
+        //                {
+        //                    continue;
+        //                }
+
+        //                if (inputCommand[i] == '\"' && inputCommand[i + 1] == ' ')
+        //                {
+        //                    checkForDoubleNotNeededSpace++;
+        //                    continue;
+        //                }
+
+        //                if (inputCommand[i] == ' ' && inputCommand[i] == ' ' && checkForDoubleNotNeededSpace > 0)
+        //                {
+        //                    checkForDoubleNotNeededSpace = 0;
+        //                    continue;
+        //                }
+
+        //                if (inputCommand[i + 1] == '\'' && inputCommand[i] == ' ')
+        //                {
+        //                    newWord += inputCommand[i];
+        //                }
+
+        //                if (inputCommand[i + 1] == '\'' && Char.IsLetter(inputCommand[i]))
+        //                {
+        //                    newWord += inputCommand[i];
+        //                }
+
+        //                if (Char.IsLetter(inputCommand[i + 1]) && Char.IsLetter(inputCommand[i]))
+        //                {
+        //                    newWord += inputCommand[i];
+        //                }
+
+        //                if (Char.IsWhiteSpace(inputCommand[i + 1]) && Char.IsWhiteSpace(inputCommand[i]))
+        //                {
+        //                    newWord += inputCommand[i];
+        //                }
+
+        //                if (Char.IsWhiteSpace(inputCommand[i + 1]) && Char.IsLetter(inputCommand[i]))
+        //                {
+        //                    newWord += inputCommand[i];
+        //                }
+
+        //                if (Char.IsWhiteSpace(inputCommand[i]) && Char.IsLetter(inputCommand[i + 1]))
+        //                {
+        //                    newWord += inputCommand[i];
+        //                }
 
 
 
-        //almost the same from what i saw jus that when theres '' or "" it prints not one line but two
-        else
-        {
+
+
+        //            }
+        //        }
+        //        catch (IndexOutOfRangeException ex)
+        //        {
+        //            if (inputCommand[^1] != '\'')
+        //            {
+        //                newWord += inputCommand[^1];
+        //            }
+        //            Console.WriteLine(newWord);
+        //            newWord = "";
+        //        }
+        //    }
+        //}
+
+
+        
+        // almost the same from what i saw jus that when theres '' or "" it prints not one line but two
+        //else
+        //{
             if (inputCommand.StartsWith('\'') || inputCommand.EndsWith('\''))
             {
                 splitInputList = inputCommand.Split('\'');
