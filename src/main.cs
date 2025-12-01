@@ -378,7 +378,7 @@ class Program
                             {
                                 // in requirements it should be only filename given, but because of how i placed my downloads need full path to work, when testing locally.
                                 string arguments = string.Join(" ", splitInputList.Skip(1));
-                                //executesFileIfMeetRequirements(changedWord, splitInputList);
+                                executesFileIfMeetRequirements(changedWord, splitInputList);
 
 
 
@@ -506,6 +506,15 @@ class Program
         inputlist = new string[newArrayLength];
 
         inputlist = result.ToArray();
+
+        foreach (string s in inputlist)
+        {
+            string trimmed = s.Trim(); // Trim whitespace!
+            if (!string.IsNullOrEmpty(trimmed))
+            {
+                result.Add(trimmed);
+            }
+        }
 
     }
 }
