@@ -99,8 +99,8 @@ class Program
             Console.Error.WriteLine(inputCommand + ": command not found");
             return;
         }
-        // _exe neveikia taip kaip per windwos linux 
-        if (splitInputList[0].Contains(".exe") && splitInputList.Length > 1 || (splitInputList[0].Contains("_exe") && splitInputList.Length > 1) || (splitInputList[0].Contains("cat") && splitInputList.Length > 1))
+        
+        if (!validCommandsList.Contains(inputCommand) && splitInputList.Length >1)
         {
             checker = true;
 
@@ -124,7 +124,7 @@ class Program
         {
             exitCommand(splitInputList, inputCommand);
 
-            //echoCommand(splitInputList, inputCommand);
+          
 
             // checking the second input
             typeBuiltCommand(splitInputList, validCommandsList, splitInputList[1]);
@@ -432,10 +432,10 @@ class Program
     {
        string executable = nameOfFile;
     
-    // Try to find cat
+    
     if (nameOfFile == "cat")
     {
-        // Check common locations for cat
+        // Check common locations for cat on linux
         string[] possiblePaths = { "/bin/cat", "/usr/bin/cat", "cat" };
         bool found = false;
         
@@ -478,48 +478,6 @@ class Program
         process.WaitForExit();
     }
 
-    //static void executesFileIfMeetRequirements(string nameOfFile, string[] splitInputList)
-    //{
-    //    Console.Error.WriteLine($"DEBUG: Trying to execute: {nameOfFile}");
-    //    Console.Error.WriteLine($"DEBUG: With args: {string.Join(", ", splitInputList.Skip(1))}");
-
-    //    try
-    //    {
-    //        var processStartInfo = new ProcessStartInfo
-    //        {
-    //            FileName = nameOfFile,
-    //            UseShellExecute = false,
-    //            RedirectStandardOutput = true,
-    //            RedirectStandardError = true
-    //        };
-
-    //        foreach (string item in splitInputList.Skip(1))
-    //        {
-    //            processStartInfo.ArgumentList.Add(item);
-    //        }
-
-    //        var process = Process.Start(processStartInfo);
-    //        string output = process.StandardOutput.ReadToEnd();
-    //        string error = process.StandardError.ReadToEnd();
-    //        process.WaitForExit();
-
-    //        Console.Error.WriteLine($"DEBUG: Output length: {output.Length}");
-    //        Console.Error.WriteLine($"DEBUG: Error length: {error.Length}");
-    //        Console.Error.WriteLine($"DEBUG: Exit code: {process.ExitCode}");
-
-    //        if (!string.IsNullOrEmpty(output))
-    //            Console.Write(output);
-    //        else
-    //            Console.Error.WriteLine("DEBUG: No output received!");
-
-    //        if (!string.IsNullOrEmpty(error))
-    //            Console.Error.Write(error);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        Console.Error.WriteLine($"DEBUG: Exception: {ex.Message}");
-    //    }
-    //}
 
     static void printWorkingDirectory(string[] splitInputList, List<string> validCommandsList)
     {
@@ -537,7 +495,7 @@ class Program
     {
         if (splitInputList[0] == "cd" && splitInputList[1] == "~")
         {
-            //Console.WriteLine("this matches 2");
+            
             string homePath = (Environment.OSVersion.Platform == PlatformID.Unix ||
                                 Environment.OSVersion.Platform == PlatformID.MacOSX)
                                 ? Environment.GetEnvironmentVariable("HOME")
@@ -549,7 +507,7 @@ class Program
 
         if (splitInputList[0] == "cd" && Directory.Exists(splitInputList[1]))
         {
-            //Console.WriteLine("this matches 2");
+            
             Directory.SetCurrentDirectory(splitInputList[1]);
             return;
         }
@@ -575,6 +533,7 @@ class Program
         {
             // Use Trim() and check for non-empty strings
             string trimmed = s.Trim();
+            // checks if blank or nothing
             if (!string.IsNullOrEmpty(trimmed))
             {
                 result.Add(trimmed);
