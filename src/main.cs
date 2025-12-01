@@ -268,7 +268,7 @@ class Program
     static void typeBuiltCommand(string[] splitInputList, List<string> validCommandsList, string nameOfFile)
     {
 
-        if (splitInputList[0].Contains("cat") && !validCommandsList.Contains(splitInputList[0]))
+        if (!validCommandsList.Contains(splitInputList[0]))
         {
             executesFileIfMeetRequirements(splitInputList[0], splitInputList);
         }
