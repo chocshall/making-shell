@@ -321,6 +321,23 @@ class Program
                             continue;
                         }
 
+                        if (inputCommand[i] == '\"' && inputCommand[i + 1] == ' ')
+                        {
+                            checkForDoubleNotNeededSpace++;
+                            continue;
+                        }
+
+                        if (inputCommand[i] == ' ' && inputCommand[i] == ' ' && checkForDoubleNotNeededSpace > 0)
+                        {
+                            checkForDoubleNotNeededSpace = 0;
+                            continue;
+                        }
+
+                        if (inputCommand[i + 1] == '\'' && inputCommand[i] == ' ')
+                        {
+                            newWord += inputCommand[i];
+                        }
+
                         if (inputCommand[i + 1] == '\'' && Char.IsLetter(inputCommand[i]))
                         {
                             newWord += inputCommand[i];
@@ -354,6 +371,10 @@ class Program
                 }
                 catch (IndexOutOfRangeException ex)
                 {
+                    if (inputCommand[^1] != '\'')
+                    {
+                        newWord += inputCommand[^1];
+                    }
                     Console.WriteLine(newWord);
                     newWord = "";
                 }
