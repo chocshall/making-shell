@@ -441,75 +441,75 @@ class Program
         //    }
         //}
 
-        else
-        {
-            if (inputCommand.StartsWith('\'') || inputCommand.EndsWith('\''))
-            {
-                splitInputList = inputCommand.Split('\'');
-                string result = string.Join("", splitInputList);
-                Console.WriteLine(result);
+        //else
+        //{
+        //    if (inputCommand.StartsWith('\'') || inputCommand.EndsWith('\''))
+        //    {
+        //        splitInputList = inputCommand.Split('\'');
+        //        string result = string.Join("", splitInputList);
+        //        Console.WriteLine(result);
 
-                return;
-            }
-
-
-
-            if (inputCommand.StartsWith('\"') || inputCommand.EndsWith('\"'))
-            {
-                splitInputList = inputCommand.Split('\"');
-                string result = string.Join("", splitInputList);
-                Console.WriteLine(result);
-
-                return;
-            }
+        //        return;
+        //    }
 
 
 
-            if (!inputCommand.StartsWith('\'') && !inputCommand.EndsWith('\'') || !inputCommand.StartsWith('\"') && !inputCommand.EndsWith('\"'))
-            {
+        //    if (inputCommand.StartsWith('\"') || inputCommand.EndsWith('\"'))
+        //    {
+        //        splitInputList = inputCommand.Split('\"');
+        //        string result = string.Join("", splitInputList);
+        //        Console.WriteLine(result);
 
-                splitInputList = inputCommand.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-                string joinedItem = string.Join(" ", splitInputList);
-
-
-
-
-                if (joinedItem.Contains('\''))
-                {
-
-                    joinedItem = joinedItem.Replace('\'', ' ');
-
-                    splitInputList = joinedItem.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-
-                    joinedItem = string.Join("", splitInputList);
+        //        return;
+        //    }
 
 
 
-                }
+        //    if (!inputCommand.StartsWith('\'') && !inputCommand.EndsWith('\'') || !inputCommand.StartsWith('\"') && !inputCommand.EndsWith('\"'))
+        //    {
 
-                if (joinedItem.Contains('\"'))
-                {
-                    joinedItem = joinedItem.Replace("\"", "");
+        //        splitInputList = inputCommand.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-                    splitInputList = joinedItem.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-
-                    joinedItem = string.Join("", splitInputList);
-
-
-                }
-
-                Console.WriteLine(joinedItem);
-
-                return;
-            }
-
-        }
+        //        string joinedItem = string.Join(" ", splitInputList);
 
 
 
+
+        //        if (joinedItem.Contains('\''))
+        //        {
+
+        //            joinedItem = joinedItem.Replace('\'', ' ');
+
+        //            splitInputList = joinedItem.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+
+        //            joinedItem = string.Join("", splitInputList);
+
+
+
+        //        }
+
+        //        if (joinedItem.Contains('\"'))
+        //        {
+        //            joinedItem = joinedItem.Replace("\"", "");
+
+        //            splitInputList = joinedItem.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+
+        //            joinedItem = string.Join("", splitInputList);
+
+
+        //        }
+
+        //        Console.WriteLine(joinedItem);
+
+        //        return;
+        //    }
+
+        //}
+
+
+        
 
 
 
