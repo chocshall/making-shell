@@ -266,8 +266,9 @@ class Program
     // pastaisyti kad jeigu neieni i commanda tada tirkini executable ar yra
     static void typeBuiltCommand(string[] splitInputList, List<string> validCommandsList, string nameOfFile)
     {
+        
 
-        if (splitInputList[0] == "type" || splitInputList[0].Contains(".exe") || splitInputList[0].Contains("_exe") || splitInputList[0].Contains("cat"))
+        if (splitInputList[0] == "type" || splitInputList[0].Contains(".exe") || splitInputList[0].Contains("_exe"))
         {
             string[] splitPathList = Array.Empty<string>();
 
@@ -414,9 +415,15 @@ class Program
                 Console.Error.WriteLine(splitInputList[1] + ": not found");
             }
 
-
+            if (splitInputList[0].Contains("cat"))
+            {
+                executesFileIfMeetRequirements(splitInputList[0], splitInputList);
+            }
 
         }
+
+
+
     }
 
     //static void executesFileIfMeetRequirements(string nameOfFile, string[] splitInputList)
