@@ -205,7 +205,7 @@ class Program
         /// removes the echo from print
         inputCommand = inputCommand.Remove(0, 5);
         string newWord = "";
-
+        int checkForDoubleNotNeededSpace = 0;
         if(inputCommand.Contains("\"\"") || inputCommand.Contains("\'\'"))
         {
             if (inputCommand.StartsWith('\"') || inputCommand.EndsWith('\"'))
@@ -222,8 +222,25 @@ class Program
 
                         if (inputCommand[i] == '\"' && inputCommand[i + 1] == ' ')
                         {
+                            checkForDoubleNotNeededSpace++;
                             continue;
                         }
+                        // this part maybw works
+                        if(inputCommand[i] == ' ' && inputCommand[i] == ' ' && checkForDoubleNotNeededSpace > 0)
+                        {
+                            checkForDoubleNotNeededSpace = 0;
+                            continue;
+                        }
+                        
+                        if (inputCommand[i+1] == '\"' && inputCommand[i] == ' ')
+                        {
+                            newWord += inputCommand[i];
+                        }
+                        if (inputCommand[i] == '\"' && Char.IsLetter(inputCommand[i + 1]))
+                        {
+                            continue;
+                        }
+
                         if (inputCommand[i] == '\"' && Char.IsLetter(inputCommand[i + 1]))
                         {
                             continue;
