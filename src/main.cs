@@ -378,7 +378,7 @@ class Program
                             {
                                 // in requirements it should be only filename given, but because of how i placed my downloads need full path to work, when testing locally.
                                 string arguments = string.Join(" ", splitInputList.Skip(1));
-                                executesFileIfMeetRequirements(changedWord, splitInputList);
+                                //executesFileIfMeetRequirements(changedWord, splitInputList);
 
 
 
@@ -482,81 +482,35 @@ class Program
 
     static void SingleQuotes(string input, ref string[] inputlist)
     {
-        string[] splitInputListTwo = Array.Empty<string>();
-        splitInputListTwo = input.Split(" ");
-
+       
+        
+        string[] splitInputList = Array.Empty<string>();
         int newArrayLength = 0;
 
 
-        string[] splitInputList = Array.Empty<string>();
-        //input = input.Remove(0, splitInputListTwo[0].Length+1);
+
         splitInputList = input.Split('\'');
+
+        List<string> result = new List<string>();
+
         foreach (string s in splitInputList)
         {
             if(s != " ")
             {
-                splitInputListTwo[newArrayLength] = s;
-                newArrayLength++;
-                
+               result.Add(s);
+               newArrayLength++;
             }
             
         }
 
         inputlist = new string[newArrayLength];
 
-        for (int number = 0; number < inputlist.Length; number++)
-        {
+        inputlist = result.ToArray();
 
-            inputlist[number] = splitInputListTwo[number];
-            //Console.WriteLine(inputlist[number]);
-        }
-       
-
-
-
-
-       
-
-        //Console.WriteLine(inputlist[1]);
     }
 }
 
-            //int firstSpaceIndex = input.IndexOf(' ');
-            //string restOfString = "";
-            //if (firstSpaceIndex >= 0)
-            //{
-            //    restOfString = input.Substring(firstSpaceIndex + 1);
-
-
-//}
-
-
-
-//string[] partsOfString = restOfString.Split('\'');
-
-//restOfString = "";
-
-//foreach (var item in partsOfString)
-//{
-//    if(item != " ")
-//    {
-//        restOfString += item;
-//    }
-//}
-//arrayWithTwoElements[1] = restOfString;
-
-
-
-//string[] parts = input.Split(' ', 2); 
-
-//if (parts.Length > 1)
-//{
-//    string theFirstElement = parts[0];
-
-//    arrayWithTwoElements[0] = theFirstElement;
-//}
-
-
+            
 
 
 
