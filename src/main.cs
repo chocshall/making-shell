@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Formats.Tar;
 using System.IO;
+using System.IO.Enumeration;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Numerics;
@@ -9,6 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 class Program
 {
@@ -66,9 +68,10 @@ class Program
         {
             if (inputCommand.Contains('\''))
             {
-                splitInputList = new string[2];
+                
 
-                SingleQuotes(inputCommand, splitInputList);
+                SingleQuotes(inputCommand, ref splitInputList);
+                //Console.WriteLine(splitInputList[1]);
             }
             else
             {
@@ -351,7 +354,7 @@ class Program
                                 else
                                 {
                                     string arguments = string.Join(" ", splitInputList.Skip(1));
-                                    executesFileIfMeetRequirements(nameOfFile, arguments);
+                                    executesFileIfMeetRequirements(nameOfFile, splitInputList);
                                 }
 
 
@@ -375,7 +378,7 @@ class Program
                             {
                                 // in requirements it should be only filename given, but because of how i placed my downloads need full path to work, when testing locally.
                                 string arguments = string.Join(" ", splitInputList.Skip(1));
-                                executesFileIfMeetRequirements(changedWord, arguments);
+                                executesFileIfMeetRequirements(changedWord, splitInputList);
 
 
 
@@ -416,11 +419,20 @@ class Program
         }
     }
 
-    static void executesFileIfMeetRequirements(string nameOfFile, string arguments)
+    static void executesFileIfMeetRequirements(string nameOfFile, string[] splitInputList)
     {
+        var processStartInfo = new ProcessStartInfo
+        {
+            FileName = nameOfFile,
+            UseShellExecute = false
+        };
 
+        foreach (string item in splitInputList.Skip(1))
+        {
+            processStartInfo.ArgumentList.Add(item);
+        }
 
-        var process = Process.Start(nameOfFile, arguments);
+        var process = Process.Start(processStartInfo);
 
         process.WaitForExit();
     }
@@ -468,32 +480,44 @@ class Program
     }
 
 
-    static void SingleQuotes(string input, string[] inputlist)
+    static void SingleQuotes(string input, ref string[] inputlist)
     {
         string[] splitInputListTwo = Array.Empty<string>();
         splitInputListTwo = input.Split(" ");
 
+        int newArrayLength = 0;
+
+
         string[] splitInputList = Array.Empty<string>();
-        input = input.Remove(0, splitInputListTwo[0].Length+1);
-        splitInputList = input.Split(" ");
-
-        string result = "";
-
-        if (input.StartsWith('\'') || input.EndsWith('\''))
+        //input = input.Remove(0, splitInputListTwo[0].Length+1);
+        splitInputList = input.Split('\'');
+        foreach (string s in splitInputList)
         {
-            splitInputList = input.Split('\'');
-            result = string.Join("", splitInputList);
+            if(s != " ")
+            {
+                splitInputListTwo[newArrayLength] = s;
+                newArrayLength++;
+                
+            }
             
-
         }
 
+        inputlist = new string[newArrayLength];
+
+        for (int number = 0; number < inputlist.Length; number++)
+        {
+
+            inputlist[number] = splitInputListTwo[number];
+            //Console.WriteLine(inputlist[number]);
+        }
+       
 
 
-        
-        inputlist[0] = splitInputListTwo[0];
-        inputlist[1] = result;
-        
 
+
+       
+
+        //Console.WriteLine(inputlist[1]);
     }
 }
 
