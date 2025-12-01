@@ -208,7 +208,7 @@ class Program
 
         if(inputCommand.Contains("\"\"") || inputCommand.Contains("\'\'"))
         {
-            if (inputCommand.StartsWith('\"') && inputCommand.EndsWith('\"'))
+            if (inputCommand.StartsWith('\"') || inputCommand.EndsWith('\"'))
             {
                 try
                 {
@@ -230,6 +230,16 @@ class Program
                         }
 
                         if (inputCommand[i + 1] == '\"' && Char.IsLetter(inputCommand[i]))
+                        {
+                            newWord += inputCommand[i];
+                        }
+
+                        if (inputCommand[i + 1] == '\'' && Char.IsLetter(inputCommand[i]))
+                        {
+                            newWord += inputCommand[i];
+                        }
+
+                        if (inputCommand[i] == '\'' && Char.IsLetter(inputCommand[i+1]))
                         {
                             newWord += inputCommand[i];
                         }
@@ -262,13 +272,18 @@ class Program
                 }
                 catch (IndexOutOfRangeException ex)
                 {
+                    if (inputCommand[^1] != '\'' || inputCommand[^1] != '\"')
+                    {
+                        newWord += inputCommand[^1];
+                    }
+                        
                     Console.WriteLine(newWord);
                     newWord = "";
                 }
             }
 
 
-            if (inputCommand.StartsWith('\'') && inputCommand.EndsWith('\''))
+            if (inputCommand.StartsWith('\'') || inputCommand.EndsWith('\''))
             {
                 try
                 {
