@@ -382,65 +382,8 @@ class Program
         }
 
 
-        //if (!inputCommand.StartsWith('\'') && !inputCommand.EndsWith('\''))
-        //{
-        //    try
-        //    {
-        //        for (int i = 0; i < inputCommand.Length; i++)
-        //        {
-
-        //            if (inputCommand[i] == '\'' && inputCommand[i + 1] == '\'')
-        //            {
-        //                continue;
-        //            }
-
-        //            if (inputCommand[i] == '\'' && inputCommand[i + 1] == ' ')
-        //            {
-        //                continue;
-        //            }
-        //            if (inputCommand[i] == '\'' && Char.IsLetter(inputCommand[i + 1]))
-        //            {
-        //                continue;
-        //            }
-
-        //            if (inputCommand[i + 1] == '\'' && Char.IsLetter(inputCommand[i]))
-        //            {
-        //                newWord += inputCommand[i];
-        //            }
-
-        //            if (Char.IsLetter(inputCommand[i + 1]) && Char.IsLetter(inputCommand[i]))
-        //            {
-        //                newWord += inputCommand[i];
-        //            }
-
-        //            if (Char.IsWhiteSpace(inputCommand[i + 1]) && Char.IsWhiteSpace(inputCommand[i]))
-        //            {
-        //                newWord += inputCommand[i];
-        //            }
-
-        //            if (Char.IsWhiteSpace(inputCommand[i + 1]) && Char.IsLetter(inputCommand[i]))
-        //            {
-        //                newWord += inputCommand[i];
-        //            }
-
-        //            if (Char.IsWhiteSpace(inputCommand[i]) && Char.IsLetter(inputCommand[i + 1]))
-        //            {
-        //                newWord += inputCommand[i];
-        //            }
-
-
-
-
-
-        //        }
-        //    }
-        //    catch (IndexOutOfRangeException ex)
-        //    {
-        //        newWord += inputCommand[^1];
-        //        Console.WriteLine(newWord + " the other here");
-        //    }
-        //}
-
+        
+        // almost the same from what i saw jus that when theres '' or "" it prints not one line but two
         else
         {
             if (inputCommand.StartsWith('\'') || inputCommand.EndsWith('\''))
@@ -507,17 +450,6 @@ class Program
             }
 
         }
-
-
-        
-
-
-
-
-
-
-
-
 
     }
     
