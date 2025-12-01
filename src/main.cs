@@ -278,7 +278,7 @@ class Program
             // used for getting a check if there exist atleast one full path
             bool wordCheckerIsPath = false;
 
-            if (false)
+            if (!false)
             {
                 splitPathList = pathListString.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries);
             }
