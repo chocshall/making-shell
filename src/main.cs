@@ -399,10 +399,6 @@ class Program
             Console.WriteLine(pathWorkingDirectory);
         }
 
-        //if(splitInputList[0] != "pwd" && splitInputList.Count() == 1)
-        //{
-            
-        //}
 
         
     }
