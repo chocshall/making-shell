@@ -4,6 +4,8 @@ using System.Formats.Tar;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -27,11 +29,15 @@ class Program
         
 
 
+
+
+
         while (true)
         {
             Console.Write("$ ");
-            userInput( inputCommand,  validCommandsList, splitInputList);
+            
 
+            userInput( inputCommand,  validCommandsList, splitInputList);
 
 
 
@@ -46,6 +52,10 @@ class Program
         
         inputCommand = Console.ReadLine();
 
+        string[] arrayWithTwoElements = new string[2];
+        
+
+
         string pattern = "echo.+";
 
         Regex regularExpressionObject = new Regex(pattern, RegexOptions.IgnoreCase);
@@ -55,8 +65,17 @@ class Program
 
         if(!checkingMatch.Success)
         {
-            Console.WriteLine("23");
-            splitInputList = inputCommand.Split(' ');
+            if(inputCommand.Contains('\''))
+            {
+                SingleQuotes(inputCommand, arrayWithTwoElements, splitInputList);
+            }
+            else
+            {
+                splitInputList = inputCommand.Split(' ');
+            }
+
+                
+            
         }
         else
         {
@@ -433,6 +452,65 @@ class Program
 
     }
 
+
+    static void SingleQuotes(string input, string[] arrayWithTwoElements, string[] inputlist)
+    {
+        
+        int firstSpaceIndex = input.IndexOf(' ');
+        string restOfString = "";
+        if (firstSpaceIndex >= 0)
+        {
+            restOfString = input.Substring(firstSpaceIndex + 1);
+
+            
+        }
+
+        
+
+        string[] partsOfString = restOfString.Split('\'');
+
+        restOfString = "";
+
+        foreach (var item in partsOfString)
+        {
+            if(item != " ")
+            {
+                restOfString += item;
+            }
+        }
+        arrayWithTwoElements[1] = restOfString;
+
+
+
+        string[] parts = input.Split(' ', 2); 
+
+        if (parts.Length > 1)
+        {
+            string theFirstElement = parts[0];
+            
+            arrayWithTwoElements[0] = theFirstElement;
+        }
+        inputlist = new string[arrayWithTwoElements.Length];
+        inputlist[0] = arrayWithTwoElements[0];
+        inputlist[1] = arrayWithTwoElements[1];
+
+
+       
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
     
 
    
