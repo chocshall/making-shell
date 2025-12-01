@@ -14,10 +14,10 @@ class Program
 {
     static void Main()
     {
-        
 
-        
-       
+
+
+
         List<string> validCommandsList = new List<string>();
         validCommandsList.Add("exit");
         validCommandsList.Add("echo");
@@ -25,8 +25,8 @@ class Program
         validCommandsList.Add("pwd");
         validCommandsList.Add("cd");
         string inputCommand = "";
-        string[] splitInputList =  Array.Empty<string>();
-        
+        string[] splitInputList = Array.Empty<string>();
+
 
 
 
@@ -35,9 +35,9 @@ class Program
         while (true)
         {
             Console.Write("$ ");
-            
 
-            userInput( inputCommand,  validCommandsList, splitInputList);
+
+            userInput(inputCommand, validCommandsList, splitInputList);
 
 
 
@@ -49,11 +49,10 @@ class Program
 
     static void userInput(string inputCommand, List<string> validCommandsList, string[] splitInputList)
     {
-        
+
         inputCommand = Console.ReadLine();
 
-        string[] arrayWithTwoElements = new string[2];
-        
+
 
 
         string pattern = "echo.+";
@@ -63,34 +62,36 @@ class Program
 
 
 
-        if(!checkingMatch.Success)
+        if (!checkingMatch.Success)
         {
-            if(inputCommand.Contains('\''))
+            if (inputCommand.Contains('\''))
             {
-                SingleQuotes(inputCommand, arrayWithTwoElements, splitInputList);
+                splitInputList = new string[2];
+
+                SingleQuotes(inputCommand, splitInputList);
             }
             else
             {
                 splitInputList = inputCommand.Split(' ');
             }
 
-                
-            
+
+
         }
         else
         {
             echoCommand(inputCommand);
             return;
-            
-            
+
+
         }
 
 
 
 
-            bool checker = false;
+        bool checker = false;
 
-        if(splitInputList.Length == 1 && !validCommandsList.Contains(inputCommand))
+        if (splitInputList.Length == 1 && !validCommandsList.Contains(inputCommand))
         {
             Console.Error.WriteLine(inputCommand + ": command not found");
             return;
@@ -137,7 +138,7 @@ class Program
 
     public static bool CheckDoesCommandExist(string[] splitInputList, string inputCommand, List<string> validCommandsList)
     {
-        
+
         foreach (string item in validCommandsList)
         {
             if (inputCommand.StartsWith(item))
@@ -150,28 +151,28 @@ class Program
         if (splitInputList[0] == "type")
         {
             Console.Error.WriteLine(inputCommand + ": not found");
-           
+
             return false;
         }
 
-        if((splitInputList[0].Contains("_exe") && splitInputList.Length > 1) || (splitInputList[0].Contains(".exe") && splitInputList.Length > 1))
+        if ((splitInputList[0].Contains("_exe") && splitInputList.Length > 1) || (splitInputList[0].Contains(".exe") && splitInputList.Length > 1))
         {
             return true;
         }
 
         Console.Error.WriteLine(inputCommand + ": command not found");
-        
+
         return false;
     }
 
-    
+
     static void exitCommand(string[] splitInputList, string inputCommand)
     {
         if (splitInputList[0] == "exit" && splitInputList.Length == 1)
         {
             Environment.Exit(0);
         }
-            if (splitInputList[0] == "exit" && splitInputList.Length > 1 )
+        if (splitInputList[0] == "exit" && splitInputList.Length > 1)
         {
             foreach (string item in splitInputList)
             {
@@ -179,7 +180,7 @@ class Program
                 {
                     Environment.Exit(Int32.Parse(splitInputList[1]));
                 }
-                
+
                 if (splitInputList[0] == "exit" && splitInputList[1] == "1")
                 {
                     Environment.Exit(Int32.Parse(splitInputList[1]));
@@ -204,12 +205,12 @@ class Program
         {
             splitInputList = inputCommand.Split('\'');
             string result = string.Join("", splitInputList);
-            Console.WriteLine(result );
+            Console.WriteLine(result);
             //foreach (string item in splitInputList)
             //{
-               
+
             //   Console.WriteLine(item);
-                
+
             //}
 
 
@@ -228,17 +229,17 @@ class Program
             //Console.WriteLine(inputCommand);
             return;
         }
-            
 
 
-        if(!inputCommand.StartsWith('\'') && !inputCommand.EndsWith('\''))
+
+        if (!inputCommand.StartsWith('\'') && !inputCommand.EndsWith('\''))
         {
-            
+
             splitInputList = inputCommand.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
             string joinedItem = string.Join(" ", splitInputList);
 
-            if(joinedItem.Contains('\''))
+            if (joinedItem.Contains('\''))
             {
                 joinedItem = joinedItem.Replace('\'', ' ');
 
@@ -248,22 +249,22 @@ class Program
 
             }
 
-                Console.WriteLine(joinedItem);
-           
+            Console.WriteLine(joinedItem);
+
             return;
         }
 
-        
 
-        
-        
+
+
+
     }
     // todo
     // pastaisyti kad jeigu neieni i commanda tada tirkini executable ar yra
-    static void typeBuiltCommand (string[] splitInputList, List<string> validCommandsList, string nameOfFile)
+    static void typeBuiltCommand(string[] splitInputList, List<string> validCommandsList, string nameOfFile)
     {
-        
-        if (splitInputList[0] == "type" || splitInputList[0].Contains(".exe")|| splitInputList[0].Contains("_exe"))
+
+        if (splitInputList[0] == "type" || splitInputList[0].Contains(".exe") || splitInputList[0].Contains("_exe"))
         {
             string[] splitPathList = Array.Empty<string>();
 
@@ -276,7 +277,7 @@ class Program
 
             if (false)
             {
-                splitPathList = pathListString.Split(Path.PathSeparator,StringSplitOptions.RemoveEmptyEntries);
+                splitPathList = pathListString.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries);
             }
 
             else
@@ -290,21 +291,21 @@ class Program
                     .Replace("$PATH", pathListString)
                     .Replace("${PATH}", pathListString)
                     .Replace("%PATH%", pathListString);
-                splitPathList = expandedInput.Split(Path.PathSeparator,StringSplitOptions.RemoveEmptyEntries);
-                
+                splitPathList = expandedInput.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries);
+
             }
 
-            
-            
-            
-            string changedWord = "";
-            
 
-            if(!validCommandsList.Contains(nameOfFile))
+
+
+            string changedWord = "";
+
+
+            if (!validCommandsList.Contains(nameOfFile))
             {
-                foreach(string directoryString in splitPathList)
-            {
-                    
+                foreach (string directoryString in splitPathList)
+                {
+
                     // skip the not existing directories
                     if (!Directory.Exists(directoryString))
                     {
@@ -313,8 +314,8 @@ class Program
 
                     // make the full path
                     changedWord = Path.Join(directoryString, nameOfFile);
-                   
-                    
+
+
                     if (File.Exists(changedWord))
                     {
 
@@ -322,7 +323,7 @@ class Program
 
                         // checks on linux if the program is executable because file exists is not enoguth to check
                         // thats why there was a problem with finding a file in a folder that you didnt have permis and printed
-                        
+
                         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                         {
 
@@ -335,7 +336,7 @@ class Program
                                 //005
                                 //101
 
-                                 
+
                                 //01
                                 //1000
                                 //1001001
@@ -352,8 +353,8 @@ class Program
                                     string arguments = string.Join(" ", splitInputList.Skip(1));
                                     executesFileIfMeetRequirements(nameOfFile, arguments);
                                 }
-                                
-                                
+
+
                             }
 
 
@@ -375,13 +376,13 @@ class Program
                                 // in requirements it should be only filename given, but because of how i placed my downloads need full path to work, when testing locally.
                                 string arguments = string.Join(" ", splitInputList.Skip(1));
                                 executesFileIfMeetRequirements(changedWord, arguments);
-                               
+
 
 
                             }
-                           
-                            
-                            
+
+
+
                         }
 
 
@@ -396,8 +397,8 @@ class Program
                 // checks the second string given does it exist in commands
                 CheckDoesCommandExist(splitInputList, splitInputList[1], validCommandsList);
             }
-            
-           
+
+
 
             if (validCommandsList.Contains(splitInputList[1]) && splitInputList.Count() == 2)
             {
@@ -410,21 +411,21 @@ class Program
                 Console.Error.WriteLine(splitInputList[1] + ": not found");
             }
 
-            
+
 
         }
     }
 
     static void executesFileIfMeetRequirements(string nameOfFile, string arguments)
     {
-       
-        
+
+
         var process = Process.Start(nameOfFile, arguments);
-        
+
         process.WaitForExit();
     }
 
-    static void printWorkingDirectory (string[] splitInputList, List<string> validCommandsList)
+    static void printWorkingDirectory(string[] splitInputList, List<string> validCommandsList)
     {
         if (splitInputList[0] == "pwd" && splitInputList.Count() == 1)
         {
@@ -433,10 +434,10 @@ class Program
         }
 
 
-        
+
     }
 
-    static void changeDirectory (string[] splitInputList, List<string> validCommandsList)
+    static void changeDirectory(string[] splitInputList, List<string> validCommandsList)
     {
         if (splitInputList[0] == "cd" && splitInputList[1] == "~")
         {
@@ -445,8 +446,8 @@ class Program
                                 Environment.OSVersion.Platform == PlatformID.MacOSX)
                                 ? Environment.GetEnvironmentVariable("HOME")
                                 : Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
-            
-            Directory.SetCurrentDirectory(homePath); 
+
+            Directory.SetCurrentDirectory(homePath);
             return;
         }
 
@@ -467,70 +468,94 @@ class Program
     }
 
 
-    static void SingleQuotes(string input, string[] arrayWithTwoElements, string[] inputlist)
+    static void SingleQuotes(string input, string[] inputlist)
     {
-        
-        int firstSpaceIndex = input.IndexOf(' ');
-        string restOfString = "";
-        if (firstSpaceIndex >= 0)
-        {
-            restOfString = input.Substring(firstSpaceIndex + 1);
+        string[] splitInputListTwo = Array.Empty<string>();
+        splitInputListTwo = input.Split(" ");
 
+        string[] splitInputList = Array.Empty<string>();
+        input = input.Remove(0, splitInputListTwo[0].Length+1);
+        splitInputList = input.Split(" ");
+
+        string result = "";
+
+        if (input.StartsWith('\'') || input.EndsWith('\''))
+        {
+            splitInputList = input.Split('\'');
+            result = string.Join("", splitInputList);
             
+
         }
+
+
 
         
-
-        string[] partsOfString = restOfString.Split('\'');
-
-        restOfString = "";
-
-        foreach (var item in partsOfString)
-        {
-            if(item != " ")
-            {
-                restOfString += item;
-            }
-        }
-        arrayWithTwoElements[1] = restOfString;
-
-
-
-        string[] parts = input.Split(' ', 2); 
-
-        if (parts.Length > 1)
-        {
-            string theFirstElement = parts[0];
-            
-            arrayWithTwoElements[0] = theFirstElement;
-        }
-        inputlist = new string[arrayWithTwoElements.Length];
-        inputlist[0] = arrayWithTwoElements[0];
-        inputlist[1] = arrayWithTwoElements[1];
-
-
-       
-
-
-
-
-
-
-
-
-
-
-
-
-
+        inputlist[0] = splitInputListTwo[0];
+        inputlist[1] = result;
+        Console.WriteLine(inputlist[1]);
 
     }
-    
-
-   
-
-
 }
+
+            //int firstSpaceIndex = input.IndexOf(' ');
+            //string restOfString = "";
+            //if (firstSpaceIndex >= 0)
+            //{
+            //    restOfString = input.Substring(firstSpaceIndex + 1);
+
+
+//}
+
+
+
+//string[] partsOfString = restOfString.Split('\'');
+
+//restOfString = "";
+
+//foreach (var item in partsOfString)
+//{
+//    if(item != " ")
+//    {
+//        restOfString += item;
+//    }
+//}
+//arrayWithTwoElements[1] = restOfString;
+
+
+
+//string[] parts = input.Split(' ', 2); 
+
+//if (parts.Length > 1)
+//{
+//    string theFirstElement = parts[0];
+
+//    arrayWithTwoElements[0] = theFirstElement;
+//}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
