@@ -99,13 +99,15 @@ class Program
             Console.Error.WriteLine(inputCommand + ": command not found");
             return;
         }
-        
-        if (!validCommandsList.Contains(inputCommand) && splitInputList.Length >1)
+        // _exe neveikia taip kaip per windwos linux 
+        //if (splitInputList[0].Contains(".exe") && splitInputList.Length > 1 || (splitInputList[0].Contains("_exe") && splitInputList.Length > 1) || (splitInputList[0].Contains("cat") && splitInputList.Length > 1))
+        if(validCommandsList.Contains(inputCommand) && splitInputList.Length > 1  )
         {
             checker = true;
 
 
             typeBuiltCommand(splitInputList, validCommandsList, splitInputList[0]);
+            return;
         }
 
         if (splitInputList[0] == "pwd" && splitInputList.Count() == 1)
