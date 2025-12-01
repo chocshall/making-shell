@@ -101,7 +101,7 @@ class Program
         }
         // _exe neveikia taip kaip per windwos linux 
         //if (splitInputList[0].Contains(".exe") && splitInputList.Length > 1 || (splitInputList[0].Contains("_exe") && splitInputList.Length > 1) || (splitInputList[0].Contains("cat") && splitInputList.Length > 1))
-        if(validCommandsList.Contains(inputCommand) && splitInputList.Length > 1  )
+        if(!validCommandsList.Contains(inputCommand) && splitInputList.Length > 1 )
         {
             checker = true;
 
