@@ -71,7 +71,7 @@ class Program
                 
 
                 SingleQuotes(inputCommand, ref splitInputList);
-                //Console.WriteLine(splitInputList[1]);
+                
             }
             else
             {
@@ -99,7 +99,7 @@ class Program
             Console.Error.WriteLine(inputCommand + ": command not found");
             return;
         }
-        // _exe neveikia taip kaip per windwos linux 
+        // checking if the first word  start with non commands and has more than one word
         if (splitInputList[0].Contains(".exe") && splitInputList.Length > 1 || (splitInputList[0].Contains("_exe") && splitInputList.Length > 1) || (splitInputList[0].Contains("cat") && splitInputList.Length > 1))
         {
             checker = true;
@@ -197,8 +197,7 @@ class Program
     }
 
 
-    // disable special meaning of single quates make it so that everything in single quates is treated literraly
-    // this echo not how it suppose to be basically read again what it need
+    
     static void echoCommand(string inputCommand)
     {
         string[] splitInputList = Array.Empty<string>();
@@ -210,27 +209,7 @@ class Program
             splitInputList = inputCommand.Split('\'');
             string result = string.Join("", splitInputList);
             Console.WriteLine(result);
-            //foreach (string item in splitInputList)
-            //{
-
-            //   Console.WriteLine(item);
-
-            //}
-
-
-            //inputCommand = inputCommand.Remove(0,1);
-            //inputCommand = inputCommand.TrimEnd('\'');
-            //if (inputCommand.Contains('\''))
-            //{
-            //    string[] splitInputList = Array.Empty<string>();
-            //    inputCommand = inputCommand.Replace('\'', ' ');
-
-            //    splitInputList = inputCommand.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-            //    inputCommand = string.Join("", splitInputList);
-
-            //}
-            //Console.WriteLine(inputCommand);
+            
             return;
         }
 
@@ -263,8 +242,7 @@ class Program
 
 
     }
-    // todo
-    // pastaisyti kad jeigu neieni i commanda tada tirkini executable ar yra
+    
     static void typeBuiltCommand(string[] splitInputList, List<string> validCommandsList, string nameOfFile)
     {
 
