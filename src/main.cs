@@ -196,22 +196,36 @@ class Program
     // this echo not how it suppose to be basically read again what it need
     static void echoCommand(string inputCommand)
     {
+        string[] splitInputList = Array.Empty<string>();
+        /// removes the echo from print
         inputCommand = inputCommand.Remove(0, 5);
-        if (inputCommand.StartsWith('\'') && inputCommand.EndsWith('\''))
+
+        if (inputCommand.StartsWith('\'') || inputCommand.EndsWith('\''))
         {
-            inputCommand = inputCommand.Remove(0,1);
-            inputCommand = inputCommand.TrimEnd('\'');
-            if (inputCommand.Contains('\''))
-            {
-                string[] splitInputList = Array.Empty<string>();
-                inputCommand = inputCommand.Replace('\'', ' ');
+            splitInputList = inputCommand.Split('\'');
+            string result = string.Join("", splitInputList);
+            Console.WriteLine(result );
+            //foreach (string item in splitInputList)
+            //{
+               
+            //   Console.WriteLine(item);
+                
+            //}
 
-                splitInputList = inputCommand.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-                inputCommand = string.Join("", splitInputList);
+            //inputCommand = inputCommand.Remove(0,1);
+            //inputCommand = inputCommand.TrimEnd('\'');
+            //if (inputCommand.Contains('\''))
+            //{
+            //    string[] splitInputList = Array.Empty<string>();
+            //    inputCommand = inputCommand.Replace('\'', ' ');
 
-            }
-            Console.WriteLine(inputCommand);
+            //    splitInputList = inputCommand.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+            //    inputCommand = string.Join("", splitInputList);
+
+            //}
+            //Console.WriteLine(inputCommand);
             return;
         }
             
@@ -219,7 +233,7 @@ class Program
 
         if(!inputCommand.StartsWith('\'') && !inputCommand.EndsWith('\''))
         {
-            string[] splitInputList = Array.Empty<string>();
+            
             splitInputList = inputCommand.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
             string joinedItem = string.Join(" ", splitInputList);
@@ -230,7 +244,7 @@ class Program
 
                 splitInputList = joinedItem.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-                joinedItem = string.Join(" ", splitInputList);
+                joinedItem = string.Join("", splitInputList);
 
             }
 
