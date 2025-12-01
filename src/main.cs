@@ -196,11 +196,9 @@ class Program
     }
 
 
-    
     static void echoCommand(string inputCommand)
     {
         string[] splitInputList = Array.Empty<string>();
-
         /// removes the echo from print
         inputCommand = inputCommand.Remove(0, 5);
 
@@ -248,7 +246,8 @@ class Program
     {
         
 
-        
+        if (splitInputList[0] == "type" || splitInputList[0].Contains(".exe") || splitInputList[0].Contains("_exe"))
+        {
             string[] splitPathList = Array.Empty<string>();
 
             // if the left is null use the right;
@@ -396,7 +395,7 @@ class Program
 
             
 
-        
+        }
 
         if (splitInputList[0].Contains("cat"))
         {
