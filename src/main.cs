@@ -272,7 +272,7 @@ class Program
                 }
                 catch (IndexOutOfRangeException ex)
                 {
-                    if (inputCommand[^1] != '\'' || inputCommand[^1] != '\"')
+                    if (inputCommand[^1] != '\'' && inputCommand[^1] != '\"')
                     {
                         newWord += inputCommand[^1];
                     }
