@@ -415,11 +415,13 @@ class Program
                 Console.Error.WriteLine(splitInputList[1] + ": not found");
             }
 
-            if (splitInputList[0].Contains("cat"))
-            {
-                executesFileIfMeetRequirements(splitInputList[0], splitInputList);
-            }
+            
 
+        }
+
+        if (splitInputList[0].Contains("cat"))
+        {
+            executesFileIfMeetRequirements(splitInputList[0], splitInputList);
         }
 
 
