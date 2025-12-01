@@ -6,6 +6,7 @@ using System.IO.Enumeration;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Numerics;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -203,65 +204,263 @@ class Program
         string[] splitInputList = Array.Empty<string>();
         /// removes the echo from print
         inputCommand = inputCommand.Remove(0, 5);
+        string newWord = "";
 
-        if (inputCommand.StartsWith('\'') || inputCommand.EndsWith('\''))
+        if(inputCommand.Contains("\"\"") || inputCommand.Contains("\'\'"))
         {
-            splitInputList = inputCommand.Split('\'');
-            string result = string.Join("", splitInputList);
-            Console.WriteLine(result);
-            
-            return;
-        }
-
-       
-
-        if (inputCommand.StartsWith('\"') || inputCommand.EndsWith('\"'))
-        {
-            splitInputList = inputCommand.Split('\"');
-            string result = string.Join("", splitInputList);
-            Console.WriteLine(result);
-
-            return;
-        }
-
-
-
-        if (!inputCommand.StartsWith('\'') && !inputCommand.EndsWith('\'') || !inputCommand.StartsWith('\"') && !inputCommand.EndsWith('\"'))
-        {
-
-            splitInputList = inputCommand.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-            string joinedItem = string.Join(" ", splitInputList);
-
-            if (joinedItem.Contains('\''))
+            if (inputCommand.StartsWith('\"') && inputCommand.EndsWith('\"'))
             {
-                joinedItem = joinedItem.Replace('\'', ' ');
+                try
+                {
+                    for (int i = 0; i < inputCommand.Length; i++)
+                    {
 
-                splitInputList = joinedItem.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                        if (inputCommand[i] == '\"' && inputCommand[i + 1] == '\"')
+                        {
+                            continue;
+                        }
 
-                joinedItem = string.Join("", splitInputList);
+                        if (inputCommand[i] == '\"' && inputCommand[i + 1] == ' ')
+                        {
+                            continue;
+                        }
+                        if (inputCommand[i] == '\"' && Char.IsLetter(inputCommand[i + 1]))
+                        {
+                            continue;
+                        }
 
+                        if (inputCommand[i + 1] == '\"' && Char.IsLetter(inputCommand[i]))
+                        {
+                            newWord += inputCommand[i];
+                        }
+
+                        if (Char.IsLetter(inputCommand[i + 1]) && Char.IsLetter(inputCommand[i]))
+                        {
+                            newWord += inputCommand[i];
+                        }
+
+                        if (Char.IsWhiteSpace(inputCommand[i + 1]) && Char.IsWhiteSpace(inputCommand[i]))
+                        {
+                            newWord += inputCommand[i];
+                        }
+
+                        if (Char.IsWhiteSpace(inputCommand[i + 1]) && Char.IsLetter(inputCommand[i]))
+                        {
+                            newWord += inputCommand[i];
+                        }
+
+                        if (Char.IsWhiteSpace(inputCommand[i]) && Char.IsLetter(inputCommand[i + 1]))
+                        {
+                            newWord += inputCommand[i];
+                        }
+
+
+
+
+
+                    }
+                }
+                catch (IndexOutOfRangeException ex)
+                {
+                    Console.WriteLine(newWord);
+                    newWord = "";
+                }
             }
 
-            if (joinedItem.Contains('\"'))
+
+            if (inputCommand.StartsWith('\'') && inputCommand.EndsWith('\''))
             {
-                joinedItem = joinedItem.Replace('\"', ' ');
+                try
+                {
+                    for (int i = 0; i < inputCommand.Length; i++)
+                    {
 
-                splitInputList = joinedItem.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                        if (inputCommand[i] == '\'' && inputCommand[i + 1] == '\'')
+                        {
+                            continue;
+                        }
 
-                joinedItem = string.Join("", splitInputList);
+                        if (inputCommand[i] == '\'' && inputCommand[i + 1] == ' ')
+                        {
+                            continue;
+                        }
+                        if (inputCommand[i] == '\'' && Char.IsLetter(inputCommand[i + 1]))
+                        {
+                            continue;
+                        }
 
+                        if (inputCommand[i + 1] == '\'' && Char.IsLetter(inputCommand[i]))
+                        {
+                            newWord += inputCommand[i];
+                        }
+
+                        if (Char.IsLetter(inputCommand[i + 1]) && Char.IsLetter(inputCommand[i]))
+                        {
+                            newWord += inputCommand[i];
+                        }
+
+                        if (Char.IsWhiteSpace(inputCommand[i + 1]) && Char.IsWhiteSpace(inputCommand[i]))
+                        {
+                            newWord += inputCommand[i];
+                        }
+
+                        if (Char.IsWhiteSpace(inputCommand[i + 1]) && Char.IsLetter(inputCommand[i]))
+                        {
+                            newWord += inputCommand[i];
+                        }
+
+                        if (Char.IsWhiteSpace(inputCommand[i]) && Char.IsLetter(inputCommand[i + 1]))
+                        {
+                            newWord += inputCommand[i];
+                        }
+
+
+
+
+
+                    }
+                }
+                catch (IndexOutOfRangeException ex)
+                {
+                    Console.WriteLine(newWord);
+                    newWord = "";
+                }
             }
-
-            Console.WriteLine(joinedItem);
-
-            return;
         }
 
-        
 
-        
-        
+        //if (!inputCommand.StartsWith('\'') && !inputCommand.EndsWith('\''))
+        //{
+        //    try
+        //    {
+        //        for (int i = 0; i < inputCommand.Length; i++)
+        //        {
+
+        //            if (inputCommand[i] == '\'' && inputCommand[i + 1] == '\'')
+        //            {
+        //                continue;
+        //            }
+
+        //            if (inputCommand[i] == '\'' && inputCommand[i + 1] == ' ')
+        //            {
+        //                continue;
+        //            }
+        //            if (inputCommand[i] == '\'' && Char.IsLetter(inputCommand[i + 1]))
+        //            {
+        //                continue;
+        //            }
+
+        //            if (inputCommand[i + 1] == '\'' && Char.IsLetter(inputCommand[i]))
+        //            {
+        //                newWord += inputCommand[i];
+        //            }
+
+        //            if (Char.IsLetter(inputCommand[i + 1]) && Char.IsLetter(inputCommand[i]))
+        //            {
+        //                newWord += inputCommand[i];
+        //            }
+
+        //            if (Char.IsWhiteSpace(inputCommand[i + 1]) && Char.IsWhiteSpace(inputCommand[i]))
+        //            {
+        //                newWord += inputCommand[i];
+        //            }
+
+        //            if (Char.IsWhiteSpace(inputCommand[i + 1]) && Char.IsLetter(inputCommand[i]))
+        //            {
+        //                newWord += inputCommand[i];
+        //            }
+
+        //            if (Char.IsWhiteSpace(inputCommand[i]) && Char.IsLetter(inputCommand[i + 1]))
+        //            {
+        //                newWord += inputCommand[i];
+        //            }
+
+
+
+
+
+        //        }
+        //    }
+        //    catch (IndexOutOfRangeException ex)
+        //    {
+        //        newWord += inputCommand[^1];
+        //        Console.WriteLine(newWord + " the other here");
+        //    }
+        //}
+
+        else
+        {
+            if (inputCommand.StartsWith('\'') || inputCommand.EndsWith('\''))
+            {
+                splitInputList = inputCommand.Split('\'');
+                string result = string.Join("", splitInputList);
+                Console.WriteLine(result);
+
+                return;
+            }
+
+
+
+            if (inputCommand.StartsWith('\"') || inputCommand.EndsWith('\"'))
+            {
+                splitInputList = inputCommand.Split('\"');
+                string result = string.Join("", splitInputList);
+                Console.WriteLine(result);
+
+                return;
+            }
+
+
+
+            if (!inputCommand.StartsWith('\'') && !inputCommand.EndsWith('\'') || !inputCommand.StartsWith('\"') && !inputCommand.EndsWith('\"'))
+            {
+
+                splitInputList = inputCommand.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                string joinedItem = string.Join(" ", splitInputList);
+
+
+
+
+                if (joinedItem.Contains('\''))
+                {
+
+                    joinedItem = joinedItem.Replace('\'', ' ');
+
+                    splitInputList = joinedItem.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+
+                    joinedItem = string.Join("", splitInputList);
+
+
+
+                }
+
+                if (joinedItem.Contains('\"'))
+                {
+                    joinedItem = joinedItem.Replace("\"", "");
+
+                    splitInputList = joinedItem.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+
+                    joinedItem = string.Join("", splitInputList);
+
+
+                }
+
+                Console.WriteLine(joinedItem);
+
+                return;
+            }
+
+        }
+
+
+
+
+
+
+
 
 
 
