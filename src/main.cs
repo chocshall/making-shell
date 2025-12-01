@@ -226,7 +226,7 @@ class Program
 
 
 
-        if (!inputCommand.StartsWith('\'') && !inputCommand.EndsWith('\''))
+        if (!inputCommand.StartsWith('\'') && !inputCommand.EndsWith('\'') || !inputCommand.StartsWith('\"') && !inputCommand.EndsWith('\"'))
         {
 
             splitInputList = inputCommand.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -442,7 +442,7 @@ class Program
     if (nameOfFile == "cat")
     {
         // Check common locations for cat on linux
-        string[] possiblePaths = { "/bin/cat", "/usr/bin/cat", "cat", "E:\\Downloads\\c#programs\\TestingProccesClass\\bin\\Debug\\net8.0" };
+        string[] possiblePaths = { "/bin/cat", "/usr/bin/cat", "cat"};
         bool found = false;
         
         foreach (string path in possiblePaths)
