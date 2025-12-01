@@ -557,7 +557,7 @@ class Program
             {
                 result.Add(trimmed);
             }
-            Console.WriteLine(s);
+            
         }
 
     }
