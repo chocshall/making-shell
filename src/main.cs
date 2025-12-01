@@ -272,7 +272,7 @@ class Program
         {
             executesFileIfMeetRequirements(splitInputList[0], splitInputList);
         }
-        if (splitInputList[0] == "type" || splitInputList[0].Contains(".exe") || splitInputList[0].Contains("_exe"))
+        if (splitInputList[0] == "type")
         {
             string[] splitPathList = Array.Empty<string>();
 
