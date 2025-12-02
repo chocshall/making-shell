@@ -282,7 +282,7 @@ namespace ConsoleApp2
 
 
                 // used for getting a check if there exist atleast one full path
-                bool wordCheckerIsPath = false;
+                bool wordCheckerIsPath = false; 
 
                 if (false)
                 {
