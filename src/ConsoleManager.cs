@@ -256,7 +256,7 @@ namespace ConsoleApp2
             }
 
             string output = result.ToString().TrimEnd();
-            Console.WriteLine(output);
+            
             return output;
 
 
