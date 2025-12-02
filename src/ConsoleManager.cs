@@ -412,6 +412,10 @@ namespace ConsoleApp2
 
         public void changeDirectory(string[] splitInputList, List<string> validCommandsList)
         {
+            if (splitInputList.Count() == 1)
+            {
+                return;
+            }
             if (splitInputList[0] == "cd" && splitInputList[1] == "~")
             {
 
