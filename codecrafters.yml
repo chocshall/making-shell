@@ -10,6 +10,6 @@ debug: false
 # Available versions: dotnet-9.0
 buildpack: dotnet-9.0
 
-# Add this if it doesn't exist
-compile_command: "cd codecrafters-shell && dotnet build --configuration Release --output ./bin codecrafters-shell.csproj"
-run_command: "cd codecrafters-shell && dotnet ./bin/codecrafters-shell.dll"
+
+compile_command: "cd codecrafters-shell && dotnet publish --configuration Release --output ./publish --nologo codecrafters-shell.csproj"
+run_command: "cd codecrafters-shell && dotnet ./publish/codecrafters-shell.dll"
