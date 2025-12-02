@@ -441,6 +441,12 @@ namespace ConsoleApp2
         {
             string executable = nameOfFile;
 
+            if ((executable.StartsWith('"') && executable.EndsWith('"')) ||
+               (executable.StartsWith('\'') && executable.EndsWith('\'')))
+                {
+                executable = executable.Substring(1, executable.Length - 2);
+                }
+
 
             if (nameOfFile == "cat")
             {
