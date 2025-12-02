@@ -9,6 +9,7 @@ using System.Numerics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -31,7 +32,7 @@ class Program
         string[] splitInputList = Array.Empty<string>();
 
 
-
+        
 
 
 
@@ -115,10 +116,7 @@ class Program
             printWorkingDirectory(splitInputList, validCommandsList);
         }
 
-        if (splitInputList[0] == "exit" && splitInputList.Count() == 1)
-        {
-            exitCommand(splitInputList, inputCommand);
-        }
+       
 
 
 
@@ -201,256 +199,66 @@ class Program
     // can become a problem with too much writing of the same because \\\ of al the special characters. maybe fin out how to make it easier to see when u dont need two spaces
     static void echoCommand(string inputCommand)
     {
-        string[] splitInputList = Array.Empty<string>();
-        /// removes the echo from print
-        inputCommand = inputCommand.Remove(0, 5);
-        string newWord = "";
-        int checkForDoubleNotNeededSpace = 0;
-        if (inputCommand.Contains("\"\"") || inputCommand.Contains("\'\'"))
+        // Remove "echo "
+        string args = inputCommand.Substring(5).TrimStart();
+
+        StringBuilder result = new StringBuilder();
+        bool inQuotes = false;
+        char quoteChar = '\0';
+
+        for (int i = 0; i < args.Length; i++)
         {
-            if (inputCommand.StartsWith('\"') || inputCommand.EndsWith('\"'))
+            char c = args[i];
+
+            // Check for quotes
+            if (c == '\'' || c == '"')
             {
-                try
+                if (!inQuotes)
                 {
-                    for (int i = 0; i < inputCommand.Length; i++)
-                    {
-
-                        if (inputCommand[i] == '\"' && inputCommand[i + 1] == '\"')
-                        {
-                            continue;
-                        }
-
-                        if (inputCommand[i] == '\"' && inputCommand[i + 1] == ' ')
-                        {
-                            checkForDoubleNotNeededSpace++;
-                            continue;
-                        }
-                        // this part maybw works
-                        if (inputCommand[i] == ' ' && inputCommand[i] == ' ' && checkForDoubleNotNeededSpace > 0)
-                        {
-                            checkForDoubleNotNeededSpace = 0;
-                            continue;
-                        }
-
-                        if (inputCommand[i + 1] == '\"' && inputCommand[i] == ' ')
-                        {
-                            newWord += inputCommand[i];
-                        }
-                        if (inputCommand[i] == '\"' && Char.IsLetter(inputCommand[i + 1]))
-                        {
-                            continue;
-                        }
-
-                        if (inputCommand[i] == '\"' && Char.IsLetter(inputCommand[i + 1]))
-                        {
-                            continue;
-                        }
-
-                        if (inputCommand[i + 1] == '\"' && Char.IsLetter(inputCommand[i]))
-                        {
-                            newWord += inputCommand[i];
-                        }
-
-                        if (inputCommand[i + 1] == '\'' && Char.IsLetter(inputCommand[i]))
-                        {
-                            newWord += inputCommand[i];
-                        }
-
-                        if (inputCommand[i] == '\'' && Char.IsLetter(inputCommand[i + 1]))
-                        {
-                            newWord += inputCommand[i];
-                        }
-
-                        if (Char.IsLetter(inputCommand[i + 1]) && Char.IsLetter(inputCommand[i]))
-                        {
-                            newWord += inputCommand[i];
-                        }
-
-                        if (Char.IsWhiteSpace(inputCommand[i + 1]) && Char.IsWhiteSpace(inputCommand[i]))
-                        {
-                            newWord += inputCommand[i];
-                        }
-
-                        if (Char.IsWhiteSpace(inputCommand[i + 1]) && Char.IsLetter(inputCommand[i]))
-                        {
-                            newWord += inputCommand[i];
-                        }
-
-                        if (Char.IsWhiteSpace(inputCommand[i]) && Char.IsLetter(inputCommand[i + 1]))
-                        {
-                            newWord += inputCommand[i];
-                        }
-
-
-
-
-
-                    }
+                    // Starting quotes
+                    inQuotes = true;
+                    quoteChar = c;
                 }
-                catch (IndexOutOfRangeException ex)
+                else if (c == quoteChar)
                 {
-                    if (inputCommand[^1] != '\'' && inputCommand[^1] != '\"')
-                    {
-                        newWord += inputCommand[^1];
-                    }
-
-                    Console.WriteLine(newWord);
-                    newWord = "";
+                    // Ending quotes of same type
+                    inQuotes = false;
                 }
+                else
+                {
+                    // Different quote char inside quotes - treat as literal
+                    result.Append(c);
+                }
+                continue;
             }
 
-
-            if (inputCommand.StartsWith('\'') || inputCommand.EndsWith('\''))
+            // Handle spaces
+            if (c == ' ')
             {
-                try
+                if (inQuotes)
                 {
-                    for (int i = 0; i < inputCommand.Length; i++)
+                    // Inside quotes: preserve all spaces
+                    result.Append(' ');
+                }
+                else
+                {
+                    // Outside quotes: collapse multiple spaces
+                    if (result.Length == 0 || result[result.Length - 1] != ' ')
                     {
-
-                        if (inputCommand[i] == '\'' && inputCommand[i + 1] == '\'')
-                        {
-                            continue;
-                        }
-
-                        if (inputCommand[i] == '\'' && inputCommand[i + 1] == ' ')
-                        {
-                            continue;
-                        }
-                        if (inputCommand[i] == '\'' && Char.IsLetter(inputCommand[i + 1]))
-                        {
-                            continue;
-                        }
-
-                        if (inputCommand[i] == '\"' && inputCommand[i + 1] == ' ')
-                        {
-                            checkForDoubleNotNeededSpace++;
-                            continue;
-                        }
-
-                        if (inputCommand[i] == ' ' && inputCommand[i] == ' ' && checkForDoubleNotNeededSpace > 0)
-                        {
-                            checkForDoubleNotNeededSpace = 0;
-                            continue;
-                        }
-
-                        if (inputCommand[i + 1] == '\'' && inputCommand[i] == ' ')
-                        {
-                            newWord += inputCommand[i];
-                        }
-
-                        if (inputCommand[i + 1] == '\'' && Char.IsLetter(inputCommand[i]))
-                        {
-                            newWord += inputCommand[i];
-                        }
-
-                        if (Char.IsLetter(inputCommand[i + 1]) && Char.IsLetter(inputCommand[i]))
-                        {
-                            newWord += inputCommand[i];
-                        }
-
-                        if (Char.IsWhiteSpace(inputCommand[i + 1]) && Char.IsWhiteSpace(inputCommand[i]))
-                        {
-                            newWord += inputCommand[i];
-                        }
-
-                        if (Char.IsWhiteSpace(inputCommand[i + 1]) && Char.IsLetter(inputCommand[i]))
-                        {
-                            newWord += inputCommand[i];
-                        }
-
-                        if (Char.IsWhiteSpace(inputCommand[i]) && Char.IsLetter(inputCommand[i + 1]))
-                        {
-                            newWord += inputCommand[i];
-                        }
-
-
-                         
-
-
+                        result.Append(' ');
                     }
                 }
-                catch (IndexOutOfRangeException ex)
-                {
-                    if (inputCommand[^1] != '\'')
-                    {
-                        newWord += inputCommand[^1];
-                    }
-                    Console.WriteLine(newWord);
-                    newWord = "";
-                }
+            }
+            else
+            {
+                // Regular character
+                result.Append(c);
             }
         }
 
+        Console.WriteLine(result.ToString().Trim());
 
-
-        // almost the same from what i saw jus that when theres '' or "" it prints not one line but two
-        //else
-        //{
-        if (inputCommand.StartsWith('\'') || inputCommand.EndsWith('\''))
-            {
-                splitInputList = inputCommand.Split('\'');
-                string result = string.Join("", splitInputList);
-                Console.WriteLine(result);
-
-                return;
-            }
-
-
-
-            if (inputCommand.StartsWith('\"') || inputCommand.EndsWith('\"'))
-            {
-                splitInputList = inputCommand.Split('\"');
-                string result = string.Join("", splitInputList);
-                Console.WriteLine(result);
-
-                return;
-            }
-
-
-
-            if (!inputCommand.StartsWith('\'') && !inputCommand.EndsWith('\'') || !inputCommand.StartsWith('\"') && !inputCommand.EndsWith('\"'))
-            {
-
-                splitInputList = inputCommand.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-                string joinedItem = string.Join(" ", splitInputList);
-
-
-
-
-                if (joinedItem.Contains('\''))
-                {
-
-                    joinedItem = joinedItem.Replace('\'', ' ');
-
-                    splitInputList = joinedItem.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-
-                    joinedItem = string.Join("", splitInputList);
-
-
-
-                }
-
-                if (joinedItem.Contains('\"'))
-                {
-                    joinedItem = joinedItem.Replace("\"", "");
-
-                    splitInputList = joinedItem.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-
-                    joinedItem = string.Join("", splitInputList);
-
-
-                }
-
-                Console.WriteLine(joinedItem);
-
-                return;
-            }
-
-        //}
-
+       
     }
     
     static void typeBuiltCommand(string[] splitInputList, List<string> validCommandsList, string nameOfFile)
