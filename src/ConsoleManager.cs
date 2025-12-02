@@ -82,6 +82,12 @@ namespace ConsoleApp2
                 return HandleEcho(consoleInput);
             }
 
+            if (!validCommandsList.Contains(splitInputList[0]) && !validCommandsList.Contains(splitInputList[1]))
+            {
+                executesFileIfMeetRequirements(splitInputList[0], splitInputList);
+                return "";
+            }
+
             // Invalid command
             return "bad";
 
@@ -268,11 +274,7 @@ namespace ConsoleApp2
             {
                 return;
             }
-            if (!validCommandsList.Contains(splitInputList[0]) && !validCommandsList.Contains(splitInputList[1]))
-            {
-                executesFileIfMeetRequirements(splitInputList[0], splitInputList);
-                return;
-            }
+            
             if (splitInputList[0] == "type")
             {
                 string[] splitPathList = Array.Empty<string>();
@@ -432,55 +434,57 @@ namespace ConsoleApp2
 
 
 
-            static void executesFileIfMeetRequirements(string nameOfFile, string[] splitInputList)
+           
+        }
+
+        void executesFileIfMeetRequirements(string nameOfFile, string[] splitInputList)
+        {
+            string executable = nameOfFile;
+
+
+            if (nameOfFile == "cat")
             {
-                string executable = nameOfFile;
+                // Check common locations for cat on linux
+                string[] possiblePaths = { "/bin/cat", "/usr/bin/cat", "cat" };
+                bool found = false;
 
-
-                if (nameOfFile == "cat")
+                foreach (string path in possiblePaths)
                 {
-                    // Check common locations for cat on linux
-                    string[] possiblePaths = { "/bin/cat", "/usr/bin/cat", "cat" };
-                    bool found = false;
-
-                    foreach (string path in possiblePaths)
+                    try
                     {
-                        try
+                        if (File.Exists(path) || path == "cat")
                         {
-                            if (File.Exists(path) || path == "cat")
-                            {
-                                executable = path;
-                                found = true;
-                                break;
-                            }
-                        }
-                        catch
-                        {
-
+                            executable = path;
+                            found = true;
+                            break;
                         }
                     }
-
-                    if (!found)
+                    catch
                     {
-                        Console.Error.WriteLine("cat: command not found");
-                        return;
+
                     }
                 }
-                var processStartInfo = new ProcessStartInfo
-                {
-                    FileName = executable,
-                    UseShellExecute = false
-                };
 
-                foreach (string item in splitInputList.Skip(1))
+                if (!found)
                 {
-                    processStartInfo.ArgumentList.Add(item);
+                    Console.Error.WriteLine("cat: command not found");
+                    return;
                 }
-
-                var process = Process.Start(processStartInfo);
-
-                process.WaitForExit();
             }
+            var processStartInfo = new ProcessStartInfo
+            {
+                FileName = executable,
+                UseShellExecute = false
+            };
+
+            foreach (string item in splitInputList.Skip(1))
+            {
+                processStartInfo.ArgumentList.Add(item);
+            }
+
+            var process = Process.Start(processStartInfo);
+
+            process.WaitForExit();
         }
 
 
