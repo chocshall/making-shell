@@ -12,7 +12,7 @@ namespace ConsoleApp2
 
             while (true)
             {
-
+                Console.Write("$ ");
                 Console.WriteLine(Maker.HandleConsoleLine(Console.ReadLine()));
             }
         }

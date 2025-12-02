@@ -21,24 +21,31 @@ namespace ConsoleApp2
             validCommandsList.Add("type");
             validCommandsList.Add("pwd");
             validCommandsList.Add("cd");
-            string[] splitInputList = Array.Empty<string>();
 
             if (string.IsNullOrWhiteSpace(consoleInput))
                 return "bad";
-
-            string command = "";
-            splitInputList = consoleInput.Split(' ');
-            foreach (string line in splitInputList)
+            string[] splitInputList = Array.Empty<string>();
+            if (consoleInput.Count() > 1)
             {
-                if(!string.IsNullOrWhiteSpace(line))
-                {
-                    command = line.Trim();
-                    break;
-                }
-                        
+                consoleInput = consoleInput.Trim();
             }
 
             
+
+
+            splitInputList = consoleInput.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            string command = splitInputList[0];
+            //foreach (string line in splitInputList)
+            //{
+            //    if(!string.IsNullOrWhiteSpace(line))
+            //    {
+            //        command = line.Trim();
+            //        break;
+            //    }
+
+            //}
+
+
 
             // Handle exit
             if (IsExitCommand(consoleInput))
@@ -126,19 +133,79 @@ namespace ConsoleApp2
 
         public string HandleEcho(string input)
         {
-            // Remove "echo "
-            string args = input.Substring(5).TrimStart();
+            // Remove "echo " - handle case insensitivity
+            string args;
+            if (input.StartsWith("echo ", StringComparison.OrdinalIgnoreCase))
+            {
+                args = input.Substring(5);
+            }
+            else
+            {
+                // Handle other cases like "ECHO ", "Echo ", etc.
+                args = input.Substring(4);
+            }
 
             StringBuilder result = new StringBuilder();
             bool inQuotes = false;
             char quoteChar = '\0';
+            bool escapeNext = false;
 
             for (int i = 0; i < args.Length; i++)
             {
                 char c = args[i];
 
-                // Check for quotes
-                if (c == '\'' || c == '"')
+                // Handle escape sequence
+                if (c == '\\' && !escapeNext)
+                {
+                    if (inQuotes && quoteChar == '\'')
+                    {
+                        // Inside single quotes: backslash is literal
+                        result.Append(c);
+                    }
+                    else if (i + 1 < args.Length)
+                    {
+                        // Check what's being escaped
+                        char nextChar = args[i + 1];
+
+                        // In double quotes: only certain characters can be escaped
+                        if (inQuotes && quoteChar == '"')
+                        {
+                            if (nextChar == '\\' || nextChar == '"' || nextChar == '$' || nextChar == '`')
+                            {
+                                escapeNext = true;
+                                continue;
+                            }
+                            else
+                            {
+                                // Not a special escape in double quotes
+                                result.Append(c);
+                            }
+                        }
+                        else
+                        {
+                            // Outside quotes: escape the next character
+                            escapeNext = true;
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        // Backslash at end of string
+                        result.Append(c);
+                    }
+                    continue;
+                }
+
+                // If we're escaping this character
+                if (escapeNext)
+                {
+                    result.Append(c);
+                    escapeNext = false;
+                    continue;
+                }
+
+                // Check for quotes (but not if we're escaping)
+                if ((c == '\'' || c == '"') && !escapeNext)
                 {
                     if (!inQuotes)
                     {
@@ -178,21 +245,30 @@ namespace ConsoleApp2
                 }
                 else
                 {
-                    // Regular character
                     result.Append(c);
                 }
             }
 
-            Console.WriteLine(result.ToString().Trim());
-            return result.ToString().Trim();
+            // Handle any trailing escape
+            if (escapeNext)
+            {
+                result.Append('\\');
+            }
+
+            string output = result.ToString().TrimEnd();
+            Console.WriteLine(output);
+            return output;
 
 
         }
 
         public void typeBuiltCommand(string[] splitInputList, List<string> validCommandsList, string nameOfFile)
         {
-
-            if (!validCommandsList.Contains(splitInputList[0]))
+            if (splitInputList.Count() == 1)
+            {
+                return;
+            }
+            if (!validCommandsList.Contains(splitInputList[0]) && !validCommandsList.Contains(splitInputList[1]))
             {
                 executesFileIfMeetRequirements(splitInputList[0], splitInputList);
                 return;
