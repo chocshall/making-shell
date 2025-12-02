@@ -26,8 +26,19 @@ namespace ConsoleApp2
             if (string.IsNullOrWhiteSpace(consoleInput))
                 return "bad";
 
+            string command = "";
             splitInputList = consoleInput.Split(' ');
-            string command = splitInputList[0];
+            foreach (string line in splitInputList)
+            {
+                if(!string.IsNullOrWhiteSpace(line))
+                {
+                    command = line.Trim();
+                    break;
+                }
+                        
+            }
+
+            
 
             // Handle exit
             if (IsExitCommand(consoleInput))
@@ -102,7 +113,7 @@ namespace ConsoleApp2
             {
                 return false;
             }
-            string pattern = "^echo\b.+";
+            string pattern = @"^echo\s+.+";
             Regex regularExpressionObject = new Regex(pattern, RegexOptions.IgnoreCase);
             return regularExpressionObject.Match(input).Success;
         }
