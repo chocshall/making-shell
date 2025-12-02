@@ -9,4 +9,4 @@ if [ -f "./bin/codecrafters-shell.dll" ]; then
 else
     echo "Build failed or output not found in ./bin/"
     exit 1
-fi
+fi  # <-- Missing this!
