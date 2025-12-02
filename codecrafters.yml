@@ -11,3 +11,5 @@ debug: false
 buildpack: dotnet-9.0
 
 
+compile_command: "cd codecrafters-shell && dotnet build --configuration Release --output ./bin codecrafters-shell.csproj"
+run_command: "cd codecrafters-shell && dotnet ./bin/codecrafters-shell.dll"
