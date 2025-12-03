@@ -14,7 +14,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-class ConsoleManager
+public class ConsoleManager
 {
     private List<string> validCommandsList;
     private string inputCommand;
