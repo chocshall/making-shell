@@ -118,9 +118,10 @@ namespace ConsoleApp2
             {
                 return false;
             }
-            string pattern = @"^echo\s+.+";
-            Regex regularExpressionObject = new Regex(pattern, RegexOptions.IgnoreCase);
-            return regularExpressionObject.Match(input).Success;
+
+            string trimmed = input.TrimStart();
+            return trimmed.StartsWith("echo ", StringComparison.OrdinalIgnoreCase) ||
+                   trimmed.Equals("echo", StringComparison.OrdinalIgnoreCase);
         }
 
 
@@ -146,64 +147,13 @@ namespace ConsoleApp2
             StringBuilder result = new StringBuilder();
             bool inQuotes = false;
             char quoteChar = '\0';
-            bool escapeNext = false;
 
             for (int i = 0; i < args.Length; i++)
             {
                 char c = args[i];
 
-                // Handle escape sequence
-                if (c == '\\' && !escapeNext)
-                {
-                    if (inQuotes && quoteChar == '\'')
-                    {
-                        // Inside single quotes: backslash is literal
-                        result.Append(c);
-                    }
-                    else if (i + 1 < args.Length)
-                    {
-                        // Check what's being escaped
-                        char nextChar = args[i + 1];
-
-                        // In double quotes: only certain characters can be escaped
-                        if (inQuotes && quoteChar == '"')
-                        {
-                            if (nextChar == '\\' || nextChar == '"' || nextChar == '$' || nextChar == '`')
-                            {
-                                escapeNext = true;
-                                continue;
-                            }
-                            else
-                            {
-                                // Not a special escape in double quotes
-                                result.Append(c);
-                            }
-                        }
-                        else
-                        {
-                            // Outside quotes: escape the next character
-                            escapeNext = true;
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        // Backslash at end of string
-                        result.Append(c);
-                    }
-                    continue;
-                }
-
-                // If we're escaping this character
-                if (escapeNext)
-                {
-                    result.Append(c);
-                    escapeNext = false;
-                    continue;
-                }
-
-                // Check for quotes (but not if we're escaping)
-                if ((c == '\'' || c == '"') && !escapeNext)
+                // Check for quotes
+                if (c == '\'' || c == '"')
                 {
                     if (!inQuotes)
                     {
@@ -247,17 +197,9 @@ namespace ConsoleApp2
                 }
             }
 
-            // Handle any trailing escape
-            if (escapeNext)
-            {
-                result.Append('\\');
-            }
-
             string output = result.ToString().TrimEnd();
-            
+
             return output;
-
-
         }
 
         public void typeBuiltCommand(string[] splitInputList, List<string> validCommandsList, string nameOfFile)
