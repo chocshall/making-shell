@@ -12,8 +12,15 @@ namespace ConsoleApp2
 
             while (true)
             {
+
                 Console.Write("$ ");
-                Console.WriteLine(Maker.HandleConsoleLine(Console.ReadLine()));
+                string result = Maker.HandleConsoleLine(Console.ReadLine());
+
+               
+                if (!string.IsNullOrEmpty(result))
+                {
+                    Console.WriteLine(result);
+                }
             }
         }
     }
