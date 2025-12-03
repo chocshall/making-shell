@@ -143,7 +143,7 @@ public class ConsoleManager
         }
 
         return false;
-    }
+    } 
 
     private void ExitCommand(string[] splitInputList, string inputCommand)
     {
