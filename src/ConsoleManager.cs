@@ -229,7 +229,14 @@ public class ConsoleManager
             {
                 char nextChar = args[i + 1];
 
-                if(i != 0)
+                if (inQuotes)
+                {
+                    
+                    result.Append(c);
+                    continue;
+                }
+
+                if (i != 0)
                 {
                     if (args[i - 1] != '\\' && nextChar != '\\' && nextChar != ' '&& nextChar != '\'' && nextChar != '"')
                     {
