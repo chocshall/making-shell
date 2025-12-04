@@ -1,6 +1,6 @@
-namespace ConsoleApp2
+namespace src
 {
-    internal class Program
+    public class Program
     {
         static void Main(string[] args)
         {

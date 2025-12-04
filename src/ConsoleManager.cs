@@ -143,9 +143,9 @@ public class ConsoleManager
         }
 
         return false;
-    } 
+    }
 
-    private void ExitCommand(string[] splitInputList, string inputCommand)
+    protected virtual void ExitCommand(string[] splitInputList, string inputCommand)
     {
         if (splitInputList[0] == "exit" && splitInputList.Length == 1)
         {
