@@ -176,7 +176,8 @@ public class ConsoleManager
         StringBuilder result = new StringBuilder();
         bool inQuotes = false;
         char quoteChar = '\0';
-
+        bool outOfQuotes = true;
+        int count = 0;
         for (int i = 0; i < args.Length; i++)
         {
             char c = args[i];
@@ -195,13 +196,15 @@ public class ConsoleManager
                     // Ending quotes of same type
                     inQuotes = false;
                 }
-                else
+                else if(c != '\\')
                 {
                     // Different quote char inside quotes - treat as literal
                     result.Append(c);
                 }
                 continue;
             }
+
+            
 
             // Handle spaces
             if (c == ' ')
@@ -219,12 +222,45 @@ public class ConsoleManager
                         result.Append(' ');
                     }
                 }
+                continue;
             }
-            else
+
+            if(c == '\\' && i + 1 < args.Length)
             {
-                // Regular character
-                result.Append(c);
+                char nextChar = args[i + 1];
+
+                if(i != 0)
+                {
+                    if (args[i - 1] != '\\' && nextChar != '\\' && nextChar != ' '&& nextChar != '\'' && nextChar != '"')
+                    {
+                        continue;
+                    }
+                }
+                if(i == 0 && nextChar != '\\' && nextChar != ' ' && nextChar != '\'' && nextChar != '"')
+                {
+                    continue;
+                }
+                
+                
+                if (nextChar == ' ' || nextChar == '\\' || nextChar == '\'' || nextChar == '"')
+                {
+                    result.Append(nextChar);
+                    i++;
+                    continue;
+                }
+
+
+
             }
+
+           
+            result.Append(c);
+          
+                
+
+
+
+
         }
 
         return result.ToString().Trim();
