@@ -27,6 +27,72 @@ namespace src
         }
 
         [Fact]
+        public void TestCatCommandParsing_Bug()
+        {
+            // Arrange
+            var consoleManager = new ConsoleManager();
+            string[] result = Array.Empty<string>();
+
+            // The actual command that fails in the test
+            string input = "cat \"/tmp/bee/\\\"f 96\\\"\" \"/tmp/bee/\\\"f\\\\48\\\"\" \"/tmp/bee/f76\"";
+
+            // Show the raw characters
+            Console.WriteLine("Raw input characters:");
+            for (int i = 0; i < input.Length; i++)
+            {
+                char c = input[i];
+                string display = c switch
+                {
+                    '\\' => "\\\\",
+                    '\"' => "\\\"",
+                    ' ' => "[space]",
+                    _ => c.ToString()
+                };
+                Console.WriteLine($"  [{i}] '{c}' ({display})");
+            }
+
+            // Act
+            consoleManager.parsingForNotCommand(input);
+
+            // Show what the parser produced
+            Console.WriteLine("\nParser output:");
+            for (int i = 0; i < result.Length; i++)
+            {
+                Console.WriteLine($"  Argument {i}: '{result[i]}'");
+            }
+
+            // What SHOULD happen:
+            // 1. cat
+            // 2. /tmp/bee/"f 96"   (with quotes inside the string)
+            // 3. /tmp/bee/"f\48"   (with quotes and backslash inside)
+            // 4. /tmp/bee/f76
+
+            // What actually happens with current parsingForNotCommand:
+            // It splits on " character, so:
+            // "cat " -> "cat"
+            // "/tmp/bee/\" -> "/tmp/bee/" (but wait, there's a backslash before quote!)
+            // Actually, let me trace it:
+            // Input: cat "/tmp/bee/\"f 96\"" "/tmp/bee/\"f\\48\"" "/tmp/bee/f76"
+            // Split on ": ["cat ", "/tmp/bee/\", "f 96", "", " ", "/tmp/bee/\", "f\\48", "", " ", "/tmp/bee/f76", ""]
+            // Trim: ["cat", "/tmp/bee/", "f 96", "", "", "/tmp/bee/", "f\\48", "", "", "/tmp/bee/f76", ""]
+            // Remove empties: ["cat", "/tmp/bee/", "f 96", "/tmp/bee/", "f\\48", "/tmp/bee/f76"]
+
+            Console.WriteLine("\nThis explains the error message:");
+            Console.WriteLine("cat: can't open '/tmp/bee/\\': No such file or directory");
+            Console.WriteLine("cat: can't open 'f 96\\': No such file or directory");
+            Console.WriteLine("cat: can't open '/tmp/bee/\\': No such file or directory");
+            Console.WriteLine("cat: can't open 'f\\\\48\\': No such file or directory");
+
+            // The cat command gets these arguments: ["/tmp/bee/", "f 96", "/tmp/bee/", "f\\48", "/tmp/bee/f76"]
+            // So it tries to open these files:
+            // 1. /tmp/bee/ (a directory, not a file)
+            // 2. f 96 (relative path)
+            // 3. /tmp/bee/ (again)
+            // 4. f\48 (relative path with backslash)
+            // 5. /tmp/bee/f76 (this one might work if it exists)
+        }
+
+        [Fact]
         public void MultipleInvalidCommands_ReturnCorrectMessages()
         {
             var cm = Create();
