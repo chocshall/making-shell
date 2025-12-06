@@ -13,7 +13,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
-
+// todo: fixed echo command so it would work with backsli withn double quates now just need to make it so all the things with the cat command go trough echo? because what isin double quates is kinda
 public class ConsoleManager
 {
     private List<string> validCommandsList;
@@ -42,9 +42,9 @@ public class ConsoleManager
         return ProcessUserInput(input);
     }
 
-    private string ProcessUserInput(string inputCommand)
+    private string ProcessUserInput(string userInputCommand)
     {
-        this.inputCommand = inputCommand;
+        inputCommand = userInputCommand;
 
         // Handle echo command with regex
         string pattern = "echo.+";
@@ -81,6 +81,7 @@ public class ConsoleManager
         {
             checker = true;
             return TypeBuiltCommand(splitInputList, validCommandsList, splitInputList[0]);
+            return "";
         }
 
         // Handle pwd command
@@ -178,6 +179,8 @@ public class ConsoleManager
         char quoteChar = '\0';
         bool outOfQuotes = true;
         int count = 0;
+        char oneTimeChar = ' ';
+        
         for (int i = 0; i < args.Length; i++)
         {
             char c = args[i];
@@ -229,11 +232,37 @@ public class ConsoleManager
             {
                 char nextChar = args[i + 1];
 
-                if (inQuotes)
+                //if (inQuotes  && (quoteChar != '\"' && quoteChar != '\''))
+                //{
+
+                //    result.Append(c);
+                //    continue;
+                //}
+                if (inQuotes && quoteChar == '\'')
                 {
-                    
+
                     result.Append(c);
                     continue;
+                }
+
+                else if (inQuotes && quoteChar == '\"')
+                {
+
+                    if (i != 0)
+                    {
+                        if (args[i - 1] != '\\' && nextChar != '\\' && nextChar != ' ' && nextChar != '\'' && nextChar != '"')
+                        {
+                            i++;
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                       
+                        result.Append(nextChar);
+                        continue;
+                    }
+                        
                 }
 
                 if (i != 0)
@@ -449,6 +478,7 @@ public class ConsoleManager
 
     private string ChangeDirectory(string[] splitInputList, List<string> validCommandsList)
     {
+
         if (splitInputList[0] == "cd" && splitInputList[1] == "~")
         {
             string homePath = (Environment.OSVersion.Platform == PlatformID.Unix ||
