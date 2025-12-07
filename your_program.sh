@@ -1,3 +1,3 @@
 #!/bin/sh
-dotnet build --configuration Release --output ./bin codecrafters-shell.csproj
+dotnet build --configuration Release --output ./bin src/codecrafters-shell.csproj
 dotnet ./bin/codecrafters-shell.dll "$@"

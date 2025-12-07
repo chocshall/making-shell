@@ -2,6 +2,7 @@ namespace src
 {
     public class Program
     {
+        private const string StartInput = "$ ";
         static void Main(string[] args)
         {
 
@@ -13,7 +14,7 @@ namespace src
             while (true)
             {
 
-                Console.Write("$ ");
+                Console.Write(StartInput);
                 string result = Maker.HandleConsoleLine(Console.ReadLine());
 
                
@@ -25,3 +26,4 @@ namespace src
         }
     }
 }
+

@@ -13,7 +13,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
-// todo: fixed echo command so it would work with backsli withn double quates now just need to make it so all the things with the cat command go trough echo? because what isin double quates is kinda
+
 public class ConsoleManager
 {
     private List<string> validCommandsList;
@@ -60,6 +60,7 @@ public class ConsoleManager
                 commandLineArgs = parsingForNotCommand(userInputCommand);
                 splitInputList = commandLineArgs;
                 
+                
 
             }
           
@@ -83,7 +84,7 @@ public class ConsoleManager
         {
             checker = true;
             return TypeBuiltCommand(splitInputList, validCommandsList, splitInputList[0], commandLineArgs);
-            return "";
+           
         }
 
         // Handle pwd command
@@ -119,7 +120,7 @@ public class ConsoleManager
             }
         }
 
-        return "";
+        return $"{splitInputList[0]}: command not found"; ;
     }
 
     public bool CheckDoesCommandExist(string[] splitInputList, string inputCommand, List<string> validCommandsList)
@@ -150,9 +151,10 @@ public class ConsoleManager
 
     protected virtual void ExitCommand(string[] splitInputList, string inputCommand)
     {
+        int exitNumber = 0;
         if (splitInputList[0] == "exit" && splitInputList.Length == 1)
         {
-            Environment.Exit(0);
+            Environment.Exit(exitNumber);
         }
         if (splitInputList[0] == "exit" && splitInputList.Length > 1)
         {
@@ -693,4 +695,3 @@ public class ConsoleManager
     }
 }
 
-        

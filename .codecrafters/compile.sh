@@ -1,3 +1,3 @@
 #!/bin/sh
 set -e
-dotnet build --configuration Release --output /tmp/codecrafters-build-csharp codecrafters-shell.csproj
+dotnet build --configuration Release --output /tmp/codecrafters-build-csharp src/codecrafters-shell.csproj
