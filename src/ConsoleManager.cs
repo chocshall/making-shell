@@ -1,19 +1,9 @@
-﻿using System;
+﻿
+using System;
 using System.Diagnostics;
-using System.Formats.Tar;
-using System.IO;
-using System.IO.Enumeration;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Net.NetworkInformation;
-using System.Numerics;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml.Linq;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+
 
 public class ConsoleManager
 {
@@ -34,7 +24,8 @@ public class ConsoleManager
         inputCommand = "";
         splitInputList = Array.Empty<string>();
     }
-
+    // testing 
+    
     public string HandleConsoleLine(string? input)
     {
         if (string.IsNullOrEmpty(input))
@@ -43,11 +34,21 @@ public class ConsoleManager
         return ProcessUserInput(input);
     }
 
+
     private string ProcessUserInput(string userInputCommand)
     {
         inputCommand = userInputCommand;
+        
+
         splitInputList = inputCommand.Split(' ');
+
+        if (inputCommand.Contains('\"') )
+        {
+            inputCommand = DealingWithSpaceWhileHasQoutes(inputCommand);
+        }
         string[] commandLineArgs = Array.Empty<string>();
+       
+        
 
         switch (CheckValidCommandExist(splitInputList,validCommandsList))
         {
@@ -71,10 +72,12 @@ public class ConsoleManager
                 
                 break;
         }
-
-        commandLineArgs = parsingForNotCommand(userInputCommand);
+        commandLineArgs = ParsingInput(inputCommand);
         splitInputList = commandLineArgs;
-        
+
+
+
+
         if (!validCommandsList.Contains(splitInputList[0]) && splitInputList.Length > 1)
         {
             return ExecutesFileIfMeetRequirements(splitInputList[0], commandLineArgs, inputCommand);
@@ -129,7 +132,7 @@ public class ConsoleManager
         StringBuilder result = new StringBuilder();
         bool inQuotes = false;
         char quoteChar = '\0';
-        
+
         int count = 0;
         char oneTimeChar = ' ';
 
@@ -244,6 +247,7 @@ public class ConsoleManager
         }
 
         return result.ToString().Trim();
+
     }
 
     private string TypeBuiltCommand(string[] splitInputList, List<string> validCommandsList, string nameOfFile, string[] commandLineArgs)
@@ -345,6 +349,10 @@ public class ConsoleManager
         
         
         string argsString = inputCommand;
+        //foreach (var item in splitInputList)
+        //{
+        //    Console.WriteLine(item);
+        //}
 
         if (nameOfFile == "cat")
         {
@@ -462,19 +470,18 @@ public class ConsoleManager
         return "";
     }
 
-    public string[] parsingForNotCommand(string input)
+    public string[] ParsingInput(string input)
     {
-        // used the echo code
         List<string> listForArgs = new List<string>();
         int firstSpace = input.IndexOf(' ');
-        
-        if(firstSpace > -1)
+
+        if (firstSpace > -1)
         {
             string commandName = input.Substring(0, input.IndexOf(' '));
             listForArgs.Add(commandName);
 
             string args = input.Substring(input.IndexOf(' ') + 1);
-            if (input.Contains("\'") || input.Contains("\""))
+            if (input.Contains("\'") || input.Contains("\"") && input.Contains('\\'))
             {
 
                 StringBuilder result = new StringBuilder();
@@ -488,29 +495,34 @@ public class ConsoleManager
                 {
                     char c = args[i];
 
-                    // checking for ' ' or " " before skipping 2 times and countinue. adding the made word before clearing result
-                    if (i + 2 < args.Length && result.Length > 0)
-                    {
+                    //checking for ' ' or " " before skipping 2 times and countinue.adding the made word before clearing result
 
-                   
-                    if (args[i] == '\"' && args[i + 1] == ' ' && args[i + 2] == '\"')
+                    if(!input.Contains("echo"))
                     {
+                        if (i + 2 < args.Length && result.Length > 0)
+                        {
+                            if (args[i] == '\"' && args[i + 1] == ' ' && args[i + 2] == '\"')
+                            {
 
-                        listForArgs.Add(result.ToString());
-                        result.Clear();
-                        i += 2;
-                        continue;
+                                listForArgs.Add(result.ToString());
+                                result.Clear();
+                                i += 2;
+                                continue;
+                            }
+
+                            if (args[i] == '\'' && args[i + 1] == ' ' && args[i + 2] == '\'')
+                            {
+
+                                listForArgs.Add(result.ToString());
+                                result.Clear();
+                                i += 2;
+                                continue;
+                            }
+                        }
                     }
+                    
 
-                    if (args[i] == '\'' && args[i + 1] == ' ' && args[i + 2] == '\'')
-                    {
-
-                        listForArgs.Add(result.ToString());
-                        result.Clear();
-                        i += 2;
-                        continue;
-                    }
-                }
+                    
 
                     // Check for quotes
                     if (c == '\'' || c == '"')
@@ -555,29 +567,19 @@ public class ConsoleManager
                         continue;
                     }
 
-                    if (c == '\\' && i + 1 < args.Length)
-                    {
+                    if(c == '\\' && i + 1 < args.Length)
+{
                         char nextChar = args[i + 1];
 
-                        //if (inQuotes  && (quoteChar != '\"' && quoteChar != '\''))
-                        //{
-
-                        //    result.Append(c);
-                        //    continue;
-                        //}
                         if (inQuotes && quoteChar == '\'')
                         {
-
                             result.Append(c);
                             continue;
                         }
-
                         else if (inQuotes && quoteChar == '\"')
                         {
-
                             if (nextChar == '"' || nextChar == '\\' || nextChar == '$' || nextChar == '`')
                             {
-
                                 result.Append(nextChar);
                                 i++;
                                 continue;
@@ -587,57 +589,109 @@ public class ConsoleManager
                                 result.Append(c);
                                 continue;
                             }
-
                         }
 
-                        if (i != 0)
+                        // NOT in quotes - SIMPLIFIED
+                        // Remove backslash for escaped special characters
+                        if (nextChar == '\\' || nextChar == ' ' || nextChar == '\'' || nextChar == '"')
                         {
-                            if (args[i - 1] != '\\' && nextChar != '\\' && nextChar != ' ' && nextChar != '\'' && nextChar != '"')
-                            {
-                                continue;
-                            }
-                        }
-                        if (i == 0 && nextChar != '\\' && nextChar != ' ' && nextChar != '\'' && nextChar != '"')
-                        {
+                            result.Append(nextChar);  // Keep the escaped character
+                            i++;  // Skip it
                             continue;
                         }
 
-
-                        if (nextChar == ' ' || nextChar == '\\' || nextChar == '\'' || nextChar == '"')
-                        {
-                            result.Append(nextChar);
-                            i++;
-                            continue;
-                        }
-
-
-
+                        // For any other character after backslash, keep backslash as literal
+                        result.Append(c);
                     }
 
 
                     result.Append(c);
 
                 }
+                //Console.WriteLine(result + " aa");
                 if (result.Length > 0)
                 {
-                    listForArgs.Add(result.ToString());
+                    if(input.StartsWith("echo"))
+                    {
+                        
+                        string[] leftArgsArray = result.ToString().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                        foreach (var item in leftArgsArray)
+                        {
+                            listForArgs.Add(item);
+                        }
+                    }
+
+                    else
+                    {
+                        listForArgs.Add(result.ToString());
+                    }
+                   
+                    
 
                 }
+                //foreach (string c in listForArgs)
+                //{
+                //    Console.WriteLine(c);
+                //}
+
 
             }
 
 
             else
             {
-                string[] argsArray = args.Split();
 
-                // Get command name and combine with arguments
-                string commandWord = input.Substring(0, input.IndexOf(' '));
-                string[] fullArray = new string[argsArray.Length + 1];
-                fullArray[0] = commandName;
-                Array.Copy(argsArray, 0, fullArray, 1, argsArray.Length);
+                if (args.Contains('\\'))
+                {
+                    //Console.WriteLine(10);
+                    if (firstSpace > -1)
+                    {
+                        commandName = input.Substring(0, input.IndexOf(' '));
 
-                return fullArray;
+                        args = input.Substring(input.IndexOf(' ') + 1);
+                        //Console.WriteLine(args + " tebn");
+                        string argsResult = "";
+                        for (int i = 0; i < args.Length; i++)
+                        {
+                            if (args[i] == '\\' && args[i + 1] == ' ' && args.Length > i + 1)
+                            {
+                                argsResult += ' ';
+                                i++;
+                                continue;
+                            }
+                            else
+                            {
+                                argsResult += args[i];
+                            }
+                        }
+                        listForArgs.Add(argsResult);
+                        //foreach (var item in listForArgs)
+                        //{
+                        //    Console.WriteLine(item);
+                        //}
+                        //Console.WriteLine(argsResult + " cia");
+                    }
+                    return listForArgs.ToArray();
+
+                }
+
+                else
+                {
+                    string[] argsArray = args.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                    string commandWord = input.Substring(0, input.IndexOf(' '));
+                    string[] fullArray = new string[argsArray.Length + 1];
+                    fullArray[0] = commandName;
+                    Array.Copy(argsArray, 0, fullArray, 1, argsArray.Length);
+                    //foreach (string c in fullArray)
+                    //{
+                    //    Console.WriteLine(c + "ASD");
+                    //}
+
+                    return fullArray;
+                }
+
+                    
             }
             return listForArgs.ToArray();
         }
@@ -647,5 +701,84 @@ public class ConsoleManager
 
 
     }
+    public string DealingWithSpaceWhileHasQoutes(string input)
+    {
+        int spaceIndex = input.IndexOf(' ');
+        string noMultipleBlanksString = "";
+        if (spaceIndex != -1)
+        {
+            string firstArg = input.Substring(0, spaceIndex);
+            noMultipleBlanksString += firstArg + " ";
+
+        }
+
+        string args = input.Substring(input.IndexOf(' ') + 1);
+        List<int> indexList = new List<int>();
+
+        char? currentQuoteType = null;
+        bool insideQuotes = false;
+
+        for (int i = 0; i < args.Length; i++)
+        {
+            // Handle backslashes
+            if (args[i] == '\\' && i + 1 < args.Length)
+            {
+                noMultipleBlanksString += args[i];
+                noMultipleBlanksString += args[i + 1];
+                i++; // Skip escaped character
+                continue;
+            }
+
+            // Handle quotes
+            if (args[i] == '\"' || args[i] == '\'')
+            {
+                if (!insideQuotes)
+                {
+                    // Opening quote
+                    currentQuoteType = args[i];
+                    insideQuotes = true;
+                }
+                else if (args[i] == currentQuoteType)
+                {
+                    // Closing quote (same type)
+                    currentQuoteType = null;
+                    insideQuotes = false;
+                }
+                // If we're inside double quotes and encounter single quote, treat as regular char
+                // and vice versa
+
+                noMultipleBlanksString += args[i];
+                continue;
+            }
+
+            // Handle spaces
+            if (args[i] == ' ')
+            {
+                if (insideQuotes)
+                {
+                    noMultipleBlanksString += args[i];
+                }
+                else
+                {
+                    // Only add space if previous wasn't space
+                    if (noMultipleBlanksString.Length == 0 ||
+                        noMultipleBlanksString[^1] != ' ')
+                    {
+                        noMultipleBlanksString += args[i];
+                    }
+                }
+                continue;
+            }
+
+            // Regular character
+            noMultipleBlanksString += args[i];
+        }
+
+        input = noMultipleBlanksString;
+        //Console.WriteLine(input);
+        return input;
+    }
 }
+
+
 
