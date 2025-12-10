@@ -260,16 +260,15 @@ public class ConsoleManager
             string pathListString = Environment.GetEnvironmentVariable("PATH") ?? "";
             bool wordCheckerIsPath = false;
             string userInput = "";
-            // Use path if linux 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                userInput = $@"$PATH";
-            }
-            // If on windows make your own to test
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                userInput = $@"$PATH";
-            }
+            
+
+#if DEBUG
+            userInput = $@"c/users{Path.PathSeparator}$PATH";
+            
+#else
+    userInput = @"$PATH";
+    
+#endif
 
             string expandedInput = userInput
                 .Replace("$PATH", pathListString)
