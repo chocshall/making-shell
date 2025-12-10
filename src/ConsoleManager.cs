@@ -24,7 +24,7 @@ public class ConsoleManager
         inputCommand = "";
         splitInputList = Array.Empty<string>();
     }
-    // testing 
+    
     
     public string HandleConsoleLine(string? input)
     {
@@ -259,9 +259,18 @@ public class ConsoleManager
             string[] splitPathList = Array.Empty<string>();
             string pathListString = Environment.GetEnvironmentVariable("PATH") ?? "";
             bool wordCheckerIsPath = false;
+            string userInput = "";
+            // Use path if linux 
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                userInput = $@"$PATH";
+            }
+            // If on windows make your own to test
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                userInput = $@"$PATH";
+            }
 
-            // Use custom path configuration
-            string userInput = $@"E:\Downloads\c#programs\TestingProccesClass\bin\Debug\net8.0{Path.PathSeparator}$PATH";
             string expandedInput = userInput
                 .Replace("$PATH", pathListString)
                 .Replace("${PATH}", pathListString)
@@ -349,10 +358,7 @@ public class ConsoleManager
         
         
         string argsString = inputCommand;
-        //foreach (var item in splitInputList)
-        //{
-        //    Console.WriteLine(item);
-        //}
+        
 
         if (nameOfFile == "cat")
         {
@@ -399,7 +405,7 @@ public class ConsoleManager
             }
             var process = Process.Start(processStartInfo);
 
-            // Capture the output
+            
             string output = process.StandardOutput.ReadToEnd();
             string error = process.StandardError.ReadToEnd();
 
@@ -477,10 +483,73 @@ public class ConsoleManager
 
         if (firstSpace > -1)
         {
-            string commandName = input.Substring(0, input.IndexOf(' '));
-            listForArgs.Add(commandName);
+            int iterator = 0;
+            char firstChar = input[iterator];
+            char currentChar = ' ';
+            string commandName = "";
+            string args = "";
+            if (firstChar == '\"')
+            {
+                currentChar = firstChar;
+                
 
-            string args = input.Substring(input.IndexOf(' ') + 1);
+                int tokenStart = iterator + 1;
+                char nextChar = input[tokenStart];
+                char prevChar = input[tokenStart-1];
+                while (nextChar != '\"' || (prevChar == '\\') || (nextChar == '\''))
+                {
+                    tokenStart++;
+                    nextChar = input[tokenStart];
+                    prevChar = input[tokenStart - 1];
+                    
+                }
+                int length = tokenStart;
+                char lastChar = input[tokenStart];
+                
+                commandName = input.Substring(iterator + 1, length - 1);
+                listForArgs.Add(commandName);
+                
+                args = input.Remove(iterator, length + 2);
+                
+            }
+
+            if (firstChar == '\'')
+            {
+                currentChar = firstChar;
+
+
+                int tokenStart = iterator + 1;
+                char nextChar = input[tokenStart];
+                char prevChar = input[tokenStart - 1];
+                while (nextChar != '\'' || (prevChar == '\\') || (nextChar == '\"'))
+                {
+                    tokenStart++;
+                    nextChar = input[tokenStart];
+                    prevChar = input[tokenStart - 1];
+                    
+                }
+                int length = tokenStart;
+                char lastChar = input[tokenStart];
+                
+                commandName = input.Substring(iterator + 1, length - 1);
+                listForArgs.Add(commandName);
+                
+                args = input.Remove(iterator, length + 2);
+                
+            }
+
+            if(firstChar != '\"' && firstChar != '\'')
+            {
+                commandName = input.Substring(0, input.IndexOf(' '));
+
+                
+                listForArgs.Add(commandName);
+
+                args = input.Substring(input.IndexOf(' ') + 1);
+                
+            }
+
+
             if (input.Contains("\'") || input.Contains("\"") && input.Contains('\\'))
             {
 
@@ -495,7 +564,7 @@ public class ConsoleManager
                 {
                     char c = args[i];
 
-                    //checking for ' ' or " " before skipping 2 times and countinue.adding the made word before clearing result
+                    
 
                     if(!input.Contains("echo"))
                     {
@@ -591,12 +660,12 @@ public class ConsoleManager
                             }
                         }
 
-                        // NOT in quotes - SIMPLIFIED
-                        // Remove backslash for escaped special characters
+                        // not in quotes
+                        
                         if (nextChar == '\\' || nextChar == ' ' || nextChar == '\'' || nextChar == '"')
                         {
                             result.Append(nextChar);  // Keep the escaped character
-                            i++;  // Skip it
+                            i++;  
                             continue;
                         }
 
@@ -608,7 +677,7 @@ public class ConsoleManager
                     result.Append(c);
 
                 }
-                //Console.WriteLine(result + " aa");
+                
                 if (result.Length > 0)
                 {
                     if(input.StartsWith("echo"))
@@ -629,10 +698,7 @@ public class ConsoleManager
                     
 
                 }
-                //foreach (string c in listForArgs)
-                //{
-                //    Console.WriteLine(c);
-                //}
+                
 
 
             }
@@ -643,13 +709,13 @@ public class ConsoleManager
 
                 if (args.Contains('\\'))
                 {
-                    //Console.WriteLine(10);
+                    
                     if (firstSpace > -1)
                     {
                         commandName = input.Substring(0, input.IndexOf(' '));
 
                         args = input.Substring(input.IndexOf(' ') + 1);
-                        //Console.WriteLine(args + " tebn");
+                        
                         string argsResult = "";
                         for (int i = 0; i < args.Length; i++)
                         {
@@ -665,11 +731,7 @@ public class ConsoleManager
                             }
                         }
                         listForArgs.Add(argsResult);
-                        //foreach (var item in listForArgs)
-                        //{
-                        //    Console.WriteLine(item);
-                        //}
-                        //Console.WriteLine(argsResult + " cia");
+                        
                     }
                     return listForArgs.ToArray();
 
@@ -683,10 +745,7 @@ public class ConsoleManager
                     string[] fullArray = new string[argsArray.Length + 1];
                     fullArray[0] = commandName;
                     Array.Copy(argsArray, 0, fullArray, 1, argsArray.Length);
-                    //foreach (string c in fullArray)
-                    //{
-                    //    Console.WriteLine(c + "ASD");
-                    //}
+                    
 
                     return fullArray;
                 }
@@ -745,7 +804,7 @@ public class ConsoleManager
                     insideQuotes = false;
                 }
                 // If we're inside double quotes and encounter single quote, treat as regular char
-                // and vice versa
+                
 
                 noMultipleBlanksString += args[i];
                 continue;
@@ -775,7 +834,7 @@ public class ConsoleManager
         }
 
         input = noMultipleBlanksString;
-        //Console.WriteLine(input);
+        
         return input;
     }
 }
