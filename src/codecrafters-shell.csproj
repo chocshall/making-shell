@@ -6,6 +6,8 @@
     <RootNamespace>codecrafters-shell</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+	<StartupObject>src.Program</StartupObject>  
   </PropertyGroup>
 
+ 
 </Project>
