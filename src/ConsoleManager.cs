@@ -128,39 +128,7 @@ public class ConsoleManager
     {
         // Remove "echo "
         string args = inputCommand.Substring(5).TrimStart();
-        //if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        //{
-        //    if (args.IndexOf('>') != -1)
-        //    {
-        //        string fileName = args.Substring(args.IndexOf('>') + 1);
-        //        Console.WriteLine(fileName.TrimStart(' '));
-        //        args = args.Remove(args.IndexOf('>'));
-        //    }
-                
-        //}
-
-        //if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        //{
-        //    if(args.IndexOf('>') != -1)
-        //    {
-        //        string fileName = args.Substring(args.IndexOf('>') + 1);
-        //        Console.WriteLine(fileName.TrimStart(' '));
-        //        args = args.Remove(args.IndexOf('>'));
-        //    }
-
-        //    if (args.IndexOf("1>") != -1)
-        //    {
-        //        string fileName = args.Substring(args.IndexOf("1>") + 1);
-        //        Console.WriteLine(fileName.TrimStart(' '));
-        //        args = args.Remove(args.IndexOf("1>"));
-        //    }
-
-
-
-        //}
-
-
-        //Console.WriteLine(args);
+        
 
         StringBuilder result = new StringBuilder();
         bool inQuotes = false;
@@ -400,10 +368,7 @@ public class ConsoleManager
 
 
         string argsString = inputCommand;
-        //foreach (var item in splitInputList)
-        //{
-        //    Console.WriteLine(item);
-        //}
+       
         
 
         if (nameOfFile == "cat")
