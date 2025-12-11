@@ -128,6 +128,39 @@ public class ConsoleManager
     {
         // Remove "echo "
         string args = inputCommand.Substring(5).TrimStart();
+        //if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        //{
+        //    if (args.IndexOf('>') != -1)
+        //    {
+        //        string fileName = args.Substring(args.IndexOf('>') + 1);
+        //        Console.WriteLine(fileName.TrimStart(' '));
+        //        args = args.Remove(args.IndexOf('>'));
+        //    }
+                
+        //}
+
+        //if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        //{
+        //    if(args.IndexOf('>') != -1)
+        //    {
+        //        string fileName = args.Substring(args.IndexOf('>') + 1);
+        //        Console.WriteLine(fileName.TrimStart(' '));
+        //        args = args.Remove(args.IndexOf('>'));
+        //    }
+
+        //    if (args.IndexOf("1>") != -1)
+        //    {
+        //        string fileName = args.Substring(args.IndexOf("1>") + 1);
+        //        Console.WriteLine(fileName.TrimStart(' '));
+        //        args = args.Remove(args.IndexOf("1>"));
+        //    }
+
+
+
+        //}
+
+
+        //Console.WriteLine(args);
 
         StringBuilder result = new StringBuilder();
         bool inQuotes = false;
@@ -263,7 +296,7 @@ public class ConsoleManager
             
 
 #if DEBUG
-            userInput = $@"c/users{Path.PathSeparator}$PATH";
+            userInput = $@"C:\cSharp\ConsoleApp1\bin\Debug\net9.0{Path.PathSeparator}$PATH";
             
 #else
     userInput = @"$PATH";
@@ -275,6 +308,7 @@ public class ConsoleManager
                 .Replace("${PATH}", pathListString)
                 .Replace("%PATH%", pathListString);
             splitPathList = expandedInput.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries);
+            
 
             string changedWord = "";
             
@@ -354,9 +388,22 @@ public class ConsoleManager
     private string ExecutesFileIfMeetRequirements(string nameOfFile, string[] splitInputList, string parsedInput)
     {
         string executable = splitInputList[0];
-        
-        
+
+#if DEBUG
+        string currentPath = Environment.GetEnvironmentVariable("PATH");
+        Environment.SetEnvironmentVariable("PATH", currentPath + ";" + "C:\\cSharp\\ConsoleApp1\\bin\\Debug\\net9.0");
+
+#else
+    
+    
+#endif
+
+
         string argsString = inputCommand;
+        //foreach (var item in splitInputList)
+        //{
+        //    Console.WriteLine(item);
+        //}
         
 
         if (nameOfFile == "cat")
@@ -412,6 +459,17 @@ public class ConsoleManager
 
             if (!string.IsNullOrEmpty(error))
             {
+                // FIX CAT ERROR FORMAT
+                if (nameOfFile == "cat" || executable.Contains("cat"))
+                {
+                    error = FixCatErrorMessage(error);
+                }
+
+                if (!string.IsNullOrEmpty(output))
+                {
+                    // Format: "ERROR|||OUTPUT"
+                    return $"{error}|||{output}";
+                }
                 return error.Trim();
             }
 
@@ -836,6 +894,29 @@ public class ConsoleManager
         
         return input;
     }
+
+
+    private string FixCatErrorMessage(string error)
+    {
+        // Transform: "cat: can't open 'filename': No such file or directory"
+        // To: "cat: filename: No such file or directory"
+
+        if (error.StartsWith("cat: can't open '") && error.Contains("': No such file or directory"))
+        {
+            int start = "cat: can't open '".Length;
+            int quoteIndex = error.IndexOf("': ", start);
+
+            if (quoteIndex > start)
+            {
+                string filename = error.Substring(start, quoteIndex - start);
+                return $"cat: {filename}: No such file or directory";
+            }
+        }
+
+        return error;
+    }
+
+
 }
 
 
