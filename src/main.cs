@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace src
 {
     public class Program
@@ -15,12 +17,27 @@ namespace src
             {
 
                 Console.Write(StartInput);
-                string result = Maker.HandleConsoleLine(Console.ReadLine());
 
+                string input = Console.ReadLine();
+                string fileString = "";
                
+                
+
+
+
+
+                string result = Maker.HandleConsoleLine(input);
+                
+                
+
                 if (!string.IsNullOrEmpty(result))
                 {
+
                     Console.WriteLine(result);
+
+                    
+
+
                 }
             }
         }
