@@ -3,6 +3,8 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 public class ConsoleManager
@@ -38,7 +40,7 @@ public class ConsoleManager
     private string ProcessUserInput(string userInputCommand)
     {
         inputCommand = userInputCommand;
-        
+        string fileString = "";
 
         splitInputList = inputCommand.Split(' ');
 
@@ -53,14 +55,14 @@ public class ConsoleManager
         switch (CheckValidCommandExist(splitInputList,validCommandsList))
         {
             case "echo":
-                return EchoCommand(inputCommand);
+                return EchoCommand(inputCommand, ref fileString);
                 break;
             case "exit":
                 ExitCommand(splitInputList, inputCommand);
                 return "";
                 break;
             case "type":
-                return TypeBuiltCommand(splitInputList, validCommandsList, splitInputList[1], commandLineArgs);
+                return TypeBuiltCommand(splitInputList, validCommandsList, splitInputList[1], commandLineArgs, fileString);
                 break;
             case "pwd":
                 return PrintWorkingDirectory(splitInputList, validCommandsList);
@@ -72,7 +74,8 @@ public class ConsoleManager
                 
                 break;
         }
-        commandLineArgs = ParsingInput(inputCommand);
+        commandLineArgs = ParsingInput(inputCommand, ref fileString);
+        
         splitInputList = commandLineArgs;
 
 
@@ -80,7 +83,7 @@ public class ConsoleManager
 
         if (!validCommandsList.Contains(splitInputList[0]) && splitInputList.Length > 1)
         {
-            return ExecutesFileIfMeetRequirements(splitInputList[0], commandLineArgs, inputCommand);
+            return ExecutesFileIfMeetRequirements(splitInputList[0], commandLineArgs, inputCommand, fileString);
         }
         
 
@@ -124,11 +127,34 @@ public class ConsoleManager
         }
     }
 
-    private string EchoCommand(string inputCommand)
+    private string EchoCommand(string inputCommand, ref string fileString)
     {
+        fileString = "";
         // Remove "echo "
         string args = inputCommand.Substring(5).TrimStart();
-        
+        if (args.IndexOf('>') != -1)
+        {
+            if (args.Length > args.IndexOf('>') + 1)
+            {
+                if (!string.IsNullOrEmpty(args) && args.IndexOf('>') != -1 && args[args.IndexOf('>') + 1] == ' ')
+                {
+                    // Checks backwards in a string if there is a > with spaces around
+                    // example: asd asd> does not match
+                    // example: asd >asd does not match
+                    // example: asd > asd       matches
+                    // only should match if its the redirect operactor
+                    string fixedInput = Regex.Replace(args, @"(?<!\S)>\s", "1> ");
+
+
+                    //Console.WriteLine(fixedInput);
+                    int index = fixedInput.IndexOf("1>");
+                    fileString = fixedInput.Substring(index + 2).TrimStart();
+                    //Console.WriteLine(fileString + " wow");
+                    args = fixedInput.Substring(0, index).Trim();
+                    //Console.WriteLine(input + " wozw");
+                }
+            }
+        }
 
         StringBuilder result = new StringBuilder();
         bool inQuotes = false;
@@ -246,12 +272,17 @@ public class ConsoleManager
 
 
         }
-
+        if(!string.IsNullOrEmpty(fileString))
+        {
+            OutPutToFile(fileString, result.ToString().Trim());
+            return "";
+        }
+        
         return result.ToString().Trim();
 
     }
 
-    private string TypeBuiltCommand(string[] splitInputList, List<string> validCommandsList, string nameOfFile, string[] commandLineArgs)
+    private string TypeBuiltCommand(string[] splitInputList, List<string> validCommandsList, string nameOfFile, string[] commandLineArgs, string fileString)
     {
         
 
@@ -310,7 +341,7 @@ public class ConsoleManager
                                 else
                                 {
                                     string arguments = string.Join(" ", splitInputList.Skip(1));
-                                    return ExecutesFileIfMeetRequirements(nameOfFile, splitInputList, inputCommand);
+                                    return ExecutesFileIfMeetRequirements(nameOfFile, splitInputList, inputCommand, fileString);
                                 }
                             }
                         }
@@ -324,7 +355,7 @@ public class ConsoleManager
                             else
                             {
                                 string arguments = string.Join(" ", splitInputList.Skip(1));
-                                return ExecutesFileIfMeetRequirements(changedWord, splitInputList, inputCommand);
+                                return ExecutesFileIfMeetRequirements(changedWord, splitInputList, inputCommand, fileString);
                             }
                         }
                     }
@@ -353,7 +384,7 @@ public class ConsoleManager
         return "";
     }
 
-    private string ExecutesFileIfMeetRequirements(string nameOfFile, string[] splitInputList, string parsedInput)
+    private string ExecutesFileIfMeetRequirements(string nameOfFile, string[] splitInputList, string parsedInput, string fileString)
     {
         string executable = splitInputList[0];
 
@@ -366,11 +397,10 @@ public class ConsoleManager
     
 #endif
 
-
-        string argsString = inputCommand;
-       
-        
-
+        //foreach (var item in splitInputList)
+        //{
+        //    Console.WriteLine(item);
+        //}
         if (nameOfFile == "cat")
         {
             // Check common locations for cat on linux
@@ -432,17 +462,30 @@ public class ConsoleManager
 
                 if (!string.IsNullOrEmpty(output))
                 {
-                    // Format: "ERROR|||OUTPUT"
-                    return $"{error}|||{output}";
+                   
+                    if(!string.IsNullOrEmpty(fileString))
+                    {
+                        OutPutToFile(fileString, output);
+                        return error;
+                    }
+                    
                 }
+                
                 return error.Trim();
             }
-
+            if (!string.IsNullOrEmpty(fileString))
+            {
+                
+                OutPutToFile(fileString, output.Trim());
+                return "";
+            }
+            
             return output.Trim();
         }
         catch (Exception ex)
         {
             return $"{nameOfFile}: error executing - {ex.Message}";
+
         }
     }
 
@@ -498,13 +541,39 @@ public class ConsoleManager
         return "";
     }
 
-    public string[] ParsingInput(string input)
+    public string[] ParsingInput(string input, ref string fileString)
     {
+        fileString = "";
         List<string> listForArgs = new List<string>();
         int firstSpace = input.IndexOf(' ');
 
         if (firstSpace > -1)
         {
+            if(input.IndexOf('>') != -1)
+            {
+                if (input.Length > input.IndexOf('>') + 1)
+                {
+                    if (!string.IsNullOrEmpty(input) && input.IndexOf('>') != -1 && input[input.IndexOf('>') + 1] == ' ')
+                    {
+                        // Checks backwards in a string if there is a > with spaces around
+                        // example: asd asd> does not match
+                        // example: asd >asd does not match
+                        // example: asd > asd       matches
+                        // only should match if its the redirect operactor
+                        string fixedInput = Regex.Replace(input, @"(?<!\S)>\s", "1> ");
+
+                        //Console.WriteLine(fixedInput);
+                        int index = fixedInput.IndexOf("1>");
+                        fileString = fixedInput.Substring(index + 2).TrimStart();
+                        //Console.WriteLine(fileString + " wow");
+                        input = fixedInput.Substring(0, index).Trim();
+                        //Console.WriteLine(input + " wozw");
+                    }
+                }
+            }
+           
+            
+
             int iterator = 0;
             char firstChar = input[iterator];
             char currentChar = ' ';
@@ -699,28 +768,13 @@ public class ConsoleManager
                     result.Append(c);
 
                 }
-                
                 if (result.Length > 0)
                 {
-                    if(input.StartsWith("echo"))
-                    {
-                        
-                        string[] leftArgsArray = result.ToString().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                        foreach (var item in leftArgsArray)
-                        {
-                            listForArgs.Add(item);
-                        }
-                    }
-
-                    else
-                    {
-                        listForArgs.Add(result.ToString());
-                    }
-                   
-                    
-
+                    listForArgs.Add(result.ToString());
                 }
-                
+
+
+
 
 
             }
@@ -774,6 +828,7 @@ public class ConsoleManager
 
                     
             }
+
             return listForArgs.ToArray();
         }
 
@@ -859,22 +914,43 @@ public class ConsoleManager
         
         return input;
     }
-
-
+    const string CatCantOpenError = "cat: can't open '";
+    const string noSuchFileOrDirError = "No such file or directory";
+    void OutPutToFile (string fileString, string result)
+    {
+        if (!string.IsNullOrEmpty(fileString))
+        {
+            
+           
+            if (result.Contains(noSuchFileOrDirError) ||
+                     result.Contains("command not found"))
+            {
+                // Just error 
+                Console.WriteLine(result);
+            }
+            else
+            {
+                // Just output 
+                File.WriteAllText(fileString, result);
+            }
+        }
+        
+    }
+    
     private string FixCatErrorMessage(string error)
     {
         // Transform: "cat: can't open 'filename': No such file or directory"
         // To: "cat: filename: No such file or directory"
 
-        if (error.StartsWith("cat: can't open '") && error.Contains("': No such file or directory"))
+        if (error.StartsWith(CatCantOpenError) && error.Contains($"': {noSuchFileOrDirError}"))
         {
-            int start = "cat: can't open '".Length;
+            int start = CatCantOpenError.Length;
             int quoteIndex = error.IndexOf("': ", start);
 
             if (quoteIndex > start)
             {
                 string filename = error.Substring(start, quoteIndex - start);
-                return $"cat: {filename}: No such file or directory";
+                return $"cat: {filename}: {noSuchFileOrDirError}";
             }
         }
 
