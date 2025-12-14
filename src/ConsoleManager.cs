@@ -278,13 +278,8 @@ public class ConsoleManager
         {
             var ConsoleOut = new ConsoleOutput();
             var possibleErrorResult = OutputToFile(fileString, result.ToString().Trim(), operatorChar);
-            if (string.IsNullOrEmpty(possibleErrorResult))
-            {
-                return ConsoleOut;
-            }
-            ConsoleOut.error = OutputToFile(fileString, result.ToString().Trim(), operatorChar);
-            ConsoleOut.HasError = true;
-            return ConsoleOut;
+           
+           
 
         }
 
@@ -292,12 +287,7 @@ public class ConsoleManager
         {
             var ConsoleOut = new ConsoleOutput();
             var possibleOutputResult = OutputToFile(fileString, result.ToString().Trim(), operatorChar);
-            if (string.IsNullOrEmpty(possibleOutputResult))
-            {
-                return ConsoleOut;
-            }
-            ConsoleOut.output = OutputToFile(fileString, result.ToString().Trim(), operatorChar);
-            ConsoleOut.HasError = false;
+            
             return ConsoleOut;
 
         }
@@ -489,25 +479,34 @@ public class ConsoleManager
                 {
                     error = FixCatErrorMessage(error);
                 }
-
+                // checking if ls was typed so it would not make empty file string and then still print the error 
+                // ...
+                if (operatorChar == '2' && !string.IsNullOrEmpty(fileString))
+                {
+                   
+                    OutputToFile(fileString, error, operatorChar);
+                    // if its sderr we still need to give output to main because there can a mix
+                    // one file with cat works the other doesnt.
+                    return new ConsoleOutput { HasError = false, output = output.Trim() };
+                }
                 if (!string.IsNullOrEmpty(output) && !string.IsNullOrEmpty(fileString))
                 {
                     OutputToFile(fileString, output, operatorChar);
                     if(operatorChar == '2')
                     {
-                        return new ConsoleOutput { HasError = false };
+                        return new ConsoleOutput { HasError = false, output = output };
                     }
                     return new ConsoleOutput { error = error, HasError = true };
 
                 }
-                
-                
+
+
                 return new ConsoleOutput { error = error.Trim(), HasError = true };
             }
 
 
             
-            if (!string.IsNullOrEmpty(fileString))
+            if (!string.IsNullOrEmpty(fileString) && operatorChar == '1')
             {
                 
                 OutputToFile(fileString, output.Trim(), operatorChar);
@@ -937,32 +936,40 @@ public class ConsoleManager
     const string noSuchFileOrDirError = "No such file or directory";
     private readonly string extraPath;
 
-    public string OutputToFile (string fileString, string result, char operatorChar)
+    public ConsoleOutput OutputToFile (string fileString, string result, char operatorChar)
     {
         if (!string.IsNullOrEmpty(fileString))
         {
-            
-           
-            if (result.Contains(noSuchFileOrDirError) ||
-                     result.Contains("command not found"))
+
+            // for sterr
+            if (operatorChar == '2')
             {
-                if(operatorChar == '2')
+                // if error is result
+                if (result.Contains(noSuchFileOrDirError) ||
+                     result.Contains("command not found"))
                 {
+                    // write if the error message
                     File.WriteAllText(fileString, result);
-                    
+
                 }
-                // Just error 
-                return result;
-                
+                else 
+                {
+                    //if not just create the file if there is none
+                    File.WriteAllText(fileString, "");
+                }
+                return new ConsoleOutput { HasError = false};
             }
-            else
+
+           // for stdout
+           
+            if(operatorChar == '1')
             {
                 // Just output 
                 File.WriteAllText(fileString, result);
                 
             }
         }
-        return "";
+        return new ConsoleOutput();
         
     }
     
@@ -988,7 +995,7 @@ public class ConsoleManager
 
      private static (string, string, char) GettingFileTextAndOperator(string input, string fileString, char operatorChar)
     {
-        // geriau nenaudoti ref ir return list kuriuos nori update jei mazai daylku tada tuple naudoti.!!
+        
         int inputIndex = -9999999;
         if (input.Contains('>'))
         {
@@ -1019,7 +1026,6 @@ public class ConsoleManager
                     
                     input = fixedInput.Substring(0, index).Trim();
                     
-                    //Console.WriteLine(input + " wozw");
                 }
                 else
                 {
@@ -1028,15 +1034,7 @@ public class ConsoleManager
                     input = input.Substring(0, inputIndex-1).Trim();
                 }
 
-                
-                
-                
-
             }
-
-            
-
-
 
         }
 

@@ -30,8 +30,10 @@ namespace src
                 if(result.HasError && !string.IsNullOrEmpty(result.error))
                 {
                     Console.Error.WriteLine(result.error);
-                    //Console.WriteLine(result.error);
+                    
                 }
+
+
             }
         }
     }
