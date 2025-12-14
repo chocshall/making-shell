@@ -1,13 +1,12 @@
-﻿
-
-using src;
+﻿using src;
+using System;
+using System.ComponentModel.Design;
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
-
-
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 public class ConsoleManager
 {
@@ -15,7 +14,7 @@ public class ConsoleManager
     private string inputCommand;
     private string[] splitInputList;
 
-    // string extraPath galima ideti i public () ir padaryti kitaip localiai
+   
     public ConsoleManager()
     {   
         validCommandsList = new List<string>
@@ -58,6 +57,15 @@ public class ConsoleManager
         fileString = GettingFileNameAndOperator.Item2;
         operatorString = GettingFileNameAndOperator.Item3;
 
+        List<string> splitPathList = new List<string>();
+        string pathListString = Environment.GetEnvironmentVariable("PATH") ?? "";
+        splitPathList = pathListString.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+#if DEBUG
+        //pathListString = $@"C:\cSharp\ConsoleApp1\bin\Debug\net9.0{Path.PathSeparator}" + pathListString;
+        splitPathList.Add($@"C:\cSharp\ConsoleApp1\bin\Debug\net9.0");
+
+#endif
 
         splitInputList = inputCommand.Split(' ');
 
@@ -79,7 +87,8 @@ public class ConsoleManager
                 return new ConsoleOutput();
                 break;
             case "type":
-                return new ConsoleOutput { output = TypeBuiltCommand(splitInputList, validCommandsList, splitInputList[1], commandLineArgs, fileString, operatorString) };
+                var output = new ConsoleOutput();
+                return output = TypeBuiltCommand(splitInputList, validCommandsList, splitInputList[1], commandLineArgs, fileString, operatorString, splitPathList);
                 break;
             case "pwd":
                 return new ConsoleOutput { output = PrintWorkingDirectory(splitInputList, validCommandsList) };
@@ -104,7 +113,8 @@ public class ConsoleManager
 
         if (!validCommandsList.Contains(splitInputList[0]) && splitInputList.Length > 1)
         {
-            return new ConsoleOutput { output = ExecutesFileIfMeetRequirements(splitInputList[0], commandLineArgs, inputCommand, fileString, operatorString) };
+            var output = new ConsoleOutput();
+            return output = ExecutesFileIfMeetRequirements(splitInputList[0], commandLineArgs, inputCommand, fileString, operatorString, splitPathList);
         }
         
 
@@ -119,7 +129,6 @@ public class ConsoleManager
             return splitInputList[0];
         }
 
-        
         return "";
 
     }
@@ -148,7 +157,7 @@ public class ConsoleManager
         }
     }
 
-    private ConsoleOutput EchoCommand(string inputCommand,  string fileString, char operatorString)
+    private ConsoleOutput EchoCommand(string inputCommand,  string fileString, char operatorChar)
     {
         
         // Remove "echo "
@@ -191,8 +200,6 @@ public class ConsoleManager
                 }
                 continue;
             }
-
-
 
             // Handle spaces
             if (c == ' ')
@@ -262,31 +269,36 @@ public class ConsoleManager
                     continue;
                 }
 
-
-
             }
-
 
             result.Append(c);
 
-
-
-
-
-
         }
-        if(!string.IsNullOrEmpty(fileString) && operatorString == '1')
+        if(!string.IsNullOrEmpty(fileString) && operatorChar == '2')
         {
             var ConsoleOut = new ConsoleOutput();
-            var possibleErrorResult = OutputToFile(fileString, result.ToString().Trim());
+            var possibleErrorResult = OutputToFile(fileString, result.ToString().Trim(), operatorChar);
             if (string.IsNullOrEmpty(possibleErrorResult))
             {
                 return ConsoleOut;
             }
-            ConsoleOut.error = OutputToFile(fileString, result.ToString().Trim());
+            ConsoleOut.error = OutputToFile(fileString, result.ToString().Trim(), operatorChar);
             ConsoleOut.HasError = true;
             return ConsoleOut;
 
+        }
+
+        if (!string.IsNullOrEmpty(fileString) && operatorChar == '1')
+        {
+            var ConsoleOut = new ConsoleOutput();
+            var possibleOutputResult = OutputToFile(fileString, result.ToString().Trim(), operatorChar);
+            if (string.IsNullOrEmpty(possibleOutputResult))
+            {
+                return ConsoleOut;
+            }
+            ConsoleOut.output = OutputToFile(fileString, result.ToString().Trim(), operatorChar);
+            ConsoleOut.HasError = false;
+            return ConsoleOut;
 
         }
         var ConsoleOutput = new ConsoleOutput { output = result.ToString().Trim() };
@@ -296,33 +308,19 @@ public class ConsoleManager
 
     }
 
-    private string TypeBuiltCommand(string[] splitInputList, List<string> validCommandsList, string nameOfFile, string[] commandLineArgs, string fileString, char operatorString)
+    private ConsoleOutput TypeBuiltCommand(string[] splitInputList, List<string> validCommandsList, string nameOfFile, string[] commandLineArgs, string fileString, char operatorString, List<string> splitPathList)
     {
         
-
         if (splitInputList[0] == "type")
         {
-            List<string> splitPathList = new List<string>();
-            string pathListString = Environment.GetEnvironmentVariable("PATH") ?? "";
+            
+            
             
             bool wordCheckerIsPath = false;
             string userInput = "";
 
-            splitPathList = pathListString.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries).ToList();
-            
-#if DEBUG
-            //pathListString = $@"C:\cSharp\ConsoleApp1\bin\Debug\net9.0{Path.PathSeparator}" + pathListString;
-            splitPathList.Add($@"C:\cSharp\ConsoleApp1\bin\Debug\net9.0");
-
-#else
-    
-    
-#endif
             
             
-            
-            
-
             string changedWord = "";
             
             if (!validCommandsList.Contains(nameOfFile))
@@ -350,12 +348,12 @@ public class ConsoleManager
                             {
                                 if (splitInputList[0] == "type")
                                 {
-                                    return $"{nameOfFile} is {changedWord}";
+                                    return new ConsoleOutput { output = $"{nameOfFile} is {changedWord}" };
                                 }
                                 else
                                 {
                                     string arguments = string.Join(" ", splitInputList.Skip(1));
-                                    return ExecutesFileIfMeetRequirements(nameOfFile, splitInputList, inputCommand, fileString, operatorString);
+                                    return ExecutesFileIfMeetRequirements(nameOfFile, splitInputList, inputCommand, fileString, operatorString, splitPathList);
                                 }
                             }
                         }
@@ -364,12 +362,12 @@ public class ConsoleManager
                         {
                             if (splitInputList[0] == "type")
                             {
-                                return $"{nameOfFile} is {changedWord}";
+                                return new ConsoleOutput { output = $"{nameOfFile} is {changedWord}" };
                             }
                             else
                             {
                                 string arguments = string.Join(" ", splitInputList.Skip(1));
-                                return ExecutesFileIfMeetRequirements(changedWord, splitInputList, inputCommand, fileString, operatorString);
+                                return ExecutesFileIfMeetRequirements(changedWord, splitInputList, inputCommand, fileString, operatorString, splitPathList);
                             }
                         }
                     }
@@ -381,47 +379,64 @@ public class ConsoleManager
             {
                 if (validCommandsList.Contains(splitInputList[1]) && splitInputList.Count() == 2)
                 {
-                    return $"{splitInputList[1]} is a shell builtin";
+                    return new ConsoleOutput { output = $"{splitInputList[1]} is a shell builtin" };
                 }
                 else
                 {
-                    return $"{splitInputList[1]}: not found";
+                    return new ConsoleOutput { output = $"{splitInputList[1]}: not found" };
                 }
             }
 
             if (splitInputList[0] == "type" && splitInputList.Count() > 2 && !File.Exists(changedWord))
             {
-                return $"{splitInputList[1]}: not found";
+                return new ConsoleOutput { output = $"{splitInputList[1]}: not found"};
             }
         }
 
-        return "";
+        return new ConsoleOutput { output = ""};
+        
     }
 
-    private string ExecutesFileIfMeetRequirements(string nameOfFile, string[] splitInputList, string parsedInput, string fileString, char operatorString)
+    private ConsoleOutput ExecutesFileIfMeetRequirements(string nameOfFile, string[] splitInputList, string parsedInput, string fileString, char operatorChar, List<string> splitPathList)
     {
         string executable = splitInputList[0];
-
-#if DEBUG
-        string currentPath = Environment.GetEnvironmentVariable("PATH");
-        Environment.SetEnvironmentVariable("PATH", currentPath + ";" + "C:\\cSharp\\ConsoleApp1\\bin\\Debug\\net9.0");
-
-#else
-    
-    
-#endif
 
         //foreach (var item in splitInputList)
         //{
         //    Console.WriteLine(item);
         //}
+        string changedWord = "";
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            foreach (string directoryString in splitPathList)
+            {
+                if (!Directory.Exists(directoryString))
+                {
+                    continue;
+                }
+
+                changedWord = Path.Join(directoryString, executable);
+               
+            }
+            if(!string.IsNullOrEmpty(changedWord))
+            {
+                executable = changedWord;
+            }
+
+            
+           
+        }
+
         if (nameOfFile == "cat")
         {
             // Check common locations for cat on linux
-            string[] possiblePaths = { "/bin/cat", "/usr/bin/cat", "cat" };
+            splitPathList.Add("/bin/cat");
+            splitPathList.Add("/usr/bin/cat");
+            splitPathList.Add("cat");
+            //string[] possiblePaths = { "/bin/cat", "/usr/bin/cat", "cat" };
             bool found = false;
 
-            foreach (string path in possiblePaths)
+            foreach (string path in splitPathList)
             {
                 try
                 {
@@ -440,7 +455,8 @@ public class ConsoleManager
 
             if (!found)
             {
-                return "cat: command not found";
+               
+                return new ConsoleOutput { output = "cat: command not found" };
             }
         }
 
@@ -474,28 +490,37 @@ public class ConsoleManager
                     error = FixCatErrorMessage(error);
                 }
 
-                if (!string.IsNullOrEmpty(output) && !string.IsNullOrEmpty(fileString)  && operatorString == '1')
+                if (!string.IsNullOrEmpty(output) && !string.IsNullOrEmpty(fileString))
                 {
-                    var returnedString = OutputToFile(fileString, output);
-                    return error;
+                    OutputToFile(fileString, output, operatorChar);
+                    if(operatorChar == '2')
+                    {
+                        return new ConsoleOutput { HasError = false };
+                    }
+                    return new ConsoleOutput { error = error, HasError = true };
 
                 }
                 
-                return error.Trim();
+                
+                return new ConsoleOutput { error = error.Trim(), HasError = true };
             }
+
+
             
-            if (!string.IsNullOrEmpty(fileString) && operatorString == '1')
+            if (!string.IsNullOrEmpty(fileString))
             {
                 
-                OutputToFile(fileString, output.Trim());
-                return "";
+                OutputToFile(fileString, output.Trim(), operatorChar);
+
+                return new ConsoleOutput();
             }
             
-            return output.Trim();
+            return new ConsoleOutput { output = output.Trim() };
         }
         catch (Exception ex)
         {
-            return $"{nameOfFile}: error executing - {ex.Message}";
+
+            return new ConsoleOutput { error = $"{nameOfFile}: error executing - {ex.Message}", HasError = true};
 
         }
     }
@@ -687,9 +712,6 @@ public class ConsoleManager
                         }
                     }
                     
-
-                    
-
                     // Check for quotes
                     if (c == '\'' || c == '"')
                     {
@@ -711,8 +733,6 @@ public class ConsoleManager
                         }
                         continue;
                     }
-
-
 
                     // Handle spaces
                     if (c == ' ')
@@ -779,12 +799,7 @@ public class ConsoleManager
                     listForArgs.Add(result.ToString());
                 }
 
-
-
-
-
             }
-
 
             else
             {
@@ -839,8 +854,6 @@ public class ConsoleManager
         }
 
         return new string[] { input };
-
-
 
     }
     public string DealingWithSpaceWhileHasQoutes(string input)
@@ -924,7 +937,7 @@ public class ConsoleManager
     const string noSuchFileOrDirError = "No such file or directory";
     private readonly string extraPath;
 
-    public string OutputToFile (string fileString, string result)
+    public string OutputToFile (string fileString, string result, char operatorChar)
     {
         if (!string.IsNullOrEmpty(fileString))
         {
@@ -933,6 +946,11 @@ public class ConsoleManager
             if (result.Contains(noSuchFileOrDirError) ||
                      result.Contains("command not found"))
             {
+                if(operatorChar == '2')
+                {
+                    File.WriteAllText(fileString, result);
+                    
+                }
                 // Just error 
                 return result;
                 
@@ -979,14 +997,15 @@ public class ConsoleManager
             {
                 
                 
-                if (!string.IsNullOrEmpty(input) && input[inputIndex + 1] == ' ')
+                if (!string.IsNullOrEmpty(input) && input[inputIndex + 1] == ' ' && !input.Contains("2>"))
                 {
-                    
+                    operatorChar = input[input.IndexOf('>') - 1];
                     // Checks backwards in a string if there is a > with spaces around
                     // example: echo asd asd> does not match
                     // example: echo asd >asd does not match
                     // example: echo asd > asd.txt       matches
                     // only should match if its the redirect operactor
+
                     string fixedInput = Regex.Replace(input, @"(?<!\S)>\s", "1> ");
                     
                     //Console.WriteLine(fixedInput);
@@ -1002,19 +1021,29 @@ public class ConsoleManager
                     
                     //Console.WriteLine(input + " wozw");
                 }
-                inputIndex = input.IndexOf('>');
+                else
+                {
+                    operatorChar = input[input.IndexOf('>') - 1];
+                    fileString = input.Substring(inputIndex + 2).TrimStart();
+                    input = input.Substring(0, inputIndex-1).Trim();
+                }
+
+                
+                
                 
 
             }
-            
 
             
+
+
+
         }
 
         return (input, fileString, operatorChar);
     }
 
-
+    
 }
 
 
