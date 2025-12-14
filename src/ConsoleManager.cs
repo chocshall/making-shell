@@ -1,10 +1,10 @@
 ﻿
-using System;
+
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+
 
 
 public class ConsoleManager
@@ -42,6 +42,9 @@ public class ConsoleManager
         inputCommand = userInputCommand;
         string fileString = "";
 
+        GettingFileText(ref fileString, ref inputCommand);
+        
+
         splitInputList = inputCommand.Split(' ');
 
         if (inputCommand.Contains('\"') )
@@ -75,6 +78,10 @@ public class ConsoleManager
                 break;
         }
         commandLineArgs = ParsingInput(inputCommand, ref fileString);
+        if (commandLineArgs[0] == "")
+        {
+            return "";
+        }
         
         splitInputList = commandLineArgs;
 
@@ -129,32 +136,14 @@ public class ConsoleManager
 
     private string EchoCommand(string inputCommand, ref string fileString)
     {
-        fileString = "";
+        
         // Remove "echo "
-        string args = inputCommand.Substring(5).TrimStart();
-        if (args.IndexOf('>') != -1)
+        if(inputCommand.TrimStart().Length == 4)
         {
-            if (args.Length > args.IndexOf('>') + 1)
-            {
-                if (!string.IsNullOrEmpty(args) && args.IndexOf('>') != -1 && args[args.IndexOf('>') + 1] == ' ')
-                {
-                    // Checks backwards in a string if there is a > with spaces around
-                    // example: asd asd> does not match
-                    // example: asd >asd does not match
-                    // example: asd > asd       matches
-                    // only should match if its the redirect operactor
-                    string fixedInput = Regex.Replace(args, @"(?<!\S)>\s", "1> ");
-
-
-                    //Console.WriteLine(fixedInput);
-                    int index = fixedInput.IndexOf("1>");
-                    fileString = fixedInput.Substring(index + 2).TrimStart();
-                    //Console.WriteLine(fileString + " wow");
-                    args = fixedInput.Substring(0, index).Trim();
-                    //Console.WriteLine(input + " wozw");
-                }
-            }
+            return "";
         }
+        string args = inputCommand.Substring(5).TrimStart();
+        
 
         StringBuilder result = new StringBuilder();
         bool inQuotes = false;
@@ -460,19 +449,16 @@ public class ConsoleManager
                     error = FixCatErrorMessage(error);
                 }
 
-                if (!string.IsNullOrEmpty(output))
+                if (!string.IsNullOrEmpty(output) && !string.IsNullOrEmpty(fileString))
                 {
-                   
-                    if(!string.IsNullOrEmpty(fileString))
-                    {
-                        OutPutToFile(fileString, output);
-                        return error;
-                    }
-                    
+                    OutPutToFile(fileString, output);
+                    return error;
+
                 }
                 
                 return error.Trim();
             }
+            
             if (!string.IsNullOrEmpty(fileString))
             {
                 
@@ -543,37 +529,35 @@ public class ConsoleManager
 
     public string[] ParsingInput(string input, ref string fileString)
     {
-        fileString = "";
+        
         List<string> listForArgs = new List<string>();
+        if (input[0] == '\"' && input[^1] == '\"')
+        {
+            string inputCheckForBlank = input.Substring(1);
+            bool blank = false;
+            inputCheckForBlank = inputCheckForBlank.Remove(inputCheckForBlank.Length - 1);
+            foreach (char item in inputCheckForBlank)
+            {
+                if (item == ' ')
+                {
+                    blank = true;
+                }
+                else
+                {
+                    blank = false;
+                }
+            }
+            if (blank)
+            {
+                return new string[] { "" };
+            }
+        }
+
         int firstSpace = input.IndexOf(' ');
 
         if (firstSpace > -1)
         {
-            if(input.IndexOf('>') != -1)
-            {
-                if (input.Length > input.IndexOf('>') + 1)
-                {
-                    if (!string.IsNullOrEmpty(input) && input.IndexOf('>') != -1 && input[input.IndexOf('>') + 1] == ' ')
-                    {
-                        // Checks backwards in a string if there is a > with spaces around
-                        // example: asd asd> does not match
-                        // example: asd >asd does not match
-                        // example: asd > asd       matches
-                        // only should match if its the redirect operactor
-                        string fixedInput = Regex.Replace(input, @"(?<!\S)>\s", "1> ");
-
-                        //Console.WriteLine(fixedInput);
-                        int index = fixedInput.IndexOf("1>");
-                        fileString = fixedInput.Substring(index + 2).TrimStart();
-                        //Console.WriteLine(fileString + " wow");
-                        input = fixedInput.Substring(0, index).Trim();
-                        //Console.WriteLine(input + " wozw");
-                    }
-                }
-            }
-           
             
-
             int iterator = 0;
             char firstChar = input[iterator];
             char currentChar = ' ';
@@ -955,6 +939,32 @@ public class ConsoleManager
         }
 
         return error;
+    }
+    
+   internal void GettingFileText (ref string fileString, ref string input)
+    {
+        if (input.IndexOf('>') != -1)
+        {
+            if (input.Length > input.IndexOf('>') + 1)
+            {
+                if (!string.IsNullOrEmpty(input) && input.IndexOf('>') != -1 && input[input.IndexOf('>') + 1] == ' ')
+                {
+                    // Checks backwards in a string if there is a > with spaces around
+                    // example: echo asd asd> does not match
+                    // example: echo asd >asd does not match
+                    // example: echo asd > asd.txt       matches
+                    // only should match if its the redirect operactor
+                    string fixedInput = Regex.Replace(input, @"(?<!\S)>\s", "1> ");
+
+                    //Console.WriteLine(fixedInput);
+                    int index = fixedInput.IndexOf("1>");
+                    fileString = fixedInput.Substring(index + 2).TrimStart();
+                    //Console.WriteLine(fileString + " wow");
+                    input = fixedInput.Substring(0, index).Trim();
+                    //Console.WriteLine(input + " wozw");
+                }
+            }
+        }
     }
 
 
