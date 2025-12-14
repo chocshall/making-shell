@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 
 
@@ -51,8 +52,12 @@ public class ConsoleManager
         string fileString = "";
         char operatorString = ' ';
 
-        GettingFileTextAndOperator(ref fileString, ref inputCommand, ref operatorString);
         
+        var GettingFileNameAndOperator = GettingFileTextAndOperator(inputCommand, fileString, operatorString);
+        inputCommand = GettingFileNameAndOperator.Item1;
+        fileString = GettingFileNameAndOperator.Item2;
+        operatorString = GettingFileNameAndOperator.Item3;
+
 
         splitInputList = inputCommand.Split(' ');
 
@@ -86,7 +91,7 @@ public class ConsoleManager
                 
                 break;
         }
-        commandLineArgs = ParsingInput(inputCommand, ref fileString);
+        commandLineArgs = ParsingInput(inputCommand,  fileString);
         if (commandLineArgs[0] == "")
         {
             return new ConsoleOutput();
@@ -273,12 +278,12 @@ public class ConsoleManager
         if(!string.IsNullOrEmpty(fileString) && operatorString == '1')
         {
             var ConsoleOut = new ConsoleOutput();
-            var possibleErrorResult = OutPutToFile(fileString, result.ToString().Trim());
+            var possibleErrorResult = OutputToFile(fileString, result.ToString().Trim());
             if (string.IsNullOrEmpty(possibleErrorResult))
             {
                 return ConsoleOut;
             }
-            ConsoleOut.error = OutPutToFile(fileString, result.ToString().Trim());
+            ConsoleOut.error = OutputToFile(fileString, result.ToString().Trim());
             ConsoleOut.HasError = true;
             return ConsoleOut;
 
@@ -297,15 +302,17 @@ public class ConsoleManager
 
         if (splitInputList[0] == "type")
         {
-            string[] splitPathList = Array.Empty<string>();
+            List<string> splitPathList = new List<string>();
             string pathListString = Environment.GetEnvironmentVariable("PATH") ?? "";
             
             bool wordCheckerIsPath = false;
             string userInput = "";
 
-
+            splitPathList = pathListString.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries).ToList();
+            
 #if DEBUG
-            pathListString = $@"C:\cSharp\ConsoleApp1\bin\Debug\net9.0{Path.PathSeparator}" + pathListString;
+            //pathListString = $@"C:\cSharp\ConsoleApp1\bin\Debug\net9.0{Path.PathSeparator}" + pathListString;
+            splitPathList.Add($@"C:\cSharp\ConsoleApp1\bin\Debug\net9.0");
 
 #else
     
@@ -313,7 +320,7 @@ public class ConsoleManager
 #endif
             
             
-            splitPathList = pathListString.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries);
+            
             
 
             string changedWord = "";
@@ -469,7 +476,7 @@ public class ConsoleManager
 
                 if (!string.IsNullOrEmpty(output) && !string.IsNullOrEmpty(fileString)  && operatorString == '1')
                 {
-                    var returnedString = OutPutToFile(fileString, output);
+                    var returnedString = OutputToFile(fileString, output);
                     return error;
 
                 }
@@ -480,7 +487,7 @@ public class ConsoleManager
             if (!string.IsNullOrEmpty(fileString) && operatorString == '1')
             {
                 
-                OutPutToFile(fileString, output.Trim());
+                OutputToFile(fileString, output.Trim());
                 return "";
             }
             
@@ -545,7 +552,7 @@ public class ConsoleManager
         return "";
     }
 
-    public string[] ParsingInput(string input, ref string fileString)
+    public string[] ParsingInput(string input,  string fileString)
     {
         
         List<string> listForArgs = new List<string>();
@@ -556,14 +563,11 @@ public class ConsoleManager
             inputCheckForBlank = inputCheckForBlank.Remove(inputCheckForBlank.Length - 1);
             foreach (char item in inputCheckForBlank)
             {
-                if (item == ' ')
-                {
-                    blank = true;
-                }
-                else
-                {
-                    blank = false;
-                }
+                blank = item == ' ';
+
+                blank = item != ' ';
+                
+                
             }
             if (blank)
             {
@@ -920,7 +924,7 @@ public class ConsoleManager
     const string noSuchFileOrDirError = "No such file or directory";
     private readonly string extraPath;
 
-    public string OutPutToFile (string fileString, string result)
+    public string OutputToFile (string fileString, string result)
     {
         if (!string.IsNullOrEmpty(fileString))
         {
@@ -963,8 +967,8 @@ public class ConsoleManager
 
         return error;
     }
-    
-   internal void GettingFileTextAndOperator (ref string fileString, ref string input, ref char operatorString)
+
+     private static (string, string, char) GettingFileTextAndOperator(string input, string fileString, char operatorChar)
     {
         // geriau nenaudoti ref ir return list kuriuos nori update jei mazai daylku tada tuple naudoti.!!
         int inputIndex = -9999999;
@@ -989,7 +993,7 @@ public class ConsoleManager
                     int index = fixedInput.IndexOf("1>");
                     if (index - 1 > 0)
                     {
-                        operatorString = fixedInput[index];
+                        operatorChar = fixedInput[index];
                     }
 
                     fileString = fixedInput.Substring(index + 2).TrimStart();
@@ -1000,20 +1004,14 @@ public class ConsoleManager
                 }
                 inputIndex = input.IndexOf('>');
                 
-                
-                //Console.WriteLine(operatorString);
-                
-
-
-
-
 
             }
             
+
             
-
-
         }
+
+        return (input, fileString, operatorChar);
     }
 
 
