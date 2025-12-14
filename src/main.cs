@@ -8,10 +8,7 @@ namespace src
         static void Main(string[] args)
         {
 
-
             ConsoleManager Maker = new ConsoleManager();
-
-             
 
             while (true)
             {
@@ -21,23 +18,19 @@ namespace src
                 string input = Console.ReadLine();
                 string fileString = "";
                
+                ConsoleOutput result = Maker.HandleConsoleLine(input);
                 
-
-
-
-
-                string result = Maker.HandleConsoleLine(input);
-                
-                
-
-                if (!string.IsNullOrEmpty(result))
+                if (!string.IsNullOrEmpty(result.output))
                 {
 
-                    Console.WriteLine(result);
+                    Console.WriteLine(result.output);
 
-                    
+                }
 
-
+                if(result.HasError)
+                {
+                    Console.Error.WriteLine(result.error);
+                    //Console.WriteLine(result.error);
                 }
             }
         }
