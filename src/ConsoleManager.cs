@@ -299,23 +299,21 @@ public class ConsoleManager
         {
             string[] splitPathList = Array.Empty<string>();
             string pathListString = Environment.GetEnvironmentVariable("PATH") ?? "";
+            
             bool wordCheckerIsPath = false;
             string userInput = "";
-            
+
 
 #if DEBUG
-            userInput = $@"C:\cSharp\ConsoleApp1\bin\Debug\net9.0{Path.PathSeparator}$PATH";
-            
+            pathListString = $@"C:\cSharp\ConsoleApp1\bin\Debug\net9.0{Path.PathSeparator}" + pathListString;
+
 #else
-    userInput = @"$PATH";
+    
     
 #endif
-            // tesiog pakeisti i list kad add ta path kitaip tesiog path naudoti ir viskas nereikia replace 
-            string expandedInput = userInput
-                .Replace("$PATH", pathListString)
-                .Replace("${PATH}", pathListString)
-                .Replace("%PATH%", pathListString);
-            splitPathList = userInput.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries);
+            
+            
+            splitPathList = pathListString.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries);
             
 
             string changedWord = "";
@@ -995,7 +993,7 @@ public class ConsoleManager
                     }
 
                     fileString = fixedInput.Substring(index + 2).TrimStart();
-                    Console.WriteLine(fileString + " wow");
+                    
                     input = fixedInput.Substring(0, index).Trim();
                     
                     //Console.WriteLine(input + " wozw");
