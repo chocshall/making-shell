@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel.Design;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -49,7 +50,7 @@ public class ConsoleManager
     {
         inputCommand = userInputCommand;
         string fileString = "";
-        char operatorString = ' ';
+        string operatorString = "";
 
         
         var GettingFileNameAndOperator = GettingFileTextAndOperator(inputCommand, fileString, operatorString);
@@ -88,7 +89,7 @@ public class ConsoleManager
                 break;
             case "type":
                 var output = new ConsoleOutput();
-                return output = TypeBuiltCommand(splitInputList, validCommandsList, splitInputList[1], commandLineArgs, fileString, operatorString, splitPathList);
+                return TypeBuiltCommand(splitInputList, validCommandsList, splitInputList[1], commandLineArgs, fileString, operatorString, splitPathList);
                 break;
             case "pwd":
                 return new ConsoleOutput { output = PrintWorkingDirectory(splitInputList, validCommandsList) };
@@ -157,7 +158,7 @@ public class ConsoleManager
         }
     }
 
-    private ConsoleOutput EchoCommand(string inputCommand,  string fileString, char operatorChar)
+    private ConsoleOutput EchoCommand(string inputCommand,  string fileString, string operatorChar)
     {
         
         // Remove "echo "
@@ -274,7 +275,7 @@ public class ConsoleManager
             result.Append(c);
 
         }
-        if(!string.IsNullOrEmpty(fileString) && operatorChar == '2')
+        if(!string.IsNullOrEmpty(fileString) && operatorChar.Contains("2"))
         {
             var ConsoleOut = new ConsoleOutput();
             var possibleErrorResult = OutputToFile(fileString, result.ToString().Trim(), operatorChar);
@@ -283,7 +284,7 @@ public class ConsoleManager
 
         }
 
-        if (!string.IsNullOrEmpty(fileString) && operatorChar == '1')
+        if (!string.IsNullOrEmpty(fileString) && operatorChar.Contains("1"))
         {
             var ConsoleOut = new ConsoleOutput();
             var possibleOutputResult = OutputToFile(fileString, result.ToString().Trim(), operatorChar);
@@ -298,7 +299,7 @@ public class ConsoleManager
 
     }
 
-    private ConsoleOutput TypeBuiltCommand(string[] splitInputList, List<string> validCommandsList, string nameOfFile, string[] commandLineArgs, string fileString, char operatorString, List<string> splitPathList)
+    private ConsoleOutput TypeBuiltCommand(string[] splitInputList, List<string> validCommandsList, string nameOfFile, string[] commandLineArgs, string fileString, string operatorString, List<string> splitPathList)
     {
         
         if (splitInputList[0] == "type")
@@ -387,7 +388,7 @@ public class ConsoleManager
         
     }
 
-    private ConsoleOutput ExecutesFileIfMeetRequirements(string nameOfFile, string[] splitInputList, string parsedInput, string fileString, char operatorChar, List<string> splitPathList)
+    private ConsoleOutput ExecutesFileIfMeetRequirements(string nameOfFile, string[] splitInputList, string parsedInput, string fileString, string operatorChar, List<string> splitPathList)
     {
         string executable = splitInputList[0];
 
@@ -481,7 +482,7 @@ public class ConsoleManager
                 }
                 // checking if ls was typed so it would not make empty file string and then still print the error 
                 // ...
-                if (operatorChar == '2' && !string.IsNullOrEmpty(fileString))
+                if (operatorChar.Contains("2") && !string.IsNullOrEmpty(fileString))
                 {
                    
                     OutputToFile(fileString, error, operatorChar);
@@ -492,7 +493,7 @@ public class ConsoleManager
                 if (!string.IsNullOrEmpty(output) && !string.IsNullOrEmpty(fileString))
                 {
                     OutputToFile(fileString, output, operatorChar);
-                    if(operatorChar == '2')
+                    if(operatorChar.Contains("2"))
                     {
                         return new ConsoleOutput { HasError = false, output = output };
                     }
@@ -506,7 +507,7 @@ public class ConsoleManager
 
 
             
-            if (!string.IsNullOrEmpty(fileString) && operatorChar == '1')
+            if (!string.IsNullOrEmpty(fileString) && operatorChar.Contains("1"))
             {
                 
                 OutputToFile(fileString, output.Trim(), operatorChar);
@@ -936,20 +937,29 @@ public class ConsoleManager
     const string noSuchFileOrDirError = "No such file or directory";
     private readonly string extraPath;
 
-    public ConsoleOutput OutputToFile (string fileString, string result, char operatorChar)
+    public ConsoleOutput OutputToFile (string fileString, string result, string operatorChar)
     {
         if (!string.IsNullOrEmpty(fileString))
         {
 
             // for sterr
-            if (operatorChar == '2')
+            if (operatorChar.Contains("2"))
             {
                 // if error is result
                 if (result.Contains(noSuchFileOrDirError) ||
                      result.Contains("command not found"))
                 {
                     // write if the error message
-                    File.WriteAllText(fileString, result);
+                    if (operatorChar.Contains("2>"))
+                    {
+                        // add to file 
+                        File.AppendAllText(fileString, result);
+                    }
+                    else
+                    {
+                        File.WriteAllText(fileString, result);
+                    }
+                    
 
                 }
                 else 
@@ -962,11 +972,19 @@ public class ConsoleManager
 
            // for stdout
            
-            if(operatorChar == '1')
+            if(operatorChar.Contains("1"))
             {
-                // Just output 
-                File.WriteAllText(fileString, result);
-                
+                // output
+                if (operatorChar.Contains("1>"))
+                {
+                    // add to file 
+                    File.AppendAllText(fileString, result + Environment.NewLine);
+                }
+                else
+                {
+                    File.WriteAllText(fileString, result + Environment.NewLine);
+                }
+
             }
         }
         return new ConsoleOutput();
@@ -993,7 +1011,7 @@ public class ConsoleManager
         return error;
     }
 
-     private static (string, string, char) GettingFileTextAndOperator(string input, string fileString, char operatorChar)
+     private static (string, string, string) GettingFileTextAndOperator(string input, string fileString, string operatorChar)
     {
         
         int inputIndex = -9999999;
@@ -1004,9 +1022,10 @@ public class ConsoleManager
             {
                 
                 
-                if (!string.IsNullOrEmpty(input) && input[inputIndex + 1] == ' ' && !input.Contains("2>"))
+                if (!string.IsNullOrEmpty(input) && input[inputIndex + 1] == ' ' && !input.Contains("2>") && !input.Contains(">>"))
                 {
-                    operatorChar = input[input.IndexOf('>') - 1];
+                    //operatorChar = input[input.IndexOf('>') - 1];
+
                     // Checks backwards in a string if there is a > with spaces around
                     // example: echo asd asd> does not match
                     // example: echo asd >asd does not match
@@ -1019,7 +1038,7 @@ public class ConsoleManager
                     int index = fixedInput.IndexOf("1>");
                     if (index - 1 > 0)
                     {
-                        operatorChar = fixedInput[index];
+                        operatorChar += fixedInput[index];
                     }
 
                     fileString = fixedInput.Substring(index + 2).TrimStart();
@@ -1027,11 +1046,37 @@ public class ConsoleManager
                     input = fixedInput.Substring(0, index).Trim();
                     
                 }
-                else
+                else if(!input.Contains(">>"))
                 {
-                    operatorChar = input[input.IndexOf('>') - 1];
+                    operatorChar += input[input.IndexOf('>') - 1];
                     fileString = input.Substring(inputIndex + 2).TrimStart();
                     input = input.Substring(0, inputIndex-1).Trim();
+                }
+
+                if(input.Contains(">>") && input[inputIndex + 2] == ' ' && !input.Contains("2>"))
+                {
+                    string fixedInput = Regex.Replace(input, @"(?<!\S)>>\s", "1>> ");
+                    int index = fixedInput.IndexOf("1>>");
+                    if (index - 1 > 0)
+                    {
+                        operatorChar += fixedInput[index];
+                        operatorChar += fixedInput[index + 1];
+                    }
+
+                    
+                    fileString = input.Substring(inputIndex + 2).TrimStart();
+                    input = input.Substring(0, index).Trim();
+                    
+
+                }
+
+                if(input.Contains("2>>"))
+                {
+                    operatorChar += input[input.IndexOf(">>") - 1];
+                    operatorChar += input[input.IndexOf(">>")];
+                    fileString = input.Substring(inputIndex +2).TrimStart();
+                    input = input.Substring(0, inputIndex - 1).Trim();
+                    //Console.WriteLine(10);
                 }
 
             }
