@@ -1,4 +1,5 @@
 ﻿using src;
+using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -25,7 +26,7 @@ public class ConsoleManager
         inputCommand = "";
         splitInputList = Array.Empty<string>();
 
-        //this.extraPath = extraPath;
+        
     }
     
     
@@ -59,7 +60,7 @@ public class ConsoleManager
         splitPathList = pathListString.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries).ToList();
 
 #if DEBUG
-        //pathListString = $@"C:\cSharp\ConsoleApp1\bin\Debug\net9.0{Path.PathSeparator}" + pathListString;
+        
         splitPathList.Add($@"C:\cSharp\ConsoleApp1\bin\Debug\net9.0");
 
 #endif
@@ -168,9 +169,6 @@ public class ConsoleManager
         StringBuilder result = new StringBuilder();
         bool inQuotes = false;
         char quoteChar = '\0';
-
-        int count = 0;
-        char oneTimeChar = ' ';
 
         for (int i = 0; i < args.Length; i++)
         {
@@ -304,7 +302,7 @@ public class ConsoleManager
             
             
             bool wordCheckerIsPath = false;
-            string userInput = "";
+            
 
             
             
@@ -388,6 +386,8 @@ public class ConsoleManager
     {
         string executable = splitInputList[0];
 
+        
+
         //foreach (var item in splitInputList)
         //{
         //    Console.WriteLine(item);
@@ -446,6 +446,10 @@ public class ConsoleManager
                 return new ConsoleOutput { output = "cat: command not found" };
             }
         }
+        if (parsedInput.StartsWith("ls"))
+        {
+            executable = "ls";
+        }
 
         try
         {
@@ -457,25 +461,41 @@ public class ConsoleManager
                 RedirectStandardError = true
             };
 
-            for (int i = 1; i < splitInputList.Length; i++)
+            if (parsedInput.Contains("ls"))
             {
-                processStartInfo.ArgumentList.Add(splitInputList[i]);
+                for (int i = 1; i < splitInputList.Length; i++)
+                {
+                    processStartInfo.ArgumentList.Add(splitInputList[i]);
+                }
+            }
+
+            else
+            {
+                for (int i = 1; i < splitInputList.Length; i++)
+                {
+                    processStartInfo.ArgumentList.Add(splitInputList[i]);
+                }
+                
             }
             var process = Process.Start(processStartInfo);
 
-            
+
+
             string output = process.StandardOutput.ReadToEnd();
             string error = process.StandardError.ReadToEnd();
 
             process.WaitForExit();
 
-            if (!string.IsNullOrEmpty(error))
+            // FIX CAT ERROR FORMAT
+            if (!string.IsNullOrEmpty(error) && nameOfFile == "cat" || executable.Contains("cat"))
             {
-                // FIX CAT ERROR FORMAT
-                if (nameOfFile == "cat" || executable.Contains("cat"))
-                {
-                    error = FixCatErrorMessage(error);
-                }
+                error = FixCatErrorMessage(error);
+            }
+            
+
+            if (!string.IsNullOrEmpty(error) && operatorChar.Contains("2"))
+            {
+                
                 // checking if ls was typed so it would not make empty file string and then still print the error 
                 // ...
                 if (operatorChar.Contains("2") && !string.IsNullOrEmpty(fileString))
@@ -488,6 +508,7 @@ public class ConsoleManager
                 }
                 if (!string.IsNullOrEmpty(output) && !string.IsNullOrEmpty(fileString))
                 {
+                    Console.WriteLine("here" + output);
                     OutputToFile(fileString, output, operatorChar);
                     if(operatorChar.Contains("2"))
                     {
@@ -497,25 +518,27 @@ public class ConsoleManager
 
                 }
 
-
+                
                 return new ConsoleOutput { error = error.Trim(), HasError = true };
             }
 
-
             
+
             if (!string.IsNullOrEmpty(fileString) && operatorChar.Contains("1"))
             {
+               
                 
                 OutputToFile(fileString, output.Trim(), operatorChar);
-
-                return new ConsoleOutput();
+                // same with stdout there can still be an error thats why we need to give the error back
+                return new ConsoleOutput { HasError = true, output = error.Trim() };
             }
-            
+
+           
             return new ConsoleOutput { output = output.Trim() };
         }
         catch (Exception ex)
         {
-
+           
             return new ConsoleOutput { error = $"{nameOfFile}: error executing - {ex.Message}", HasError = true};
 
         }
@@ -675,9 +698,6 @@ public class ConsoleManager
                 bool inQuotes = false;
                 char quoteChar = '\0';
 
-                int count = 0;
-                char oneTimeChar = ' ';
-
                 for (int i = 0; i < args.Length; i++)
                 {
                     char c = args[i];
@@ -832,6 +852,7 @@ public class ConsoleManager
 
                 else
                 {
+                    
                     string[] argsArray = args.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
                     string commandWord = input.Substring(0, input.IndexOf(' '));
@@ -931,12 +952,19 @@ public class ConsoleManager
     }
     const string CatCantOpenError = "cat: can't open '";
     const string noSuchFileOrDirError = "No such file or directory";
-    private readonly string extraPath;
-
+  
     public ConsoleOutput OutputToFile (string fileString, string result, string operatorChar)
     {
+        
+
         if (!string.IsNullOrEmpty(fileString))
         {
+            if (!string.IsNullOrEmpty(result))
+            {
+                result += Environment.NewLine;
+            }
+
+            
 
             // for sterr
             if (operatorChar.Contains("2"))
@@ -946,7 +974,7 @@ public class ConsoleManager
                      result.Contains("command not found"))
                 {
                     // write if the error message
-                    if (operatorChar.Contains("2>"))
+                    if (operatorChar == "2>")
                     {
                         // add to file 
                         File.AppendAllText(fileString, result);
@@ -971,15 +999,24 @@ public class ConsoleManager
             if(operatorChar.Contains("1"))
             {
                 // output
-                if (operatorChar.Contains("1>"))
+                if (operatorChar == "1>" && !string.IsNullOrEmpty(result))
                 {
                     // add to file 
-                    File.AppendAllText(fileString, result + Environment.NewLine);
+                    File.AppendAllText(fileString, result);
+                    
                 }
-                else
+                if (operatorChar == "1"  && !string.IsNullOrEmpty(result))
                 {
-                    File.WriteAllText(fileString, result + Environment.NewLine);
+                    File.WriteAllText(fileString, result);
                 }
+
+                if(string.IsNullOrEmpty(result) || result.Contains("nonexistent"))
+                {
+                    //if not just create the file if there is none
+                    File.WriteAllText(fileString, "");
+                }
+
+                 
 
             }
         }
@@ -1007,7 +1044,7 @@ public class ConsoleManager
         return error;
     }
 
-     private static (string, string, string) GettingFileTextAndOperator(string input, string fileString, string operatorChar)
+     private  (string, string, string) GettingFileTextAndOperator(string input, string fileString, string operatorChar)
     {
         
         int inputIndex = -9999999;
@@ -1078,6 +1115,7 @@ public class ConsoleManager
             }
 
         }
+        
 
         return (input, fileString, operatorChar);
     }

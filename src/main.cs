@@ -16,7 +16,7 @@ namespace src
                 Console.Write(StartInput);
 
                 string input = Console.ReadLine();
-                string fileString = "";
+                
                
                 ConsoleOutput result = Maker.HandleConsoleLine(input);
                 
