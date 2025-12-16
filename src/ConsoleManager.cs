@@ -1,13 +1,9 @@
 ﻿using src;
-using System;
-using System.ComponentModel.Design;
 using System.Diagnostics;
-using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+
 
 public class ConsoleManager
 {
