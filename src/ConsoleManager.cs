@@ -1,10 +1,8 @@
 ﻿using src;
-using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
-
 
 public class ConsoleManager
 {
@@ -26,9 +24,7 @@ public class ConsoleManager
         inputCommand = "";
         splitInputList = Array.Empty<string>();
 
-        
     }
-    
     
     public ConsoleOutput HandleConsoleLine(string? input)
     {
@@ -41,7 +37,6 @@ public class ConsoleManager
 
         return output;
     }
-
 
     private ConsoleOutput ProcessUserInput(string userInputCommand)
     {
@@ -73,7 +68,6 @@ public class ConsoleManager
         }
         string[] commandLineArgs = Array.Empty<string>();
        
-        
 
         switch (CheckValidCommandExist(splitInputList,validCommandsList))
         {
@@ -105,9 +99,6 @@ public class ConsoleManager
         }
         
         splitInputList = commandLineArgs;
-
-
-
 
         if (!validCommandsList.Contains(splitInputList[0]) && splitInputList.Length > 1)
         {
@@ -274,8 +265,6 @@ public class ConsoleManager
             var ConsoleOut = new ConsoleOutput();
             var possibleErrorResult = OutputToFile(fileString, result.ToString().Trim(), operatorChar);
            
-           
-
         }
 
         if (!string.IsNullOrEmpty(fileString) && operatorChar.Contains("1"))
@@ -299,12 +288,7 @@ public class ConsoleManager
         if (splitInputList[0] == "type")
         {
             
-            
-            
             bool wordCheckerIsPath = false;
-            
-
-            
             
             string changedWord = "";
             
@@ -386,8 +370,6 @@ public class ConsoleManager
     {
         string executable = splitInputList[0];
 
-        
-
         //foreach (var item in splitInputList)
         //{
         //    Console.WriteLine(item);
@@ -410,8 +392,6 @@ public class ConsoleManager
                 executable = changedWord;
             }
 
-            
-           
         }
 
         if (nameOfFile == "cat")
@@ -479,8 +459,6 @@ public class ConsoleManager
             }
             var process = Process.Start(processStartInfo);
 
-
-
             string output = process.StandardOutput.ReadToEnd();
             string error = process.StandardError.ReadToEnd();
 
@@ -508,7 +486,7 @@ public class ConsoleManager
                 }
                 if (!string.IsNullOrEmpty(output) && !string.IsNullOrEmpty(fileString))
                 {
-                    Console.WriteLine("here" + output);
+                    
                     OutputToFile(fileString, output, operatorChar);
                     if(operatorChar.Contains("2"))
                     {
@@ -607,8 +585,7 @@ public class ConsoleManager
             inputCheckForBlank = inputCheckForBlank.Remove(inputCheckForBlank.Length - 1);
             foreach (char item in inputCheckForBlank)
             {
-                blank = item == ' ';
-
+               
                 blank = item != ' ';
                 
                 
@@ -864,7 +841,6 @@ public class ConsoleManager
                     return fullArray;
                 }
 
-                    
             }
 
             return listForArgs.ToArray();
@@ -918,7 +894,6 @@ public class ConsoleManager
                 }
                 // If we're inside double quotes and encounter single quote, treat as regular char
                 
-
                 noMultipleBlanksString += args[i];
                 continue;
             }
@@ -964,7 +939,6 @@ public class ConsoleManager
                 result += Environment.NewLine;
             }
 
-            
 
             // for sterr
             if (operatorChar.Contains("2"))
@@ -984,7 +958,6 @@ public class ConsoleManager
                         File.WriteAllText(fileString, result);
                     }
                     
-
                 }
                 else 
                 {
@@ -1016,8 +989,6 @@ public class ConsoleManager
                     File.WriteAllText(fileString, "");
                 }
 
-                 
-
             }
         }
         return new ConsoleOutput();
@@ -1048,11 +1019,16 @@ public class ConsoleManager
     {
         
         int inputIndex = -9999999;
+
         if (input.Contains('>'))
         {
+            // checks if > exist if it does 
+            // saves the place where > it first finds the >
             inputIndex = input.IndexOf('>');
+            // in if checks  if > is not the last char so that it wouldnt go out of bounds
             if (input.Length > inputIndex + 1)
             {
+                //Console.WriteLine(10);
                 
                 
                 if (!string.IsNullOrEmpty(input) && input[inputIndex + 1] == ' ' && !input.Contains("2>") && !input.Contains(">>"))
@@ -1114,10 +1090,19 @@ public class ConsoleManager
 
             }
 
-        }
-        
+            else
+            {
+                
+                return (input, "", "");
+            }
 
-        return (input, fileString, operatorChar);
+            return (input, fileString, operatorChar);
+
+        }
+
+        return (input, "", "");
+
+
     }
 
     
