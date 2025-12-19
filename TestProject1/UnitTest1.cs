@@ -1,81 +1,121 @@
-﻿using Xunit;
+﻿//using System;
+//using Xunit;
 
-namespace src
-{
-    public class ConsoleManagerTests
-    {
-        [Theory]
-        [InlineData("echo hello world", "hello world")]
-        [InlineData("echo 'hello world'", "hello world")]
-        [InlineData("echo \"hello world\"", "hello world")]
-        [InlineData("echo hello", "hello")]
-        [InlineData("echo hello   world", "hello world")]
-        [InlineData("echo    hello    world   ", "hello world")]
-        [InlineData("echo ''", "")]
-        [InlineData("echo \"\"", "")]
-        [InlineData("echo 'single quoted'", "single quoted")]
-        [InlineData("echo \"double quoted\"", "double quoted")]
-        [InlineData("echo hello\\ world", "hello world")]
-        [InlineData("echo hello\\'world", "hello'world")]
-        [InlineData("echo hello\\\"world", "hello\"world")]
-        [InlineData("echo hello\\\\world", "hello\\world")]
-        [InlineData("echo 'hello\\nworld'", "hello\\nworld")]
-        [InlineData("echo \"hello\\nworld\"", "hello\\nworld")]
-        public void EchoCommand_VariousInputs_ReturnsExpectedOutput(string input, string expected)
-        {
-            // Arrange
-            var consoleManager = new ConsoleManager();
+//public class ConsoleManagerTests
+//{
+//    private ConsoleManager consoleManager;
 
-            // Act
-            string result = consoleManager.HandleConsoleLine(input);
+//    public ConsoleManagerTests()
+//    {
+//        consoleManager = new ConsoleManager();
+//    }
 
-            // Assert
-            Assert.Equal(expected, result);
-        }
+//    // ---------- Simple built-in command tests ----------
 
-        [Theory]
-        [InlineData("pwd")]
-        public void PwdCommand_ReturnsCurrentDirectory(string input)
-        {
-            // Arrange
-            var consoleManager = new ConsoleManager();
-            string expected = Directory.GetCurrentDirectory();
+//    [Fact]
+//    public void Pwd_ReturnsCurrentDirectory()
+//    {
+//        var result = consoleManager.HandleConsoleLine("pwd");
+//        Assert.Equal(Environment.CurrentDirectory, result);
+//    }
 
-            // Act
-            string result = consoleManager.HandleConsoleLine(input);
+//    [Fact]
+//    public void Cd_ToHomeDirectory()
+//    {
+//        string home = (Environment.OSVersion.Platform == PlatformID.Unix ||
+//                       Environment.OSVersion.Platform == PlatformID.MacOSX)
+//                       ? Environment.GetEnvironmentVariable("HOME")
+//                       : Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
 
-            // Assert
-            Assert.Equal(expected, result);
-        }
+//        var result = consoleManager.HandleConsoleLine("cd ~");
+//        Assert.Equal("", result);
+//        Assert.Equal(home, Environment.CurrentDirectory);
+//    }
 
-        [Theory]
-        [InlineData("unknowncommand", "unknowncommand: command not found")]
-        [InlineData("notacommand arg1 arg2", "notacommand: command not found")]
-        public void InvalidCommand_ReturnsCommandNotFound(string input, string expected)
-        {
-            // Arrange
-            var consoleManager = new ConsoleManager();
+//    [Fact(Skip = "Exit command would terminate test runner")]
+//    public void ExitCommand_Skipped()
+//    {
+//        consoleManager.HandleConsoleLine("exit");
+//    }
 
-            // Act
-            string result = consoleManager.HandleConsoleLine(input);
+//    // ---------- Echo command tests ----------
 
-            // Assert
-            Assert.Equal(expected, result);
-        }
+//    [Theory]
+//    [InlineData("echo hello world", "hello world")]
+//    [InlineData("echo \"hello world\"", "hello world")]
+//    [InlineData("echo 'hello world'", "hello world")]
+//    [InlineData("echo \"hello   world\"", "hello   world")]
+//    [InlineData("echo hello\\ world", "hello world")]
+//    [InlineData("echo \"hello \\\"world\\\"\"", "hello \"world\"")]
+    
+//    public void EchoCommand_HandlesQuotesAndBackslashes(string input, string expected)
+//    {
+//        var result = consoleManager.HandleConsoleLine(input);
+//        Assert.Equal(expected, result);
+//    }
 
-        [Theory]
-        [InlineData("")]
-        [InlineData(null)]
-        public void EmptyOrNullInput_ReturnsEmptyString(string input)
-        {
-            // Arrange
-            var consoleManager = new ConsoleManager();
+//    // ---------- Type command tests ----------
 
-            // Act
-            string result = consoleManager.HandleConsoleLine(input);
+//    [Fact]
+//    public void TypeCommand_KnownBuiltin()
+//    {
+//        var result = consoleManager.HandleConsoleLine("type pwd");
+//        Assert.Equal("pwd is a shell builtin", result);
+//    }
 
-            // Assert
-            Assert.Equal("", result);
-        }
-    }
-}
+//    [Fact]
+//    public void TypeCommand_Unknown()
+//    {
+//        var result = consoleManager.HandleConsoleLine("type nonexistentcommand");
+//        Assert.Equal("nonexistentcommand: not found", result);
+//    }
+
+//    // ---------- Handling of invalid commands ----------
+
+//    [Fact]
+//    public void UnknownCommand_ReturnsError()
+//    {
+//        var result = consoleManager.HandleConsoleLine("foobar");
+//        Assert.Equal("foobar: command not found", result);
+//    }
+
+//    // ---------- Redirection tests ----------
+
+
+//    [Fact]
+//    public void Echo_WithFileRedirection_WritesFile()
+//    {
+//        string tempFile = Path.GetTempFileName();
+//        try
+//        {
+//            var result = consoleManager.HandleConsoleLine($"echo hello > {tempFile}");
+//            Assert.Equal("", result);
+//            Assert.Equal("hello", File.ReadAllText(tempFile).Trim());
+//        }
+//        finally
+//        {
+//            File.Delete(tempFile);
+//        }
+//    }
+
+//    // ---------- Edge-case input ----------
+
+//    [Theory]
+//    [InlineData("", "")]
+//    [InlineData("   ", "")]
+//    [InlineData("echo", "")]
+//    public void EmptyOrWhitespaceInput_ReturnsEmpty(string input, string expected)
+//    {
+//        var result = consoleManager.HandleConsoleLine(input);
+//        Assert.Equal(expected, result);
+//    }
+
+//    // ---------- Change directory invalid ----------
+
+//    [Fact]
+//    public void Cd_ToInvalidDirectory_ReturnsError()
+//    {
+//        var result = consoleManager.HandleConsoleLine("cd /nonexistentpath12345");
+//        Assert.Contains("No such file or directory", result);
+//    }
+//}

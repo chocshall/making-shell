@@ -1,3 +1,5 @@
+
+
 namespace src
 {
     public class Program
@@ -6,22 +8,32 @@ namespace src
         static void Main(string[] args)
         {
 
-
             ConsoleManager Maker = new ConsoleManager();
-
-             
 
             while (true)
             {
 
                 Console.Write(StartInput);
-                string result = Maker.HandleConsoleLine(Console.ReadLine());
 
+                string input = Console.ReadLine();
+                
                
-                if (!string.IsNullOrEmpty(result))
+                ConsoleOutput result = Maker.HandleConsoleLine(input);
+                
+                if (!string.IsNullOrEmpty(result.output))
                 {
-                    Console.WriteLine(result);
+
+                    Console.WriteLine(result.output);
+
                 }
+
+                if(result.HasError && !string.IsNullOrEmpty(result.error))
+                {
+                    Console.Error.WriteLine(result.error);
+                    
+                }
+
+
             }
         }
     }
