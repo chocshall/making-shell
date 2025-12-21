@@ -1,4 +1,3 @@
-
 namespace src
 {
     public class Program
@@ -47,42 +46,53 @@ namespace src
                         {
                             try
                             {
+                                
                                 foreach (var directory in Maker.splitPathList)
                                 {
-                                    var files = from file in Directory.EnumerateFiles(directory)
-                                                where Path.GetFileName(file).ToLower().StartsWith(partialString)
-                                                select file;
-                                    foreach (string fileName in files)
+                                    // when testing locally what u have in path or added sometimes the paths listed are old and they dont get updated when the dirs are deleted on file explorer
+                                    if(Directory.Exists(directory))
                                     {
-                                        if (File.Exists(fileName))
+                                        // finds every file in a single dir if accesible
+                                        var files = from file in Directory.EnumerateFiles(directory)
+                                                    // gets the filename and changes it to lower checks if starts with the partialstring
+                                                    where Path.GetFileName(file).ToLower().StartsWith(partialString)
+                                                    // if it maches the select return that one saves to files
+                                                    select file;
+                                        foreach (string fileName in files)
                                         {
-                                            string newFileName = fileName.Substring(directory.Length + 1);
-                                            string filelastChars = newFileName.Substring(partialString.Length);
-                                            Console.WriteLine(filelastChars + " ");
-                                            noMatches = false;
-                                            break;
-                                        }
+                                            
+                                            if (File.Exists(fileName))
+                                            {
+                                                string newFileName = fileName.Substring(directory.Length + 1);
+                                                string filelastChars = newFileName.Substring(partialString.Length);
+                                                Console.Write(filelastChars + " ");
+                                                
+                                                noMatches = false;
+                                                break;
+                                            }
 
+                                        }
                                     }
+                                    
                                 }
                             }
                             catch (UnauthorizedAccessException UAEx)
                             {
+                                //Console.WriteLine(UAEx);
                                 Console.WriteLine('\x07');
                             }
                             catch (PathTooLongException PathEx)
                             {
+                                //Console.WriteLine(PathEx);
                                 Console.WriteLine('\x07');
                             }
 
                             catch ( DirectoryNotFoundException UEX)
                             {
+                                //Console.WriteLine(UEX);
                                 Console.WriteLine('\x07');
                             }
                         }
-
-                            
-
 
                     }
                     else

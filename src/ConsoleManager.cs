@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
-
 public class ConsoleManager
 {
     public List<string> validCommandsList;
@@ -11,6 +10,7 @@ public class ConsoleManager
     private string[] splitInputList;
     public List<string> splitPathList;
     string pathListString = Environment.GetEnvironmentVariable("PATH") ?? "";
+    
     public ConsoleManager()
     {   
         validCommandsList = new List<string>
@@ -25,8 +25,12 @@ public class ConsoleManager
         splitInputList = Array.Empty<string>();
         splitPathList = pathListString.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries).ToList();
 
+#if DEBUG
+
+        splitPathList.Add($@"C:\cSharp\ConsoleApp1\bin\Debug\net9.0");
+#endif
+
     }
-    
     public ConsoleOutput HandleConsoleLine(string? input)
     {
         var output = new ConsoleOutput();
@@ -38,7 +42,6 @@ public class ConsoleManager
 
         return output;
     }
-
     private ConsoleOutput ProcessUserInput(string userInputCommand)
     {
         inputCommand = userInputCommand;
@@ -50,21 +53,6 @@ public class ConsoleManager
         inputCommand = GettingFileNameAndOperator.Item1;
         fileString = GettingFileNameAndOperator.Item2;
         operatorString = GettingFileNameAndOperator.Item3;
-
-       
-        
-        
-        
-        
-        
-
-
-#if DEBUG
-
-        splitPathList.Add($@"C:\cSharp\ConsoleApp1\bin\Debug\net9.0");
-       
-#endif
-        
 
         splitInputList = inputCommand.Split(' ');
 
@@ -111,7 +99,6 @@ public class ConsoleManager
             var output = new ConsoleOutput();
             return output = ExecutesFileIfMeetRequirements(splitInputList[0], commandLineArgs, inputCommand, fileString, operatorString, splitPathList);
         }
-        
 
         return new ConsoleOutput { output = $"{splitInputList[0]}: command not found" };
     }
@@ -282,7 +269,6 @@ public class ConsoleManager
 
         }
         var ConsoleOutput = new ConsoleOutput { output = result.ToString().Trim() };
-        
 
         return ConsoleOutput;
 
@@ -376,10 +362,6 @@ public class ConsoleManager
     {
         string executable = splitInputList[0];
 
-        //foreach (var item in splitInputList)
-        //{
-        //    Console.WriteLine(item);
-        //}
         string changedWord = "";
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
@@ -481,10 +463,8 @@ public class ConsoleManager
             {
                 
                 // checking if ls was typed so it would not make empty file string and then still print the error 
-                // ...
                 if (operatorChar.Contains("2") && !string.IsNullOrEmpty(fileString))
                 {
-                   
                     OutputToFile(fileString, error, operatorChar);
                     // if its sderr we still need to give output to main because there can a mix
                     // one file with cat works the other doesnt.
@@ -492,7 +472,7 @@ public class ConsoleManager
                 }
                 if (!string.IsNullOrEmpty(output) && !string.IsNullOrEmpty(fileString))
                 {
-                    
+
                     OutputToFile(fileString, output, operatorChar);
                     if(operatorChar.Contains("2"))
                     {
@@ -502,22 +482,17 @@ public class ConsoleManager
 
                 }
 
-                
                 return new ConsoleOutput { error = error.Trim(), HasError = true };
             }
 
-            
-
             if (!string.IsNullOrEmpty(fileString) && operatorChar.Contains("1"))
             {
-               
-                
+  
                 OutputToFile(fileString, output.Trim(), operatorChar);
                 // same with stdout there can still be an error thats why we need to give the error back
                 return new ConsoleOutput { HasError = true, output = error.Trim() };
             }
 
-           
             return new ConsoleOutput { output = output.Trim() };
         }
         catch (Exception ex)
@@ -591,9 +566,7 @@ public class ConsoleManager
             inputCheckForBlank = inputCheckForBlank.Remove(inputCheckForBlank.Length - 1);
             foreach (char item in inputCheckForBlank)
             {
-               
                 blank = item != ' ';
-                
                 
             }
             if (blank)
@@ -842,7 +815,6 @@ public class ConsoleManager
                     string[] fullArray = new string[argsArray.Length + 1];
                     fullArray[0] = commandName;
                     Array.Copy(argsArray, 0, fullArray, 1, argsArray.Length);
-                    
 
                     return fullArray;
                 }
@@ -936,7 +908,6 @@ public class ConsoleManager
   
     public ConsoleOutput OutputToFile (string fileString, string result, string operatorChar)
     {
-        
 
         if (!string.IsNullOrEmpty(fileString))
         {
@@ -1113,6 +1084,4 @@ public class ConsoleManager
 
     
 }
-
-
 

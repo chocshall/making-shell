@@ -1,5 +1,4 @@
-﻿
-namespace src
+﻿namespace src
 {
     public class ConsoleOutput
 {
