@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 public class ConsoleManager
 {
-    private List<string> validCommandsList;
+    public List<string> validCommandsList;
     private string inputCommand;
     private string[] splitInputList;
 
