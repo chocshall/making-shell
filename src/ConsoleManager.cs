@@ -9,8 +9,8 @@ public class ConsoleManager
     public List<string> validCommandsList;
     private string inputCommand;
     private string[] splitInputList;
-
-   
+    public List<string> splitPathList;
+    string pathListString = Environment.GetEnvironmentVariable("PATH") ?? "";
     public ConsoleManager()
     {   
         validCommandsList = new List<string>
@@ -23,6 +23,7 @@ public class ConsoleManager
         };
         inputCommand = "";
         splitInputList = Array.Empty<string>();
+        splitPathList = pathListString.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries).ToList();
 
     }
     
@@ -50,15 +51,20 @@ public class ConsoleManager
         fileString = GettingFileNameAndOperator.Item2;
         operatorString = GettingFileNameAndOperator.Item3;
 
-        List<string> splitPathList = new List<string>();
-        string pathListString = Environment.GetEnvironmentVariable("PATH") ?? "";
-        splitPathList = pathListString.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries).ToList();
+       
+        
+        
+        
+        
+        
+
 
 #if DEBUG
-        
-        splitPathList.Add($@"C:\cSharp\ConsoleApp1\bin\Debug\net9.0");
 
+        splitPathList.Add($@"C:\cSharp\ConsoleApp1\bin\Debug\net9.0");
+       
 #endif
+        
 
         splitInputList = inputCommand.Split(' ');
 
