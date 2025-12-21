@@ -1,27 +1,17 @@
-
-using System;
-
 namespace src
 {
     public class Program
     {
-        private readonly static string[] commands = {"exit",
-            "echo",
-            "type",
-            "pwd",
-            "cd" };
         private const string StartInput = "$ ";
         static void Main(string[] args)
         {
 
             ConsoleManager Maker = new ConsoleManager();
-
+            
             while (true)
             {
-
                 Console.Write(StartInput);
 
-                
                 string input = "";
 
                 while (true)
@@ -34,21 +24,17 @@ namespace src
                         break;
                     }
                        
-
                     if (key.Key == ConsoleKey.Tab && input.Length >= 3)
                     {
                         string partialString = input;
-                        foreach (var command in commands)
+                        foreach (var command in Maker.validCommandsList)
                         {
                             if(command.StartsWith(partialString))
                         {
-                                
                                 input = command + " ";
                                 string commandlastChars = command.Substring(partialString.Length);
                                 Console.Write(commandlastChars + " ");
                                 
-
-
                                 break;
           
                             }
@@ -62,7 +48,6 @@ namespace src
                     }
                 }
                 
-
                 ConsoleOutput result = Maker.HandleConsoleLine(input);
                 
                 if (!string.IsNullOrEmpty(result.output))
@@ -77,7 +62,6 @@ namespace src
                     Console.Error.WriteLine(result.error);
                     
                 }
-
 
             }
         }

@@ -1,6 +1,4 @@
-﻿using System;
-using Xunit;
-
+﻿
 public class ConsoleManagerTests
 {
     private ConsoleManager consoleManager;
