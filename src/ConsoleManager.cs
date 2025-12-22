@@ -9,9 +9,9 @@ public class ConsoleManager
     private string inputCommand;
     private string[] splitInputList;
     public List<string> splitPathList;
-    string pathListString = Environment.GetEnvironmentVariable("PATH") ?? "";
     
-    public ConsoleManager()
+    
+    public ConsoleManager(string pathListString)
     {   
         validCommandsList = new List<string>
         {
