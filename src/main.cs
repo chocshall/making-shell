@@ -9,12 +9,14 @@ namespace src
             ConsoleManager Maker = new ConsoleManager();
             bool noMatches = true;
             bool tabPressed = false;
+            bool noMatchesCommand = false;
+            
             while (true)
             {
                 Console.Write(StartInput);
 
                 string input = "";
-
+                int tabCount = 0;
                 while (true)
                 {
                     var key = Console.ReadKey(intercept:true);
@@ -24,11 +26,14 @@ namespace src
                         Console.WriteLine();
                         break;
                     }
-                       
+                    List<string> foundExecutablesList = new List<string>();
+                    
                     if (key.Key == ConsoleKey.Tab && input.Length >= 3)
                     {
+                        tabCount++; 
                         tabPressed = true;
                         string partialString = input;
+                        
                         foreach (var command in Maker.validCommandsList)
                         {
                             if (command.StartsWith(partialString))
@@ -37,16 +42,18 @@ namespace src
                                 string commandlastChars = command.Substring(partialString.Length);
                                 Console.Write(commandlastChars + " ");
                                 noMatches = false;
+                                noMatchesCommand = true;
                                 break;
 
                             }
                            
                         }
-                        if(noMatches)
+                        if(!noMatchesCommand)
                         {
+                            
                             try
                             {
-                                
+                                string filelastChars = "";
                                 foreach (var directory in Maker.splitPathList)
                                 {
                                     // when testing locally what u have in path or added sometimes the paths listed are old and they dont get updated when the dirs are deleted on file explorer
@@ -58,23 +65,52 @@ namespace src
                                                     where Path.GetFileName(file).ToLower().StartsWith(partialString)
                                                     // if it maches the select return that one saves to files
                                                     select file;
+                                        
                                         foreach (string fileName in files)
                                         {
                                             
                                             if (File.Exists(fileName))
                                             {
+                                                
                                                 string newFileName = fileName.Substring(directory.Length + 1);
-                                                string filelastChars = newFileName.Substring(partialString.Length);
-                                                Console.Write(filelastChars + " ");
+                                                filelastChars = newFileName.Substring(partialString.Length);
+                                                foundExecutablesList.Add(partialString + filelastChars);
+                                                
+                                                //Console.Write(filelastChars + " ");
                                                 
                                                 noMatches = false;
-                                                break;
+                                                
+                                                
                                             }
 
+
                                         }
+                                        foundExecutablesList.Sort();
+
+
+
                                     }
                                     
                                 }
+                                // check it finds two or more items in the executables list then prints bell sound
+                                if (foundExecutablesList.Count() >= 2)
+                                {
+                                    Console.Write('\x07');
+                                    
+                                   
+                                }
+                                // counting tab presses on the second tab press print contecation of executables list  string
+                                if (tabCount > 1)
+                                {
+                                    
+                                    Console.WriteLine(Environment.NewLine + string.Join("  ", foundExecutablesList));
+                                    Console.Write(StartInput + input);
+                                }
+                                if(tabCount == 1 && foundExecutablesList.Count() == 1)
+                                {
+                                    Console.Write(filelastChars + " ");
+                                }
+                                
                             }
                             catch (UnauthorizedAccessException UAEx)
                             {
@@ -107,6 +143,7 @@ namespace src
                     }
 
                 }
+                
                 
                     ConsoleOutput result = Maker.HandleConsoleLine(input);
                 
