@@ -34,7 +34,7 @@ namespace src
 
                         tabCount++; 
                         tabPressed = true;
-                        //#123 because of updating input to longer and longer string one there could be only match so in the files
+                        //#123 because of updating input to longer and longer string one there could be only match in the files
                         // if (foundExecutablesList.Count() == 1) it could that the list comes as one item 
                         string partialString = input;
 
@@ -66,7 +66,7 @@ namespace src
                                     {
 
                                         // finds every file in a single dir if accesible gets the filename and changes it to lower checks if starts with the partialstring
-                                        // if it maches the select return that one saves to files
+                                        // if it maches the select  would be used to return lets say changed file names but the names are not changed so it doesnt need select
                                         var files = Directory.EnumerateFiles(directory).Where(file => Path.GetFileName(file).ToLower().StartsWith(partialString));
 
                                         foreach (string fileName in files)
@@ -96,9 +96,10 @@ namespace src
                                 if (rangeOfList > i + 1)
                                 {
                                     string exelastChars = "";
+                                    string completion = "";
                                     if (executableListByLength[1].StartsWith(executableListByLength[0]) && tabCount == 1)
                                     {
-                                        // need to use partialString because input doesnt get updated here 
+                                        // need to use partialString because input doesnt get updated here before key press
                                         exelastChars = executableListByLength[0].Substring(partialString.Length);
                                         input += exelastChars;
                                         Console.Write(exelastChars);
@@ -107,7 +108,7 @@ namespace src
                                     if (executableListByLength[i + 1].StartsWith(executableListByLength[i]) && tabCount > 1)
                                     {
                                         // need to add not the second but the first item in the list 
-                                        string completion = executableListByLength[i].ToString().Substring(input.Length);
+                                        completion = executableListByLength[i].ToString().Substring(input.Length);
                                         input += completion;
 
                                         Console.Write(completion);
