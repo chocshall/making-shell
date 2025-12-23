@@ -1,5 +1,4 @@
-﻿
-public class ConsoleManagerTests
+﻿public class ConsoleManagerTests
 {
     private ConsoleManager consoleManager;
 
