@@ -103,6 +103,7 @@ namespace src
                                         exelastChars = executableListByLength[0].Substring(partialString.Length);
                                         input += exelastChars;
                                         Console.Write(exelastChars);
+                                        i++;
                                     }
 
                                     if (executableListByLength[i + 1].StartsWith(executableListByLength[i]) && tabCount > 1)
@@ -123,6 +124,16 @@ namespace src
                                     {
                                         Console.Write('\x07');
                                     }
+                                }
+
+                                // checks for the last element because the rangeOfList doenst check the last element in list
+                                if (executableListByLength[^1].StartsWith(input) && tabCount > 1 && rangeOfList < i + 1)
+                                {
+                                    string completion = executableListByLength[^1].ToString().Substring(input.Length);
+                                    input += completion;
+
+                                    Console.Write(completion);
+                                    i++;
                                 }
                                 //#123 we check every time because it could be the last long file name and input became too long for others
                                 if (foundExecutablesList.Count() == 1)
