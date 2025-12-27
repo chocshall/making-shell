@@ -1,23 +1,23 @@
-﻿
-namespace src
+﻿namespace src
 {
     public class Program
     {
         private const string StartInput = "$ ";
         static void Main(string[] args)
         {
-            string pathListString = Environment.GetEnvironmentVariable("PATH") ?? "";
-            ConsoleManager Maker = new ConsoleManager(pathListString);
+            string stringOfPaths = Environment.GetEnvironmentVariable("PATH") ?? "";
+            
+            ConsoleManager Maker = new ConsoleManager(stringOfPaths);
             bool noMatches = true;
             bool tabPressed = false;
-            bool noMatchesCommand = false;
+            bool noMatchesCommand = true;
             while (true)
             {
                 Console.Write(StartInput);
 
                 string input = "";
                 int tabCount = 0;
-                int i = 0;
+                int countForFoundSimilarFileNamesOnTabPresses = 0;
                 while (true)
                 {
                     var key = Console.ReadKey(intercept:true);
@@ -31,29 +31,29 @@ namespace src
 
                     if (key.Key == ConsoleKey.Tab && input.Length >= 3)
                     {
-
                         tabCount++; 
                         tabPressed = true;
-                        //#123 because of updating input to longer and longer string one there could be only match in the files
-                        // if (foundExecutablesList.Count() == 1) it could that the list comes as one item 
+
+                        // getting all the chars before tab press
                         string partialString = input;
 
                         foreach (var command in Maker.validCommandsList)
                         {
                             if (command.StartsWith(partialString))
                             {
-                               
                                 string commandlastChars = command.Substring(partialString.Length);
+                                // autocompleting if starts to the command and saving to input
                                 input += commandlastChars + " ";
+                                // but because of tab completion works and there is already on screen letters, then only need the last chars that were missing after completion
                                 Console.Write(commandlastChars + " ");
                                 noMatches = false;
-                                noMatchesCommand = true;
+                                noMatchesCommand = false;
                                 break;
 
                             }
                            
                         }
-                        if(!noMatchesCommand)
+                        if(noMatchesCommand)
                         {
 
                             try
@@ -64,56 +64,57 @@ namespace src
                                     // when testing locally what u have in path or added sometimes the paths listed are old and they dont get updated when the dirs are deleted on file explorer
                                     if(Directory.Exists(directory))
                                     {
+                                        // files is just holding a blueprint how in a loop the program will accces the files and with what spefications
+                                        // right not it only reserved memory only for the variable 
+                                        var files = Directory.EnumerateFiles(directory).Where(file => Path.GetFileName(file).StartsWith(partialString));
 
-                                        // finds every file in a single dir if accesible gets the filename and changes it to lower checks if starts with the partialstring
-                                        // if it maches the select  would be used to return lets say changed file names but the names are not changed so it doesnt need select
-                                        var files = Directory.EnumerateFiles(directory).Where(file => Path.GetFileName(file).ToLower().StartsWith(partialString));
-
-                                        foreach (string fileName in files)
+                                        // when accesing the files in a for loop the EnumerateFiles gives the ability to acces the directory to check the files with the created enumerable
+                                        // in a loop it checks if a file has the spefication of  Where(file => Path.GetFileName(file).StartsWith(partialString));
+                                        // if it doesnt skip. Else return the value and  at the same time saves the position on where the enumerable
+                                        // ended so that way it doesnt need to iterate over all the files again to that position and check if the file found needs to be skipped
+                                        foreach (string fullPathToFileName in files)
                                         {
-                                            
-                                            if (File.Exists(fileName))
+                                            if (File.Exists(fullPathToFileName))
                                             {
-                                                
-                                                string newFileName = fileName.Substring(directory.Length + 1);
-                                                filelastChars = newFileName.Substring(partialString.Length);
+                                                string FileName = fullPathToFileName.Substring(directory.Length + 1);
+                                                filelastChars = FileName.Substring(partialString.Length);
                                                 foundExecutablesList.Add(partialString + filelastChars);
-
                                                 noMatches = false;
                                             }
                                         }
+                                       
                                         foundExecutablesList.Sort();
                                     }
                                 }
 
                                 List<string> executableListByLength = new List<string>(foundExecutablesList);
-                                // compares the a with b if a i comes first return -1 if they they same unchanged return 0
-                                // if a longer a comes after b returns 1 the lambda expression
+                                // compares the a with b if a i comes first return -1
+                                // if they are the same return 0
+                                // if a longer than b returns 1 the lambda expression
                                 // then the sort gets the value of the pair compared an changes it 
                                 executableListByLength.Sort((a, b) => a.Length.CompareTo(b.Length));
                                 int rangeOfList = executableListByLength.Count();
 
-                                if (rangeOfList > i + 1)
+                                if (rangeOfList > countForFoundSimilarFileNamesOnTabPresses + 1)
                                 {
                                     string exelastChars = "";
                                     string completion = "";
                                     if (executableListByLength[1].StartsWith(executableListByLength[0]) && tabCount == 1)
                                     {
-                                        // need to use partialString because input doesnt get updated here before key press
-                                        exelastChars = executableListByLength[0].Substring(partialString.Length);
+                                        exelastChars = executableListByLength[0].Substring(input.Length);
                                         input += exelastChars;
                                         Console.Write(exelastChars);
-                                        i++;
+                                        countForFoundSimilarFileNamesOnTabPresses++;
                                     }
 
-                                    if (executableListByLength[i + 1].StartsWith(executableListByLength[i]) && tabCount > 1)
+                                    if (executableListByLength[countForFoundSimilarFileNamesOnTabPresses + 1].StartsWith(executableListByLength[countForFoundSimilarFileNamesOnTabPresses]) && tabCount > 1)
                                     {
                                         // need to add not the second but the first item in the list 
-                                        completion = executableListByLength[i].ToString().Substring(input.Length);
+                                        completion = executableListByLength[countForFoundSimilarFileNamesOnTabPresses].Substring(input.Length);
                                         input += completion;
 
                                         Console.Write(completion);
-                                        i++;
+                                        countForFoundSimilarFileNamesOnTabPresses++;
                                     }
                                     else if(tabCount > 1)
                                     {
@@ -126,16 +127,16 @@ namespace src
                                     }
                                 }
 
-                                // checks for the last element because the rangeOfList doenst check the last element in list
-                                if (executableListByLength[^1].StartsWith(input) && tabCount > 1 && rangeOfList < i + 1)
+                                // check for the last element in a list if there are atleast two
+                                if (executableListByLength[^1].StartsWith(input) && tabCount > 1 && rangeOfList < countForFoundSimilarFileNamesOnTabPresses + 1)
                                 {
-                                    string completion = executableListByLength[^1].ToString().Substring(input.Length);
+                                    string completion = executableListByLength[^1].Substring(input.Length);
                                     input += completion;
 
                                     Console.Write(completion);
-                                    i++;
                                 }
-                                //#123 we check every time because it could be the last long file name and input became too long for others
+                                ///because of updating input to longer and longer string after tab presses
+                                ///the input could have only one match so we need to check if the list has found only one item
                                 if (foundExecutablesList.Count() == 1)
                                 {
                                     string completion = foundExecutablesList[0].Substring(input.Length);
@@ -166,8 +167,9 @@ namespace src
                     else 
                     {
                         input += key.KeyChar;
-                        // after pressing any key other than  the tab becomes 0
-                        i = 0;
+                        
+                        countForFoundSimilarFileNamesOnTabPresses = 0;
+                        tabCount = 0;
                         Console.Write(key.KeyChar);
                     }
 
