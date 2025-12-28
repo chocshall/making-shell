@@ -21,7 +21,8 @@ namespace src
             "echo",
             "type",
             "pwd",
-            "cd"
+            "cd",
+            "history"
         };
             inputCommand = "";
             splitInputList = Array.Empty<string>();
