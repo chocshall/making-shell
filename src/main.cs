@@ -181,8 +181,10 @@
                     }
 
                 }
-
+               
                 Maker.inputLines.Add(input);
+            
+                
 
                 ConsoleOutput result = Maker.HandleConsoleLine(input);
 
@@ -196,13 +198,27 @@
                     Console.Error.WriteLine(result.error);
                 }
 
-                if(result.history !=  null)
+                if (result.showHistory)
                 {
-                    for(int i = result.limitHistory; i < result.history.Count();  i++)
+                    if(result.limitHistory != 0)
                     {
-                        Console.WriteLine($"    {i+1}  {result.history[i]}");
+                        for (int i = result.history.Count() - result.limitHistory; i < result.history.Count(); i++)
+                        {
+                            Console.WriteLine($"    {i + 1}  {result.history[i]}");
+                        }
                     }
+                    else
+                    {
+                        for (int i = result.limitHistory; i < result.history.Count(); i++)
+                        {
+                            Console.WriteLine($"    {i + 1}  {result.history[i]}");
+                        }
+                    }
+                    result.history.RemoveAt(result.history.Count() - 1);
+
+
                 }
+                
 
             }
         }

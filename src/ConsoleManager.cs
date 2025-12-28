@@ -1078,10 +1078,10 @@ namespace src
         {
             if(splitInputList.Length == 1)
             {
-                return new ConsoleOutput { history = inputLines, limitHistory = 0 };
+                return new ConsoleOutput { history = inputLines, limitHistory = 0, showHistory = true};
             }
             
-            return new ConsoleOutput { history = inputLines, limitHistory = Convert.ToInt32(splitInputList[1])};
+            return new ConsoleOutput { history = inputLines, limitHistory = Convert.ToInt32(splitInputList[1]), showHistory = true};
         }
 
     }
