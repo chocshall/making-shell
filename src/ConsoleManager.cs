@@ -11,6 +11,7 @@ namespace src
         private string inputCommand;
         private string[] splitInputList;
         public List<string> splitPathList;
+        public List<string> inputLines = new List<string>();
 
 
         public ConsoleManager(string pathListString)
@@ -84,6 +85,11 @@ namespace src
                     break;
                 case "cd":
                     return new ConsoleOutput { output = ChangeDirectory(splitInputList, validCommandsList) };
+                    break;
+
+                case "history":
+                    
+                    return historyCommand(splitInputList);
                     break;
                 default:
 
@@ -1067,11 +1073,19 @@ namespace src
 
             return (input, "", "");
 
-
+        }
+        public ConsoleOutput historyCommand(string[] splitInputList)
+        {
+            if(splitInputList.Length == 1)
+            {
+                return new ConsoleOutput { history = inputLines, limitHistory = 0 };
+            }
+            
+            return new ConsoleOutput { history = inputLines, limitHistory = Convert.ToInt32(splitInputList[1])};
         }
 
-
     }
+    
 
 
 }

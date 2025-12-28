@@ -8,6 +8,8 @@
             string stringOfPaths = Environment.GetEnvironmentVariable("PATH") ?? "";
             
             ConsoleManager Maker = new ConsoleManager(stringOfPaths);
+
+            
             bool noMatches = true;
             bool tabPressed = false;
             bool noMatchesCommand = true;
@@ -179,6 +181,9 @@
                     }
 
                 }
+
+                Maker.inputLines.Add(input);
+
                 ConsoleOutput result = Maker.HandleConsoleLine(input);
 
                 if (!string.IsNullOrEmpty(result.output))
@@ -189,6 +194,14 @@
                 if(result.HasError && !string.IsNullOrEmpty(result.error))
                 {
                     Console.Error.WriteLine(result.error);
+                }
+
+                if(result.history !=  null)
+                {
+                    for(int i = result.limitHistory; i < result.history.Count();  i++)
+                    {
+                        Console.WriteLine($"    {i+1}  {result.history[i]}");
+                    }
                 }
 
             }
