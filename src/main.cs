@@ -12,7 +12,7 @@
             bool tabPressed = false;
             bool noMatchesCommand = true;
             while (true)
-            {
+            { 
                 Console.Write(StartInput);
 
                 string input = "";
