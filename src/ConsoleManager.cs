@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -14,7 +12,8 @@ namespace src
         private string[] splitInputList;
         public List<string> splitPathList;
         public List<string> inputLines = new List<string>();
-
+        public List<string> inputLinesThatRan = new List<string>();
+        public int flagACount = 0;
 
         public ConsoleManager(string pathListString)
         {
@@ -1123,8 +1122,23 @@ namespace src
                     }
                 }
 
+                if (splitInputList[1] == "-a")
+                {
+                    // checks if its a first time that history -a was used
+                    if (flagACount == 0)
+                    {
+                        File.AppendAllLines(inputOfFullFilePath, inputLines);
+                        
+                        flagACount = 1;
+                        inputLinesThatRan = new List<string>();
+                    }
+                    else
+                    {
+                        inputLinesThatRan.Add(string.Join(' ', splitInputList));
+                        File.AppendAllLines(inputOfFullFilePath, inputLinesThatRan);
+                    }
 
-
+                }
             }
             if (splitInputList.Length == 2)
             {
@@ -1134,8 +1148,6 @@ namespace src
         }
 
     }
-    
-
 
 }
 

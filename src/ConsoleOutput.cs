@@ -9,6 +9,6 @@
         public int limitHistory = 0;
         public bool showHistory = false;
         public string flag = "";
-        
+       
 }
 }

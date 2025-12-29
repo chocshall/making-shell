@@ -257,6 +257,8 @@
 
                 if (!string.IsNullOrEmpty(result.output))
                 {
+                    Maker.inputLinesThatRan.Add(input);
+
                     Console.WriteLine(result.output);
                 }
 
