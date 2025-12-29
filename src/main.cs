@@ -3,13 +3,13 @@
     public class Program
     {
         private const string StartInput = "$ ";
+        private static bool isWaitingForDelay = false;
         static void Main(string[] args)
         {
             string stringOfPaths = Environment.GetEnvironmentVariable("PATH") ?? "";
             
             ConsoleManager Maker = new ConsoleManager(stringOfPaths);
 
-            
             bool noMatches = true;
             bool tabPressed = false;
             bool noMatchesCommand = true;
@@ -20,17 +20,87 @@
                 string input = "";
                 int tabCount = 0;
                 int countForFoundSimilarFileNamesOnTabPresses = 0;
+                int linePostion = 0;
                 while (true)
                 {
                     var key = Console.ReadKey(intercept:true);
 
+                    // start a time on w press wait 5 secs and then print
                     if (key.Key == ConsoleKey.Enter)
                     {
                         Console.WriteLine();
+                        linePostion = 0;
                         break;
                     }
-                    List<string> foundExecutablesList = new List<string>();
 
+                    if (key.Key == ConsoleKey.UpArrow)
+                    {
+                        // checks if it doesnt go out of bounds 
+                        if (linePostion <Maker.inputLines.Count)
+                        {
+                            linePostion++;
+                            string previousCommand = Maker.inputLines[Maker.inputLines.Count - linePostion];
+                            
+                            
+                            // Backspace to clear current line
+                            for (int i = 0; i < input.Length; i++)
+                            {
+                                // first loop moves the cursor hello on o makes it a blank space hell(blank space) moves the cursor before the second l hell(here)
+                                Console.Write("\b \b");
+                            }
+                            // then we have $(cursor position)(however many blank spaces)
+
+                            // Write new command the spaces become irrevant, they dont get saved to the prompt, history
+                            Console.Write(previousCommand);
+
+                            input = previousCommand;
+                        }
+                        // if  it does 
+                        else
+                        {
+                            // saves the uppresses to the count of available lines, so the ifs would valid which chekcs bounds range after
+                            linePostion = Maker.inputLines.Count;
+                            // nothing new get written to console
+                        }
+
+                    }
+
+                    if (key.Key == ConsoleKey.DownArrow)
+                    {
+                        if(linePostion >= 0)
+                        {
+                            if(linePostion != 0)
+                            {
+                                linePostion--;
+                            }
+
+                            string previousCommand = "";
+                            if (linePostion != 0)
+                            {
+                                previousCommand = Maker.inputLines[Maker.inputLines.Count() - linePostion];
+                            }
+                            else
+                            {
+                                previousCommand = Maker.inputLines[Maker.inputLines.Count() - 1];
+                            }
+
+                            for (int i = 0; i < input.Count(); i++)
+                                {
+                                    Console.Write("\b \b");
+                                }
+
+                            Console.Write(previousCommand);
+                            input = previousCommand;
+
+                        }
+
+                        else
+                        {
+                            linePostion = 0;
+                        }
+                    }
+
+                    List<string> foundExecutablesList = new List<string>();
                     if (key.Key == ConsoleKey.Tab && input.Length >= 3)
                     {
                         tabCount++; 
@@ -166,10 +236,9 @@
                         
                     }
 
-                    else 
+                    else if(key.Key != ConsoleKey.Tab && key.Key != ConsoleKey.UpArrow && key.Key != ConsoleKey.DownArrow)
                     {
                         input += key.KeyChar;
-                        
                         countForFoundSimilarFileNamesOnTabPresses = 0;
                         tabCount = 0;
                         Console.Write(key.KeyChar);
@@ -181,11 +250,7 @@
                     }
 
                 }
-               
                 Maker.inputLines.Add(input);
-            
-                
-
                 ConsoleOutput result = Maker.HandleConsoleLine(input);
 
                 if (!string.IsNullOrEmpty(result.output))
@@ -214,9 +279,6 @@
                             Console.WriteLine($"    {i + 1}  {result.history[i]}");
                         }
                     }
-                    result.history.RemoveAt(result.history.Count() - 1);
-
-
                 }
                 
 
