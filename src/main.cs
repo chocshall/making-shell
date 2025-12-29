@@ -16,7 +16,7 @@
             while (true)
             { 
                 Console.Write(StartInput);
-
+                 
                 string input = "";
                 int tabCount = 0;
                 int countForFoundSimilarFileNamesOnTabPresses = 0;
