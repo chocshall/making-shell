@@ -1096,8 +1096,15 @@ namespace src
                             inputLines.Add(s);
                         }
                     }
-                    inputLines.Remove("history");
-                    inputLines.Add("history");
+                    if (inputLines[0] == "history")
+                    {
+                        inputLines.RemoveAt(0);
+                    }
+                    if (inputLines[^1] != "history")
+                    {
+                        inputLines.Add("history");
+                    }
+                        
 
                 }
                 
