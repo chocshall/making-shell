@@ -253,6 +253,7 @@
 
                 }
                 Maker.inputLines.Add(input);
+
                 ConsoleOutput result = Maker.HandleConsoleLine(input);
 
                 if (!string.IsNullOrEmpty(result.output))

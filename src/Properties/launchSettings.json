@@ -1,7 +1,9 @@
 {
   "profiles": {
     "codecrafters-shell": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "environmentVariables": {
+      }
     },
     "WSL": {
       "commandName": "WSL2",

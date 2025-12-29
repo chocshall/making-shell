@@ -1084,6 +1084,23 @@ namespace src
         {
             if(splitInputList.Length == 1)
             {
+                string histFilePath = Environment.GetEnvironmentVariable("HISTFILE");
+                if (!string.IsNullOrEmpty(histFilePath))
+                {
+                    string[] readText = File.ReadAllLines(histFilePath);
+                    foreach (string s in readText)
+                    {
+                        if (!string.IsNullOrEmpty(s))
+                        {
+
+                            inputLines.Add(s);
+                        }
+                    }
+                    inputLines.Remove("history");
+                    inputLines.Add("history");
+
+                }
+                
                 return new ConsoleOutput { history = inputLines, limitHistory = 0, showHistory = true};
             }
             
