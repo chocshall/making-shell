@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -32,6 +33,7 @@ namespace src
 #if DEBUG
 
             splitPathList.Add($@"C:\cSharp\ConsoleApp1\bin\Debug\net9.0");
+            splitPathList.Add($@"C:\cSharp\newfile.txt");
 #endif
 
         }
@@ -52,11 +54,15 @@ namespace src
             string fileName = "";
             string operatorString = "";
 
-
-            var GettingFileNameAndOperator = GettingFileTextAndOperator(inputCommand, fileName, operatorString);
-            inputCommand = GettingFileNameAndOperator.Item1;
-            fileName = GettingFileNameAndOperator.Item2;
-            operatorString = GettingFileNameAndOperator.Item3;
+            if (!inputCommand.StartsWith("history"))
+            {
+                var GettingFileNameAndOperator = GettingFileTextAndOperator(inputCommand, fileName, operatorString);
+                inputCommand = GettingFileNameAndOperator.Item1;
+                fileName = GettingFileNameAndOperator.Item2;
+                operatorString = GettingFileNameAndOperator.Item3;
+            }
+            
+            
 
             splitInputList = inputCommand.Split(' ');
 
@@ -1080,7 +1086,30 @@ namespace src
             {
                 return new ConsoleOutput { history = inputLines, limitHistory = 0, showHistory = true};
             }
-            return new ConsoleOutput { history = inputLines, limitHistory = Convert.ToInt32(splitInputList[1]), showHistory = true};
+            
+            if(splitInputList.Length > 2 && splitInputList[1] == "-r")
+            {
+                string FullPathToReadFrom = splitInputList[2];
+                if (File.Exists(FullPathToReadFrom))
+                {
+                    string[] readText = File.ReadAllLines(FullPathToReadFrom);
+                    foreach (string s in readText)
+                    {
+                        if (!string.IsNullOrEmpty(s))
+                        {
+                           
+                            inputLines.Add(s);
+                        }
+                    }
+                }
+                return new ConsoleOutput { history = inputLines, flag = splitInputList[1], showHistory = false };
+               
+            }
+            if (splitInputList.Length == 2)
+            {
+                return new ConsoleOutput { history = inputLines, limitHistory = Convert.ToInt32(splitInputList[1]), showHistory = true };
+            }
+            return new ConsoleOutput();
         }
 
     }
