@@ -133,6 +133,11 @@ namespace src
         protected virtual void ExitCommand(string[] splitInputList, string inputCommand)
         {
             int exitNumber = 0;
+            string histFilePath = Environment.GetEnvironmentVariable("HISTFILE");
+            if (!string.IsNullOrEmpty(histFilePath))
+            {
+                File.WriteAllLines(histFilePath, inputLines);
+            }
             if (splitInputList[0] == "exit" && splitInputList.Length == 1)
             {
                 Environment.Exit(exitNumber);
