@@ -137,6 +137,7 @@ namespace src
             if (!string.IsNullOrEmpty(histFilePath))
             {
                 File.WriteAllLines(histFilePath, inputLines);
+               
             }
             if (splitInputList[0] == "exit" && splitInputList.Length == 1)
             {
@@ -1093,14 +1094,8 @@ namespace src
                 if (!string.IsNullOrEmpty(histFilePath))
                 {
                     string[] readText = File.ReadAllLines(histFilePath);
-                    foreach (string s in readText)
-                    {
-                        if (!string.IsNullOrEmpty(s))
-                        {
-
-                            inputLines.Add(s);
-                        }
-                    }
+                    inputLines.InsertRange(0, readText);
+                    
                     if (inputLines[0] == "history")
                     {
                         inputLines.RemoveAt(0);
