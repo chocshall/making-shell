@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -1087,23 +1088,43 @@ namespace src
                 return new ConsoleOutput { history = inputLines, limitHistory = 0, showHistory = true};
             }
             
-            if(splitInputList.Length > 2 && splitInputList[1] == "-r")
+            if(splitInputList.Length > 2)
             {
-                string FullPathToReadFrom = splitInputList[2];
-                if (File.Exists(FullPathToReadFrom))
+                string inputOfFullFilePath = splitInputList[2];
+                if (splitInputList[1] == "-r")
                 {
-                    string[] readText = File.ReadAllLines(FullPathToReadFrom);
-                    foreach (string s in readText)
+                    
+                    if (File.Exists(inputOfFullFilePath))
                     {
-                        if (!string.IsNullOrEmpty(s))
+                        string[] readText = File.ReadAllLines(inputOfFullFilePath);
+                        foreach (string s in readText)
                         {
-                           
-                            inputLines.Add(s);
+                            if (!string.IsNullOrEmpty(s))
+                            {
+
+                                inputLines.Add(s);
+                            }
                         }
                     }
+                    return new ConsoleOutput { history = inputLines, flag = splitInputList[1], showHistory = false };
                 }
-                return new ConsoleOutput { history = inputLines, flag = splitInputList[1], showHistory = false };
-               
+
+                if (splitInputList[1] == "-w")
+                {
+                    if (!File.Exists(inputOfFullFilePath))
+                    {
+                        
+                        File.WriteAllLines(inputOfFullFilePath, inputLines);
+                    }
+
+                    else
+                    {
+                        File.AppendAllLines(inputOfFullFilePath, inputLines);
+                    }
+                }
+
+
+
             }
             if (splitInputList.Length == 2)
             {
