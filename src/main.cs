@@ -45,7 +45,9 @@
                             // Backspace to clear current line
                             for (int i = 0; i < input.Length; i++)
                             {
-                                // first loop moves the cursor hello on o makes it a blank space hell(blank space) moves the cursor before the second l hell(here)
+                                // example with line : hello
+                                // first loop moves the cursor on o makes it a blank space hell(blank space)
+                                // the cursor is before the space so the second \b moves the cursor on the space
                                 Console.Write("\b \b");
                             }
                             // then we have $(cursor position)(however many blank spaces)
