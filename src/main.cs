@@ -1,4 +1,6 @@
-﻿namespace src
+﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
+namespace src
 {
     public class Program
     {
@@ -69,12 +71,9 @@
 
                     if (key.Key == ConsoleKey.DownArrow)
                     {
-                        if(linePostion >= 0)
+                        if(linePostion == Math.Max(0,linePostion))
                         {
-                            if(linePostion != 0)
-                            {
-                                linePostion--;
-                            }
+                            linePostion = Math.Max(0, --linePostion);
 
                             string previousCommand = "";
                             if (linePostion != 0)
@@ -93,13 +92,9 @@
 
                             Console.Write(previousCommand);
                             input = previousCommand;
-
+                            
                         }
 
-                        else
-                        {
-                            linePostion = 0;
-                        }
                     }
 
                     List<string> foundExecutablesList = new List<string>();
@@ -253,42 +248,249 @@
 
                 }
                 Maker.inputLines.Add(input);
-
-                ConsoleOutput result = Maker.HandleConsoleLine(input);
-
-                if (!string.IsNullOrEmpty(result.output))
+                if (input.Contains('|'))
                 {
-                    Maker.inputLinesThatRan.Add(input);
-
-                    Console.WriteLine(result.output);
-                }
-
-                if(result.HasError && !string.IsNullOrEmpty(result.error))
-                {
-                    Console.Error.WriteLine(result.error);
-                }
-
-                if (result.showHistory)
-                {
-                    if(result.limitHistory != 0)
+                    string[] checkIfAtlastTwoList = input.Split('|');
+                    if(checkIfAtlastTwoList.Length > 1 && RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                     {
-                        for (int i = result.history.Count() - result.limitHistory; i < result.history.Count(); i++)
+                        ProcessPipeCommand(input).Wait();
+                        
+                    }
+  
+                }
+                else
+                {
+                    ConsoleOutput result = Maker.HandleConsoleLine(input);
+
+                    if (!string.IsNullOrEmpty(result.output))
+                    {
+                        Maker.inputLinesThatRan.Add(input);
+
+                        Console.WriteLine(result.output);
+                    }
+
+                    if (result.HasError && !string.IsNullOrEmpty(result.error))
+                    {
+                        Maker.inputLinesThatRan.Add(input);
+                        Console.Error.WriteLine(result.error);
+                    }
+
+                    if (result.showHistory)
+                    {
+                        if (result.limitHistory != 0)
                         {
-                            Console.WriteLine($"    {i + 1}  {result.history[i]}");
+                            for (int i = result.history.Count() - result.limitHistory; i < result.history.Count(); i++)
+                            {
+                                Console.WriteLine($"    {i + 1}  {result.history[i]}");
+                            }
+                        }
+                        else
+                        {
+                            for (int i = result.limitHistory; i < result.history.Count(); i++)
+                            {
+                                Console.WriteLine($"    {i + 1}  {result.history[i]}");
+                            }
                         }
                     }
-                    else
-                    {
-                        for (int i = result.limitHistory; i < result.history.Count(); i++)
-                        {
-                            Console.WriteLine($"    {i + 1}  {result.history[i]}");
-                        }
-                    }
                 }
-                
 
             }
         }
+        // basically async Task is used so we could use pipes it doesnt block other procceses start sending or receiving data
+        // and can see errors
+        static async Task ProcessPipeCommand(string line)
+        {
+            string[] splitList = line.Split('|', StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < splitList.Length; i++)
+            {
+                splitList[i] = splitList[i].Trim();
+            }
+
+            List<Process> processesToStart = new List<Process>();
+
+            for (int i = 0; i < splitList.Length; i++)
+            {
+                // checks if cat is without arguments and if it is the first command then the variables becomes true
+                bool isCatWithoutFile = (splitList[i] == "cat" && i == 0);
+                // if command is first then sets its redirected input to false
+                bool needsInput = (i > 0);
+                if (isCatWithoutFile)
+                {
+                    needsInput = true;
+                }
+
+                Process process = new Process();
+
+                if (splitList[i].StartsWith("cat"))
+                {
+                    string argument = splitList[i].Substring(3).Trim();
+                    process.StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "cat",
+                        Arguments = argument,
+                        RedirectStandardInput = needsInput,
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+                }
+                else if (splitList[i].StartsWith("wc"))
+                {
+                    string argument = splitList[i].Substring(2).Trim();
+                    process.StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "wc",
+                        Arguments = argument,
+                        RedirectStandardInput = needsInput,
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+                }
+                else if (splitList[i].StartsWith("ls"))
+                {
+                    string argument = splitList[i].Substring(2).Trim();
+                    process.StartInfo = new ProcessStartInfo
+                    {
+
+                        FileName = "ls",
+                        Arguments = argument,
+                        // exception for ls the first command rule, it neved redirects stdinput
+                        RedirectStandardInput = false,
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+                }
+                else if (splitList[i].StartsWith("tail"))
+                {
+                    string argument = splitList[i].Substring(4).Trim();
+                    process.StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "tail",
+                        Arguments = argument,
+                        RedirectStandardInput = needsInput,
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+                }
+                else if (splitList[i].StartsWith("grep"))
+                {
+                    string argument = splitList[i].Substring(4).Trim();
+                    process.StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "grep",
+                        Arguments = argument,
+                        RedirectStandardInput = needsInput,
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+                }
+                else if (splitList[i].StartsWith("head"))
+                {
+                    string argument = splitList[i].Substring(4).Trim();
+                    process.StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "head",
+                        Arguments = argument,
+                        RedirectStandardInput = needsInput,
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+                }
+                processesToStart.Add(process);
+            }
+            // checks if there are at least two commands for a pipe
+            if (processesToStart.Count < 2)
+            {
+                return;
+            }
+
+            try
+            {
+              
+                foreach (var process in processesToStart)
+                {
+                    process.Start();
+                }
+
+               
+                var pipeTask = Task.Run(async () =>
+                {
+                    try
+                    {
+                        for (int i = 0; i < processesToStart.Count - 1; i++)
+                        {
+                            var sourceProcess = processesToStart[i];
+                            var destProcess = processesToStart[i + 1];
+                            // start copies a from the first to the second to the n output into that command input and immediately continues
+                            await sourceProcess.StandardOutput.BaseStream.CopyToAsync(
+                                destProcess.StandardInput.BaseStream);
+                            // closes the proccess that got the copy after the copying is done
+                            destProcess.StandardInput.Close();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                      
+                        Console.WriteLine($"Pipe error: {ex.Message}");
+                    }
+                });
+
+               
+                var readTask = Task.Run(async () =>
+                {
+                    try
+                    {
+                        var lastProcess = processesToStart.Last();
+                        var reader = lastProcess.StandardOutput;
+
+                        while (true)
+                        {
+                            // then we read line by line the output of the last proccess
+                            string lineOutput = await reader.ReadLineAsync();
+                            
+                            if (lineOutput == null) 
+                                break;
+
+                            Console.WriteLine(lineOutput);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Read error: {ex.Message}");
+                    }
+                });
+
+                await Task.WhenAll(pipeTask, readTask);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+            finally
+            {
+               
+                foreach (var process in processesToStart)
+                {
+                    try
+                    {
+                        if (!process.HasExited)
+                        {
+                            process.Kill();
+                            process.WaitForExit();
+                        }
+                        // lets finally use the resources that were used for all the proccesses again
+                        process.Dispose();
+                    }
+                    catch { }
+                }
+            }
+        }
+
     }
 }
 
