@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "codecrafters-shell": {
+      "commandName": "Project",
+      "environmentVariables": {
+      }
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
+    }
+  }
+}
